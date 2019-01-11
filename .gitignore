@@ -249,3 +249,5 @@ pip-selfcheck.json
 __pycache__/*
 
 config.yml
+
+*.db
