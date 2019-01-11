@@ -60,9 +60,8 @@ func RegistFeed(userID int64, sourceID uint) error {
 	db := getConnect()
 	defer db.Close()
 
-	if err := db.Where("user_id=? and source_id", userID, sourceID).Find(&subscribe).Error;
-		err != nil {
-		if (err.Error() == "record not found") {
+	if err := db.Where("user_id=? and source_id=?", userID, sourceID).Find(&subscribe).Error; err != nil {
+		if err.Error() == "record not found" {
 			subscribe.UserID = userID
 			subscribe.SourceID = sourceID
 			err := db.Create(&subscribe).Error
@@ -81,7 +80,7 @@ func FindOrNewSourceByUrl(url string) (*Source, error) {
 	defer db.Close()
 
 	if err := db.Where("link=?", url).Find(&source).Error; err != nil {
-		if (err.Error() == "record not found") {
+		if err.Error() == "record not found" {
 			source.Link = url
 
 			// parsing rss
