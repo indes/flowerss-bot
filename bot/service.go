@@ -20,3 +20,7 @@ func registFeed(chat *telebot.Chat, url string) {
 		msg, _ = B.Edit(msg, "订阅失败")
 	}
 }
+
+func SendError(c *telebot.Chat) {
+	B.Send(c, "请输入正确的指令！")
+}
