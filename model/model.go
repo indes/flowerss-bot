@@ -25,6 +25,9 @@ func init() {
 	if !db.HasTable(&Content{}) {
 		db.CreateTable(&Content{})
 	}
+	if !db.HasTable(&User{}) {
+		db.CreateTable(&User{})
+	}
 }
 
 func getConnect() *gorm.DB {
@@ -33,6 +36,12 @@ func getConnect() *gorm.DB {
 		panic("连接数据库失败")
 	}
 	return db
+}
+
+type User struct {
+	ID     int64    `gorm:"primary_key"`
+	Source []Source `gorm:"many2many:subscribes;"`
+	EditTime
 }
 
 type Source struct {
@@ -131,4 +140,16 @@ func (s *Source) appendContents(items []*rss.Item) error {
 	}
 
 	return nil
+}
+
+func GetSubscribeByUserID(userID int64) {
+
+}
+
+func FindOrInitUser(userID int64) *User {
+	db := getConnect()
+	defer db.Close()
+	var user = User{ID: userID}
+	db.FirstOrInit(&user, &user)
+	return &user
 }

@@ -1,7 +1,9 @@
 package bot
 
 import (
+	"fmt"
 	"github.com/indes/go-rssbot/config"
+	"github.com/indes/go-rssbot/model"
 	"golang.org/x/net/proxy"
 	tb "gopkg.in/tucnak/telebot.v2"
 	"log"
@@ -57,16 +59,16 @@ func register(b *tb.Bot) {
 
 func makeHandle(b *tb.Bot) {
 
-	b.Handle("/hello", func(m *tb.Message) {
-		log.Println(m.Text)
-		_, _ = b.Send(m.Sender, "hello world!")
+	b.Handle("/start", func(m *tb.Message) {
+		user := model.FindOrInitUser(m.Chat.ID)
+		_, _ = b.Send(m.Sender, fmt.Sprintf("hello, %d", user.ID))
 	})
 
 	b.Handle("/sub", func(m *tb.Message) {
 		//log.Fatal(m.Text)
 		msg := strings.Split(m.Text, " ")
 
-		if len(msg) > 2 {
+		if len(msg) != 2 {
 			SendError(m.Chat)
 		} else {
 			url := msg[1]
@@ -76,6 +78,11 @@ func makeHandle(b *tb.Bot) {
 				SendError(m.Chat)
 			}
 		}
+	})
+
+	b.Handle("/list", func(m *tb.Message) {
+
+		_, _ = b.Send(m.Sender, "hello world!")
 	})
 
 	b.Handle(tb.OnText, func(m *tb.Message) {
