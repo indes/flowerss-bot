@@ -2,6 +2,7 @@ package model
 
 import (
 	"github.com/SlyMarbo/rss"
+	tgp "github.com/indes/go-rssbot/tgraph"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
 	"log"
@@ -114,8 +115,9 @@ func FindOrNewSourceByUrl(url string) (*Source, error) {
 			source.ErrorCount = 0
 
 			// Get contents and insert
-			item := feed.Items
-			source.appendContents(item)
+			items := feed.Items
+			source.appendContents(items)
+			tgp.PublishItems(items)
 			db.Create(&source)
 			return &source, nil
 		}
