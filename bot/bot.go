@@ -1,7 +1,7 @@
 package bot
 
 import (
-	"github.com/indes/go-rssbot/bot/env"
+	"github.com/indes/go-rssbot/config"
 	"golang.org/x/net/proxy"
 	tb "gopkg.in/tucnak/telebot.v2"
 	"log"
@@ -11,8 +11,8 @@ import (
 )
 
 var (
-	botToken            = env.BotToken
-	socks5Proxy         = env.Socks5
+	botToken            = config.BotToken
+	socks5Proxy         = config.Socks5
 	B           *tb.Bot = nil
 )
 

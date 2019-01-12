@@ -27,6 +27,14 @@ func init() {
 	}
 }
 
+func getConnect() *gorm.DB {
+	db, err := gorm.Open("sqlite3", "data.db")
+	if err != nil {
+		panic("连接数据库失败")
+	}
+	return db
+}
+
 type Source struct {
 	ID         uint `gorm:"primary_key";"AUTO_INCREMENT"`
 	Link       string
@@ -37,6 +45,7 @@ type Source struct {
 }
 
 type Subscribe struct {
+	ID       uint `gorm:"primary_key";"AUTO_INCREMENT"`
 	UserID   int64
 	SourceID uint
 	EditTime
@@ -46,6 +55,7 @@ type Content struct {
 	SourceID     uint
 	HashID       string `gorm:"primary_key"`
 	RawLink      string
+	Title        string
 	TelegraphUrl string
 	EditTime
 }
@@ -93,6 +103,9 @@ func FindOrNewSourceByUrl(url string) (*Source, error) {
 			source.Title = feed.Title
 			source.ErrorCount = 0
 
+			// Get contents and insert
+			item := feed.Items
+			source.appendContents(item)
 			db.Create(&source)
 			return &source, nil
 		}
@@ -102,10 +115,18 @@ func FindOrNewSourceByUrl(url string) (*Source, error) {
 	return &source, nil
 }
 
-func getConnect() *gorm.DB {
-	db, err := gorm.Open("sqlite3", "data.db")
-	if err != nil {
-		panic("连接数据库失败")
+func (s *Source) appendContents(items []*rss.Item) error {
+	for _, item := range items {
+		var c = Content{
+			Title:        item.Title,
+			SourceID:     s.ID,
+			HashID:       item.Link,
+			RawLink:      item.Link,
+			TelegraphUrl: item.Link,
+		}
+
+		s.Content = append(s.Content, c)
 	}
-	return db
+
+	return nil
 }
