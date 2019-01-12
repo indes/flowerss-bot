@@ -142,14 +142,18 @@ func (s *Source) appendContents(items []*rss.Item) error {
 	return nil
 }
 
-func GetSubscribeByUserID(userID int64) {
-
+func GetSubscribeByUserID(userID int64) []Source {
+	db := getConnect()
+	defer db.Close()
+	user := FindOrInitUser(userID)
+	return user.Source
 }
 
 func FindOrInitUser(userID int64) *User {
 	db := getConnect()
 	defer db.Close()
-	var user = User{ID: userID}
-	db.FirstOrInit(&user, &user)
+	var user User
+	//db.FirstOrInit(User{ID: userID}, &user)
+	db.Where(User{ID: userID}).FirstOrCreate(&user)
 	return &user
 }
