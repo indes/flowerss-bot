@@ -13,6 +13,7 @@ require (
 	github.com/jinzhu/now v0.0.0-20181116074157-8ec929ed50c3 // indirect
 	github.com/lib/pq v1.0.0 // indirect
 	github.com/mattn/go-sqlite3 v1.10.0 // indirect
+	github.com/meinside/telegraph-go v0.0.2
 	github.com/pkg/errors v0.8.1 // indirect
 	github.com/spf13/viper v1.3.1
 	golang.org/x/net v0.0.0-20190110044637-be1c187aa6c6
