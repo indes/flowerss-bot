@@ -54,6 +54,7 @@ type Subscribe struct {
 type Content struct {
 	SourceID     uint
 	HashID       string `gorm:"primary_key"`
+	RawID        string
 	RawLink      string
 	Title        string
 	TelegraphUrl string
@@ -120,7 +121,8 @@ func (s *Source) appendContents(items []*rss.Item) error {
 		var c = Content{
 			Title:        item.Title,
 			SourceID:     s.ID,
-			HashID:       item.Link,
+			RawID:        item.ID,
+			HashID:       genHashID(s, item.ID),
 			RawLink:      item.Link,
 			TelegraphUrl: item.Link,
 		}
