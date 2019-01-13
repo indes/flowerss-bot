@@ -73,7 +73,7 @@ func makeHandle(b *tb.Bot) {
 		} else {
 			url := msg[1]
 			if CheckUrl(url) {
-				registFeed(m.Chat, url);
+				registFeed(m.Chat, url)
 			} else {
 				SendError(m.Chat)
 			}
@@ -85,7 +85,17 @@ func makeHandle(b *tb.Bot) {
 		_, _ = b.Send(m.Sender, "hello world!")
 	})
 
+	b.Handle("/ping", func(m *tb.Message) {
+
+		_, _ = b.Send(m.Sender, "pong")
+	})
 	b.Handle(tb.OnText, func(m *tb.Message) {
 
 	})
+}
+
+func BroadNews(subs []model.Subscribe, c *model.Content) error {
+	log.Println(subs)
+	log.Println(c)
+	return nil
 }

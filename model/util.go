@@ -1,9 +1,17 @@
 package model
 
-import "encoding/base64"
+import (
+	"encoding/hex"
+	"hash/fnv"
+)
 
-func genHashID(sid uint, id string) string {
-	idString := string(sid) + "||" + id
-	encoded := base64.StdEncoding.EncodeToString([]byte(idString))
+func genHashID(sLink string, id string) string {
+	idString := string(sLink) + "||" + id
+	f := fnv.New32()
+	f.Write([]byte(idString))
+
+	//encoded := base64.StdEncoding.EncodeToString([]byte(idString))
+	encoded := hex.EncodeToString(f.Sum(nil))
 	return encoded
+
 }
