@@ -2,10 +2,11 @@ package model
 
 import (
 	"github.com/SlyMarbo/rss"
-	tgp "github.com/indes/rssflow/tgraph"
+	"github.com/indes/rssflow/tgraph"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
 	"log"
+	"strings"
 	"time"
 )
 
@@ -117,7 +118,6 @@ func FindOrNewSourceByUrl(url string) (*Source, error) {
 			// Get contents and insert
 			items := feed.Items
 			source.appendContents(items)
-			tgp.PublishItems(items)
 			db.Create(&source)
 			return &source, nil
 		}
@@ -128,14 +128,23 @@ func FindOrNewSourceByUrl(url string) (*Source, error) {
 }
 
 func (s *Source) appendContents(items []*rss.Item) error {
+	//htmlRegexp := regexp.MustCompile(`^$`)
+
 	for _, item := range items {
+		//params := flysnowRegexp.FindStringSubmatch("http://www.flysnow.org/2018/01/20/golang-goquery-examples-selector.html")
+		tgpUrl := ""
+		if (item.Content != "") {
+			html := strings.Replace(item.Content, "<![CDATA[", "", -1)
+			html = strings.Replace(html, "]]>", "", -1)
+			tgpUrl = tgraph.PublishItem(item.Title,html)
+		}
 		var c = Content{
 			Title:        item.Title,
 			SourceID:     s.ID,
 			RawID:        item.ID,
 			HashID:       genHashID(s, item.ID),
+			TelegraphUrl: tgpUrl,
 			RawLink:      item.Link,
-			TelegraphUrl: item.Link,
 		}
 
 		s.Content = append(s.Content, c)
