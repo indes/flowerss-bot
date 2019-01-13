@@ -1,8 +1,8 @@
-package rss
+package task
 
 import (
+	"github.com/indes/rssflow/bot"
 	"github.com/indes/rssflow/model"
-	"log"
 	"time"
 )
 
@@ -15,11 +15,9 @@ func Update() {
 		sources := model.GetSources()
 		for _, source := range sources {
 			c, _ := source.GetNewContents()
-			log.Println(c)
+			subs := model.GetSubscriberBySource(&source)
+			bot.BroadNews(subs, c)
 		}
-		log.Println(len(sources))
-		//log.Println(time.Now())
-		time.Sleep(10 * time.Second)
-
+		time.Sleep(10 * time.Minute)
 	}
 }

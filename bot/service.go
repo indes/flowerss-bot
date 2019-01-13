@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/indes/rssflow/model"
 	"gopkg.in/tucnak/telebot.v2"
+	"log"
 )
 
 func registFeed(chat *telebot.Chat, url string) {
@@ -23,4 +24,17 @@ func registFeed(chat *telebot.Chat, url string) {
 
 func SendError(c *telebot.Chat) {
 	B.Send(c, "请输入正确的指令！")
+}
+
+func BroadNews(subs []model.Subscribe, contents []model.Content) error {
+	//bot.Start()
+	var u telebot.User
+	log.Println("Subs Len: ", len(subs), " Contents Len: ", len(contents))
+	for _, content := range contents {
+		for _, sub := range subs {
+			u.ID = int(sub.UserID)
+			B.Send(&u, content.TelegraphUrl)
+		}
+	}
+	return nil
 }
