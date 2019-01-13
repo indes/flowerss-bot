@@ -2,11 +2,9 @@ package model
 
 import (
 	"github.com/SlyMarbo/rss"
-	"github.com/indes/rssflow/tgraph"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
 	"log"
-	"strings"
 	"time"
 )
 
@@ -46,29 +44,10 @@ type User struct {
 	EditTime
 }
 
-type Source struct {
-	ID         uint `gorm:"primary_key";"AUTO_INCREMENT"`
-	Link       string
-	Title      string
-	ErrorCount uint
-	Content    []Content
-	EditTime
-}
-
 type Subscribe struct {
 	ID       uint `gorm:"primary_key";"AUTO_INCREMENT"`
 	UserID   int64
 	SourceID uint
-	EditTime
-}
-
-type Content struct {
-	SourceID     uint
-	HashID       string `gorm:"primary_key"`
-	RawID        string
-	RawLink      string
-	Title        string
-	TelegraphUrl string
 	EditTime
 }
 
@@ -125,32 +104,6 @@ func FindOrNewSourceByUrl(url string) (*Source, error) {
 	}
 
 	return &source, nil
-}
-
-func (s *Source) appendContents(items []*rss.Item) error {
-	//htmlRegexp := regexp.MustCompile(`^$`)
-
-	for _, item := range items {
-		//params := flysnowRegexp.FindStringSubmatch("http://www.flysnow.org/2018/01/20/golang-goquery-examples-selector.html")
-		tgpUrl := ""
-		if (item.Content != "") {
-			html := strings.Replace(item.Content, "<![CDATA[", "", -1)
-			html = strings.Replace(html, "]]>", "", -1)
-			tgpUrl = tgraph.PublishItem(item.Title,html)
-		}
-		var c = Content{
-			Title:        item.Title,
-			SourceID:     s.ID,
-			RawID:        item.ID,
-			HashID:       genHashID(s, item.ID),
-			TelegraphUrl: tgpUrl,
-			RawLink:      item.Link,
-		}
-
-		s.Content = append(s.Content, c)
-	}
-
-	return nil
 }
 
 func GetSubscribeByUserID(userID int64) []Source {
