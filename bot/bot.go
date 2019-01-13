@@ -2,8 +2,8 @@ package bot
 
 import (
 	"fmt"
-	"github.com/indes/go-rssbot/config"
-	"github.com/indes/go-rssbot/model"
+	"github.com/indes/rssflow/config"
+	"github.com/indes/rssflow/model"
 	"golang.org/x/net/proxy"
 	tb "gopkg.in/tucnak/telebot.v2"
 	"log"

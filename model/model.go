@@ -2,7 +2,7 @@ package model
 
 import (
 	"github.com/SlyMarbo/rss"
-	tgp "github.com/indes/go-rssbot/tgraph"
+	tgp "github.com/indes/rssflow/tgraph"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
 	"log"

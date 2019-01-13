@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/indes/go-rssbot/bot"
-	_ "github.com/indes/go-rssbot/tgraph"
+	"github.com/indes/rssflow/bot"
+	_ "github.com/indes/rssflow/tgraph"
 )
 
 func main() {

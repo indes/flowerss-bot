@@ -2,7 +2,7 @@ package bot
 
 import (
 	"fmt"
-	"github.com/indes/go-rssbot/model"
+	"github.com/indes/rssflow/model"
 	"gopkg.in/tucnak/telebot.v2"
 )
 
