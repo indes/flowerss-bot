@@ -32,3 +32,12 @@ func GetSubscribeByUserID(userID int64) []Source {
 	user := FindOrInitUser(userID)
 	return user.Source
 }
+
+func getSubscriberBySource(s *Source) []Subscribe {
+	db := getConnect()
+	defer db.Close()
+	var subs []Subscribe
+
+	db.Where("source_id=?", s.ID).Find(&subs)
+	return subs
+}

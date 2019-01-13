@@ -16,7 +16,7 @@ type Source struct {
 
 func (s *Source) appendContents(items []*rss.Item) error {
 	for _, item := range items {
-		c, _ := getContentByFeedItem(s.ID, item)
+		c, _ := getContentByFeedItem(s, item)
 		s.Content = append(s.Content, c)
 	}
 
@@ -52,4 +52,34 @@ func FindOrNewSourceByUrl(url string) (*Source, error) {
 	}
 
 	return &source, nil
+}
+
+func GetSources() []Source {
+	var sources []Source
+
+	db := getConnect()
+	defer db.Close()
+	db.Find(&sources)
+	return sources
+}
+
+func (s *Source) GetNewContents() ([]Content, error) {
+	var contents []Content
+	feed, err := rss.Fetch(s.Link)
+	if err != nil {
+		log.Println("Unable to make request: ", err)
+		return nil, err
+	}
+
+	items := feed.Items
+
+	for _, item := range items {
+		c, isBroad, _ := GenContentAndCheckByFeedItem(s, item)
+		if isBroad {
+			subs := getSubscriberBySource(s)
+			log.Println(subs)
+		}
+		log.Println(c, isBroad)
+	}
+	return contents, nil
 }

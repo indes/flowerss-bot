@@ -16,7 +16,7 @@ type Content struct {
 	EditTime
 }
 
-func getContentByFeedItem(sid uint, item *rss.Item) (Content, error) {
+func getContentByFeedItem(source *Source, item *rss.Item) (Content, error) {
 	tgpUrl := ""
 
 	html := item.Content
@@ -30,12 +30,32 @@ func getContentByFeedItem(sid uint, item *rss.Item) (Content, error) {
 
 	var c = Content{
 		Title:        item.Title,
-		SourceID:     sid,
+		SourceID:     source.ID,
 		RawID:        item.ID,
-		HashID:       genHashID(sid, item.ID),
+		HashID:       genHashID(source.Link, item.ID),
 		TelegraphUrl: tgpUrl,
 		RawLink:      item.Link,
 	}
 
 	return c, nil
+}
+
+func GenContentAndCheckByFeedItem(s *Source, item *rss.Item) (*Content, bool, error) {
+	db := getConnect()
+	defer db.Close()
+	var (
+		content   Content
+		isBroaded bool
+	)
+
+	hashID := genHashID(s.Link, item.ID)
+	db.Where("hash_id=?", hashID).First(&content)
+	if content.HashID == "" {
+		isBroaded = false
+		content, _ = getContentByFeedItem(s, item)
+	} else {
+		isBroaded = true
+	}
+
+	return &content, isBroaded, nil
 }
