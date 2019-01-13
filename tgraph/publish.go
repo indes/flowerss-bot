@@ -1,7 +1,6 @@
 package tgraph
 
 import (
-	"fmt"
 	"log"
 )
 
@@ -13,16 +12,13 @@ func PublishItem(title string, html string) string {
 }
 
 func PublisHtml(title string, html string) (string, error) {
-	//log.Println(html)
+
 	// CreatePage
 	if page, err := client.CreatePageWithHTML(title, authorName, authorUrl, html, true); err == nil {
-		//log.Printf("> CreatePage result: %#+v", page)
-		log.Printf("> Created page url: %s", page.URL)
-
-		fmt.Println(page)
+		log.Printf("Created telegraph page url: %s", page.URL)
 		return page.URL, err
 	} else {
-		log.Printf("* CreatePage error: %s", err)
+		log.Printf("Create telegraph page error: %s", err)
 		return "", nil
 	}
 }
