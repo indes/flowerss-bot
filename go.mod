@@ -1,4 +1,4 @@
-module github.com/indes/go-rssbot
+module github.com/indes/rssflow
 
 require (
 	github.com/BurntSushi/toml v0.3.1 // indirect
