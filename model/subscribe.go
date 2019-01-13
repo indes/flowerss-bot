@@ -33,7 +33,7 @@ func GetSubscribeByUserID(userID int64) []Source {
 	return user.Source
 }
 
-func getSubscriberBySource(s *Source) []Subscribe {
+func GetSubscriberBySource(s *Source) []Subscribe {
 	db := getConnect()
 	defer db.Close()
 	var subs []Subscribe

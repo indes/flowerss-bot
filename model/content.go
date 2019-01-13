@@ -53,6 +53,7 @@ func GenContentAndCheckByFeedItem(s *Source, item *rss.Item) (*Content, bool, er
 	if content.HashID == "" {
 		isBroaded = false
 		content, _ = getContentByFeedItem(s, item)
+		db.Save(&content)
 	} else {
 		isBroaded = true
 	}

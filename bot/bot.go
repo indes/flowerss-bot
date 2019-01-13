@@ -46,15 +46,8 @@ func init() {
 }
 
 func Start() {
-
-	register(B)
 	makeHandle(B)
-
 	B.Start()
-}
-
-func register(b *tb.Bot) {
-
 }
 
 func makeHandle(b *tb.Bot) {
@@ -92,10 +85,4 @@ func makeHandle(b *tb.Bot) {
 	b.Handle(tb.OnText, func(m *tb.Message) {
 
 	})
-}
-
-func BroadNews(subs []model.Subscribe, c *model.Content) error {
-	log.Println(subs)
-	log.Println(c)
-	return nil
 }

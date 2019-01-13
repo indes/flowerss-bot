@@ -2,10 +2,10 @@ package main
 
 import (
 	"github.com/indes/rssflow/bot"
-	"github.com/indes/rssflow/rss"
+	"github.com/indes/rssflow/task"
 )
 
 func main() {
-	go rss.Update()
+	go task.Update()
 	bot.Start()
 }

@@ -32,7 +32,7 @@ func FindOrNewSourceByUrl(url string) (*Source, error) {
 		if err.Error() == "record not found" {
 			source.Link = url
 
-			// parsing rss
+			// parsing task
 			feed, err := rss.Fetch(url)
 			if err != nil {
 				log.Println("Unable to make request: ", err)
@@ -64,7 +64,7 @@ func GetSources() []Source {
 }
 
 func (s *Source) GetNewContents() ([]Content, error) {
-	var contents []Content
+	var newContents []Content
 	feed, err := rss.Fetch(s.Link)
 	if err != nil {
 		log.Println("Unable to make request: ", err)
@@ -75,11 +75,9 @@ func (s *Source) GetNewContents() ([]Content, error) {
 
 	for _, item := range items {
 		c, isBroad, _ := GenContentAndCheckByFeedItem(s, item)
-		if isBroad {
-			subs := getSubscriberBySource(s)
-			log.Println(subs)
+		if !isBroad {
+			newContents = append(newContents, *c)
 		}
-		log.Println(c, isBroad)
 	}
-	return contents, nil
+	return newContents, nil
 }
