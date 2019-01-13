@@ -21,28 +21,43 @@ var (
 func init() {
 	log.Printf("Token: %s Proxy: %s\n", botToken, socks5Proxy)
 
-	// creat bot
-	dialer, err := proxy.SOCKS5("tcp", socks5Proxy, nil, proxy.Direct)
-	if err != nil {
-		log.Fatal("Error creating dialer, aborting.")
+	if socks5Proxy != "" {
+		dialer, err := proxy.SOCKS5("tcp", socks5Proxy, nil, proxy.Direct)
+		if err != nil {
+			log.Fatal("Error creating dialer, aborting.")
+		}
+
+		httpTransport := &http.Transport{}
+		httpClient := &http.Client{Transport: httpTransport}
+		httpTransport.Dial = dialer.Dial
+
+		// creat bot
+		B, err = tb.NewBot(tb.Settings{
+			Token: botToken,
+			// You can also set custom API URL. If field is empty it equals to "https://api.telegram.org"
+			// URL:    "http://195.129.111.17:8012",
+			Poller: &tb.LongPoller{Timeout: 10 * time.Second},
+			Client: httpClient,
+		})
+
+		if err != nil {
+			log.Fatal(err)
+			return
+		}
+	} else {
+		var err error
+		B, err = tb.NewBot(tb.Settings{
+			Token: botToken,
+			// You can also set custom API URL. If field is empty it equals to "https://api.telegram.org"
+			// URL:    "http://195.129.111.17:8012",
+			Poller: &tb.LongPoller{Timeout: 10 * time.Second},
+		})
+		if err != nil {
+			log.Fatal(err)
+			return
+		}
 	}
 
-	httpTransport := &http.Transport{}
-	httpClient := &http.Client{Transport: httpTransport}
-	httpTransport.Dial = dialer.Dial
-
-	B, err = tb.NewBot(tb.Settings{
-		Token: botToken,
-		// You can also set custom API URL. If field is empty it equals to "https://api.telegram.org"
-		// URL:    "http://195.129.111.17:8012",
-		Poller: &tb.LongPoller{Timeout: 10 * time.Second},
-		Client: httpClient,
-	})
-
-	if err != nil {
-		log.Fatal(err)
-		return
-	}
 }
 
 func Start() {
