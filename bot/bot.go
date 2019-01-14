@@ -88,10 +88,14 @@ func makeHandle() {
 	B.Handle("/list", func(m *tb.Message) {
 		sources, _ := model.GetSourcesByUserID(m.Sender.ID)
 		log.Println(sources)
+		message := "目前的订阅源：\n"
 		for index, source := range sources {
-			_, _ = B.Send(m.Sender, fmt.Sprintf("%d - %s", index+1, source.Title))
-
+			message = message + fmt.Sprintf("%d - [%s](%s)\n", index+1, source.Title, source.Link)
 		}
+		_, _ = B.Send(m.Sender, message, &tb.SendOptions{
+			ParseMode: tb.ModeMarkdown,
+		})
+
 	})
 
 	B.Handle("/unsub", func(m *tb.Message) {
