@@ -5,6 +5,6 @@ import (
 )
 
 func main() {
-	//go task.Update()
+	go task.Update()
 	bot.Start()
 }
