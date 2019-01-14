@@ -10,13 +10,12 @@ import (
 func registFeed(chat *telebot.Chat, url string) {
 	msg, _ := B.Send(chat, "处理中...")
 
-	k, _ := model.FindOrNewSourceByUrl(url)
-	err := model.RegistFeed(chat.ID, k.ID)
-
-	fmt.Println(k)
+	source, _ := model.FindOrNewSourceByUrl(url)
+	err := model.RegistFeed(chat.ID, source.ID)
+	log.Printf("%d subscribe %s %s", chat.ID, source.Title, source.Link)
 
 	if err == nil {
-		msg, _ = B.Edit(msg, fmt.Sprintf("<%s> 订阅成功", k.Title))
+		msg, _ = B.Edit(msg, fmt.Sprintf("<%s> 订阅成功", source.Title))
 	} else {
 		msg, _ = B.Edit(msg, "订阅失败")
 	}
