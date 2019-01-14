@@ -25,14 +25,24 @@ func SendError(c *telebot.Chat) {
 	B.Send(c, "请输入正确的指令！")
 }
 
-func BroadNews(subs []model.Subscribe, contents []model.Content) error {
-	//bot.Start()
+func BroadNews(source *model.Source, subs []model.Subscribe, contents []model.Content) error {
+	//log.Println("Subs Len: ", len(subs), " Contents Len: ", len(contents))
+	log.Printf("Source Title: <%s> Subscriber: %d New Contents: %d", source.Title, len(subs), len(contents))
 	var u telebot.User
-	log.Println("Subs Len: ", len(subs), " Contents Len: ", len(contents))
 	for _, content := range contents {
 		for _, sub := range subs {
 			u.ID = int(sub.UserID)
-			B.Send(&u, content.TelegraphUrl)
+			message := `
+*%s*
+%s
+[原文](%s)
+[Telegraph](%s)
+`
+			message = fmt.Sprintf(message, source.Title, content.Title, content.RawLink, content.TelegraphUrl)
+
+			_, _ = B.Send(&u, message, telebot.SendOptions{
+				ParseMode: telebot.ModeMarkdown,
+			})
 		}
 	}
 	return nil

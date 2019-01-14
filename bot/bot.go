@@ -126,6 +126,20 @@ func makeHandle() {
 		_, _ = B.Send(m.Sender, "pong")
 	})
 
+	B.Handle("/test", func(m *tb.Message) {
+
+		message := `
+*bold text*
+_italic text_
+[inline URL](http://www.example.com/)
+[inline mention of a user](tg://user?id=123456789)
+`
+
+		_, err := B.Send(m.Sender, message, &tb.SendOptions{
+			ParseMode: tb.ModeMarkdown,
+		})
+		log.Println(err)
+	})
 	B.Handle(tb.OnText, func(m *tb.Message) {
 
 	})
