@@ -94,3 +94,19 @@ func (s *Source) GetNewContents() ([]Content, error) {
 	}
 	return newContents, nil
 }
+
+func GetSourcesByUserID(userID int) ([]Source, error) {
+	db := getConnect()
+	defer db.Close()
+	var sources []Source
+	subs := GetSubsByUserID(userID)
+	for _, sub := range subs {
+		var source Source
+		db.Where("id=?", sub.SourceID).First(&source)
+		if source.ID == sub.SourceID {
+			sources = append(sources, source)
+		}
+	}
+
+	return sources, nil
+}
