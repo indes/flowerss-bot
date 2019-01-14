@@ -73,9 +73,28 @@ func GetSources() []Source {
 	db := getConnect()
 	defer db.Close()
 	db.Find(&sources)
+
 	return sources
 }
 
+func GetSubscribedSources() []Source {
+	var subscribedSources []Source
+	sources := GetSources()
+	for _, source := range sources {
+		if source.IsSubscribed() {
+			subscribedSources = append(subscribedSources, source)
+		}
+	}
+	return subscribedSources
+}
+
+func (s *Source) IsSubscribed() bool {
+	db := getConnect()
+	defer db.Close()
+	var sub Subscribe
+	db.Where("source_id=?", s.ID).First(&sub)
+	return sub.SourceID == s.ID
+}
 func (s *Source) GetNewContents() ([]Content, error) {
 	var newContents []Content
 	feed, err := rss.Fetch(s.Link)

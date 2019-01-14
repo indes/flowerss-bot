@@ -12,11 +12,11 @@ func init() {
 
 func Update() {
 	for {
-		sources := model.GetSources()
+		sources := model.GetSubscribedSources()
 		for _, source := range sources {
 			c, _ := source.GetNewContents()
 			subs := model.GetSubscriberBySource(&source)
-			bot.BroadNews(subs, c)
+			bot.BroadNews(&source, subs, c)
 		}
 		time.Sleep(10 * time.Minute)
 	}
