@@ -55,3 +55,14 @@ func UnsubByUserIDAndSource(userID int, source *Source) error {
 	db.Delete(&sub)
 	return nil
 }
+
+func GetSubsByUserID(userID int) []Subscribe {
+	db := getConnect()
+	defer db.Close()
+
+	var subs []Subscribe
+
+	db.Where("user_id=?", userID).Find(&subs)
+
+	return subs
+}

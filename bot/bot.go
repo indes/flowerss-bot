@@ -86,8 +86,12 @@ func makeHandle() {
 	})
 
 	B.Handle("/list", func(m *tb.Message) {
+		sources, _ := model.GetSourcesByUserID(m.Sender.ID)
+		log.Println(sources)
+		for index, source := range sources {
+			_, _ = B.Send(m.Sender, fmt.Sprintf("%d - %s", index+1, source.Title))
 
-		_, _ = B.Send(m.Sender, "hello world!")
+		}
 	})
 
 	B.Handle("/unsub", func(m *tb.Message) {
