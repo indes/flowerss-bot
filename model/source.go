@@ -23,6 +23,19 @@ func (s *Source) appendContents(items []*rss.Item) error {
 	return nil
 }
 
+func GetSourceByUrl(url string) (*Source, error) {
+	var source Source
+	db := getConnect()
+	defer db.Close()
+	if err := db.Where("link=?", url).Find(&source).Error; err != nil {
+		if err.Error() == "record not found" {
+			return nil, err
+		}
+		return nil, err
+	}
+	return &source, nil
+}
+
 func FindOrNewSourceByUrl(url string) (*Source, error) {
 	var source Source
 	db := getConnect()

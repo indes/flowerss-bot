@@ -1,5 +1,7 @@
 package model
 
+import "errors"
+
 type Subscribe struct {
 	ID       uint `gorm:"primary_key";"AUTO_INCREMENT"`
 	UserID   int64
@@ -40,4 +42,16 @@ func GetSubscriberBySource(s *Source) []Subscribe {
 
 	db.Where("source_id=?", s.ID).Find(&subs)
 	return subs
+}
+
+func UnsubByUserIDAndSource(userID int, source *Source) error {
+	db := getConnect()
+	defer db.Close()
+	var sub Subscribe
+	db.Where("user_id=? and source_id=?", userID, source.ID).First(&sub)
+	if sub.UserID != int64(userID) {
+		return errors.New("未订阅该RSS源")
+	}
+	db.Delete(&sub)
+	return nil
 }

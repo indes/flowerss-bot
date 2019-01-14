@@ -33,9 +33,7 @@ func init() {
 
 		// creat bot
 		B, err = tb.NewBot(tb.Settings{
-			Token: botToken,
-			// You can also set custom API URL. If field is empty it equals to "https://api.telegram.org"
-			// URL:    "http://195.129.111.17:8012",
+			Token:  botToken,
 			Poller: &tb.LongPoller{Timeout: 10 * time.Second},
 			Client: httpClient,
 		})
@@ -46,10 +44,9 @@ func init() {
 		}
 	} else {
 		var err error
+		// creat bot
 		B, err = tb.NewBot(tb.Settings{
-			Token: botToken,
-			// You can also set custom API URL. If field is empty it equals to "https://api.telegram.org"
-			// URL:    "http://195.129.111.17:8012",
+			Token:  botToken,
 			Poller: &tb.LongPoller{Timeout: 10 * time.Second},
 		})
 		if err != nil {
@@ -61,19 +58,19 @@ func init() {
 }
 
 func Start() {
-	makeHandle(B)
+	makeHandle()
 	B.Start()
 }
 
-func makeHandle(b *tb.Bot) {
+func makeHandle() {
 
-	b.Handle("/start", func(m *tb.Message) {
+	B.Handle("/start", func(m *tb.Message) {
 		user := model.FindOrInitUser(m.Chat.ID)
-		_, _ = b.Send(m.Sender, fmt.Sprintf("hello, %d", user.ID))
+		_, _ = B.Send(m.Sender, fmt.Sprintf("hello, %d", user.ID))
 	})
 
-	b.Handle("/sub", func(m *tb.Message) {
-		//log.Fatal(m.Text)
+	B.Handle("/sub", func(m *tb.Message) {
+
 		msg := strings.Split(m.Text, " ")
 
 		if len(msg) != 2 {
@@ -88,16 +85,44 @@ func makeHandle(b *tb.Bot) {
 		}
 	})
 
-	b.Handle("/list", func(m *tb.Message) {
+	B.Handle("/list", func(m *tb.Message) {
 
-		_, _ = b.Send(m.Sender, "hello world!")
+		_, _ = B.Send(m.Sender, "hello world!")
 	})
 
-	b.Handle("/ping", func(m *tb.Message) {
+	B.Handle("/unsub", func(m *tb.Message) {
+		msg := strings.Split(m.Text, " ")
+		B.Send(m.Sender, m.Text)
 
-		_, _ = b.Send(m.Sender, "pong")
+		if len(msg) != 2 {
+			SendError(m.Chat)
+		} else {
+			url := msg[1]
+			if CheckUrl(url) {
+				source, _ := model.GetSourceByUrl(url)
+				if source == nil {
+					_, _ = B.Send(m.Sender, "未订阅该RSS源")
+				} else {
+					err := model.UnsubByUserIDAndSource(m.Sender.ID, source)
+					if err == nil {
+						_, _ = B.Send(m.Sender, "退定成功！")
+					} else {
+						_, err = B.Send(m.Sender, err.Error())
+					}
+				}
+			} else {
+				SendError(m.Chat)
+			}
+		}
+
 	})
-	b.Handle(tb.OnText, func(m *tb.Message) {
+
+	B.Handle("/ping", func(m *tb.Message) {
+
+		_, _ = B.Send(m.Sender, "pong")
+	})
+
+	B.Handle(tb.OnText, func(m *tb.Message) {
 
 	})
 }
