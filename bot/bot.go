@@ -13,13 +13,13 @@ import (
 )
 
 var (
-	botToken            = config.BotToken
-	socks5Proxy         = config.Socks5
-	B           *tb.Bot = nil
+	botToken    = config.BotToken
+	socks5Proxy = config.Socks5
+	//B bot
+	B *tb.Bot
 )
 
 func init() {
-
 	log.Printf("Token: %s Proxy: %s\n", botToken, socks5Proxy)
 
 	if socks5Proxy != "" {
@@ -58,6 +58,7 @@ func init() {
 
 }
 
+//Start run bot
 func Start() {
 	makeHandle()
 	B.Start()
@@ -132,7 +133,6 @@ func makeHandle() {
 	})
 
 	B.Handle("/test", func(m *tb.Message) {
-
 		message := `
 *bold text*
 _italic text_

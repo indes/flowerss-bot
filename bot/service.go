@@ -21,22 +21,24 @@ func registFeed(chat *telebot.Chat, url string) {
 	log.Printf("%d subscribe [%d]%s %s", chat.ID, source.ID, source.Title, source.Link)
 
 	if err == nil {
-		msg, _ = B.Edit(msg, fmt.Sprintf(" [%s](%s) 订阅成功", source.Title, source.Link),
+		_, _ = B.Edit(msg, fmt.Sprintf(" [%s](%s) 订阅成功", source.Title, source.Link),
 			&telebot.SendOptions{
 				DisableWebPagePreview: true,
 				ParseMode:             telebot.ModeMarkdown,
 			})
 	} else {
-		msg, _ = B.Edit(msg, "订阅失败")
+		_, _ = B.Edit(msg, "订阅失败")
 	}
 }
 
+//SendError send error user
 func SendError(c *telebot.Chat) {
 	B.Send(c, "请输入正确的指令！")
 }
 
+//BroadNews send new contents message to subscriber
 func BroadNews(source *model.Source, subs []model.Subscribe, contents []model.Content) error {
-	//log.Println("Subs Len: ", len(subs), " Contents Len: ", len(contents))
+
 	log.Printf("Source Title: <%s> Subscriber: %d New Contents: %d", source.Title, len(subs), len(contents))
 	var u telebot.User
 	for _, content := range contents {

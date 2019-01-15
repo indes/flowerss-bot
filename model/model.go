@@ -3,12 +3,10 @@ package model
 import (
 	"github.com/indes/rssflow/config"
 	"github.com/jinzhu/gorm"
-	_ "github.com/jinzhu/gorm/dialects/mysql"
+	_ "github.com/jinzhu/gorm/dialects/mysql" //mysql driver
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
 	"time"
 )
-
-var ()
 
 func init() {
 	db := getConnect()
@@ -38,16 +36,16 @@ func getConnect() *gorm.DB {
 			panic("连接数据库失败")
 		}
 		return db
-	} else {
-		db, err := gorm.Open("sqlite3", "data.db")
-		if err != nil {
-			panic("连接数据库失败")
-		}
-		return db
 	}
 
+	db, err := gorm.Open("sqlite3", "data.db")
+	if err != nil {
+		panic("连接数据库失败")
+	}
+	return db
 }
 
+//EditTime timestamp
 type EditTime struct {
 	CreatedAt time.Time
 	UpdatedAt time.Time
