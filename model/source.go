@@ -101,9 +101,12 @@ func (s *Source) GetNewContents() ([]Content, error) {
 	var newContents []Content
 	feed, err := rss.Fetch(s.Link)
 	if err != nil {
-		log.Println("Unable to make request: ", err)
+		log.Println("Unable to make request: ", err, " ", s.Link)
+		s.AddErrorCount()
 		return nil, err
 	}
+
+	s.EraseErrorCount()
 
 	items := feed.Items
 
@@ -130,4 +133,20 @@ func GetSourcesByUserID(userID int) ([]Source, error) {
 	}
 
 	return sources, nil
+}
+func (s *Source) AddErrorCount() {
+	s.ErrorCount++
+	s.Save()
+}
+
+func (s *Source) EraseErrorCount() {
+	s.ErrorCount = 0
+	s.Save()
+}
+
+func (s *Source) Save() {
+	db := getConnect()
+	defer db.Close()
+	db.Save(&s)
+	return
 }
