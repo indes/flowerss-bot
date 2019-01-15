@@ -46,14 +46,16 @@ func BroadNews(source *model.Source, subs []model.Subscribe, contents []model.Co
 *%s*
 %s
 [原文](%s)
-[Telegraph](%s)
+%s
 `
 			message = fmt.Sprintf(message, source.Title, content.Title, content.RawLink, content.TelegraphUrl)
 
 			_, err := B.Send(&u, message, &telebot.SendOptions{
 				ParseMode: telebot.ModeMarkdown,
 			})
-			log.Println(err)
+			if err != nil {
+				log.Println(err)
+			}
 		}
 	}
 	return nil
