@@ -10,7 +10,7 @@ var (
 	BotToken    string
 	Socks5      string
 	Mysql       MysqlConfig
-	EnableMysql bool = false
+	EnableMysql bool
 )
 
 type MysqlConfig struct {
@@ -25,14 +25,12 @@ func init() {
 	projectName := "rssflow"
 
 	viper.SetConfigName("config") // name of config file (without extension)
-
 	viper.AddConfigPath(".")
-
 	viper.AddConfigPath(fmt.Sprintf("$HOME/.%s", projectName))              // call multiple times to add many search paths
 	viper.AddConfigPath(fmt.Sprintf("/data/docker/config/%s", projectName)) // path to look for the config file in
 
 	err := viper.ReadInConfig() // Find and read the config file
-	if err != nil { // Handle errors reading the config file
+	if err != nil {             // Handle errors reading the config file
 		panic(fmt.Errorf("Fatal error config file: %s", err))
 	}
 
@@ -49,6 +47,8 @@ func init() {
 
 	if Mysql.Host != "" {
 		EnableMysql = true
+	} else {
+		EnableMysql = false
 	}
 }
 
@@ -62,7 +62,5 @@ func GetMysqlConnectingString() string {
 	pwd := viper.GetString("mysql.password")
 	host := viper.GetString("mysql.host")
 	db := viper.GetString("mysql.database")
-
-
 	return fmt.Sprintf("%s:%s@tcp(%s:3306)/%s?charset=utf8&parseTime=true", usr, pwd, host, db)
 }
