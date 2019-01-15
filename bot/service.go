@@ -21,7 +21,11 @@ func registFeed(chat *telebot.Chat, url string) {
 	log.Printf("%d subscribe [%d]%s %s", chat.ID, source.ID, source.Title, source.Link)
 
 	if err == nil {
-		msg, _ = B.Edit(msg, fmt.Sprintf("<%s> 订阅成功", source.Title))
+		msg, _ = B.Edit(msg, fmt.Sprintf(" [%s](%s) 订阅成功", source.Title, source.Link),
+			&telebot.SendOptions{
+				DisableWebPagePreview: true,
+				ParseMode:             telebot.ModeMarkdown,
+			})
 	} else {
 		msg, _ = B.Edit(msg, "订阅失败")
 	}
