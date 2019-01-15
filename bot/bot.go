@@ -19,6 +19,7 @@ var (
 )
 
 func init() {
+
 	log.Printf("Token: %s Proxy: %s\n", botToken, socks5Proxy)
 
 	if socks5Proxy != "" {
@@ -87,7 +88,7 @@ func makeHandle() {
 
 	B.Handle("/list", func(m *tb.Message) {
 		sources, _ := model.GetSourcesByUserID(m.Sender.ID)
-		
+
 		message := "目前的订阅源：\n"
 		for index, source := range sources {
 			message = message + fmt.Sprintf("[[%d]] [%s](%s)\n", index+1, source.Title, source.Link)

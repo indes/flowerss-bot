@@ -1,7 +1,9 @@
 package model
 
 import (
+	"github.com/indes/rssflow/config"
 	"github.com/jinzhu/gorm"
+	_ "github.com/jinzhu/gorm/dialects/mysql"
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
 	"time"
 )
@@ -29,11 +31,21 @@ func init() {
 }
 
 func getConnect() *gorm.DB {
-	db, err := gorm.Open("sqlite3", "data.db")
-	if err != nil {
-		panic("连接数据库失败")
+	if config.EnableMysql {
+		clientConfig := config.GetMysqlConnectingString()
+		db, err := gorm.Open("mysql", clientConfig)
+		if err != nil {
+			panic("连接数据库失败")
+		}
+		return db
+	} else {
+		db, err := gorm.Open("sqlite3", "data.db")
+		if err != nil {
+			panic("连接数据库失败")
+		}
+		return db
 	}
-	return db
+
 }
 
 type EditTime struct {
