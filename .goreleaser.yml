@@ -2,7 +2,6 @@ project_name: rssflow
 before:
   hooks:
     - go mod download
-    - go generate ./...
 builds:
 - env:
   - CGO_ENABLED=0
@@ -10,7 +9,6 @@ builds:
     - linux
     - darwin
     - windows
-
   goarch:
     - 386
     - amd64
