@@ -1,6 +1,7 @@
 package model
 
 import (
+	"errors"
 	"github.com/SlyMarbo/rss"
 	"log"
 )
@@ -15,11 +16,13 @@ type Source struct {
 }
 
 func (s *Source) appendContents(items []*rss.Item) error {
+	db := getConnect()
+	defer db.Close()
 	for _, item := range items {
 		c, _ := getContentByFeedItem(s, item)
 		s.Content = append(s.Content, c)
 	}
-
+	db.Save(&s)
 	return nil
 }
 
@@ -48,8 +51,7 @@ func FindOrNewSourceByUrl(url string) (*Source, error) {
 			// parsing task
 			feed, err := rss.Fetch(url)
 			if err != nil {
-				log.Println("Unable to make request: ", err)
-				return nil, err
+				return nil, errors.New("Feed 抓取错误")
 			}
 
 			source.Title = feed.Title
@@ -57,8 +59,8 @@ func FindOrNewSourceByUrl(url string) (*Source, error) {
 
 			// Get contents and insert
 			items := feed.Items
-			source.appendContents(items)
 			db.Create(&source)
+			go source.appendContents(items)
 			return &source, nil
 		}
 		return nil, err
