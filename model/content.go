@@ -2,6 +2,7 @@ package model
 
 import (
 	"github.com/SlyMarbo/rss"
+	"github.com/indes/rssflow/config"
 	"github.com/indes/rssflow/tgraph"
 	"strings"
 )
@@ -26,7 +27,9 @@ func getContentByFeedItem(source *Source, item *rss.Item) (Content, error) {
 
 	html = strings.Replace(html, "<![CDATA[", "", -1)
 	html = strings.Replace(html, "]]>", "", -1)
-	tgpUrl = PublishItem(source, item, html)
+	if config.EnableTelegraph {
+		tgpUrl = PublishItem(source, item, html)
+	}
 
 	var c = Content{
 		Title:        item.Title,
