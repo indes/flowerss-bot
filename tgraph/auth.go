@@ -1,7 +1,9 @@
 package tgraph
 
-const (
-	authToken  = "77d1ae436c753a81300ce36b0ffcee22fd304616c4e013524c45d598c39e"
+import "github.com/indes/rssflow/config"
+
+var (
+	authToken  = config.TelegraphToken
 	authorUrl  = "https://github.com/indes/rssflow"
 	authorName = "RSSFlow"
 	verbose    = false
