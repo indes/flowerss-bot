@@ -3,6 +3,7 @@ package model
 import (
 	"errors"
 	"github.com/SlyMarbo/rss"
+	"github.com/indes/rssflow/config"
 	"log"
 )
 
@@ -79,11 +80,11 @@ func GetSources() []Source {
 	return sources
 }
 
-func GetSubscribedSources() []Source {
+func GetSubscribedNormalSources() []Source {
 	var subscribedSources []Source
 	sources := GetSources()
 	for _, source := range sources {
-		if source.IsSubscribed() {
+		if source.IsSubscribed() && source.ErrorCount < config.ErrorThreshold {
 			subscribedSources = append(subscribedSources, source)
 		}
 	}
@@ -149,4 +150,12 @@ func (s *Source) Save() {
 	defer db.Close()
 	db.Save(&s)
 	return
+}
+
+func GetSourceById(id int) *Source {
+	db := getConnect()
+	defer db.Close()
+	var source Source
+	db.Where("id=?", id).First(&source)
+	return &source
 }
