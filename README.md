@@ -5,9 +5,14 @@
 
 DEMO: https://t.me/rssflowbot
 
+## Features  
+
+- 支持 Telegram 应用内 instant view
+- 默认10分钟抓取一次
+
 ## 安装
 
-**由于 GoReleaser 不支持 Cgo，如果要使用 SQLite 做为数据库，请下载源码自行编译。**
+**由于 GoReleaser 不支持 Cgo，如果要使用 SQLite 做为数据库，请下载源码自行编译。**  
 
 ### 源码安装
 
@@ -15,11 +20,13 @@ DEMO: https://t.me/rssflowbot
 git clone https://github.com/indes/rssflow && cd rssflow
 go model download
 go build .
+./rssflow
 ```
 
 ### 下载二进制
 
-**不支持 SQLite**
+**不支持 SQLite**  
+
 从[Releases](https://github.com/indes/rssflow/releases) 页面下载对应的版本。
 
 ## 配置
@@ -40,10 +47,10 @@ mysql:
 配置说明：
 
 | 配置项 | 含义 | 必填 |
-| ------ | ------ |
+| ------ | ------ | ------ |
 | token | Telegram Bot Token | 必填 |
-| socks5 | 用于无法正常telegram api环境 | 可忽略（能正常连接上tg服务器） |
-| mysql | 数据库配置 | 可忽略（使用SQLite） |
+| socks5 | 用于无法正常 Telegram API 的环境 | 可忽略（能正常连接上 Telegram API 服务器） |
+| mysql | 数据库配置 | 可忽略（使用 SQLite ） |
 
 ## 使用
 
