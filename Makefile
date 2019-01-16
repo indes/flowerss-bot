@@ -1,8 +1,8 @@
 test:
-    # The item just for travis-ci :)
+	# The item just for travis-ci :)
 
 build: get
-    go build .
+	go build .
 
 get:
-    go mod download
+	go mod download
