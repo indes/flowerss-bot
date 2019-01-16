@@ -1,0 +1,11 @@
+language: go
+go:
+  - 1.11.2
+  
+deploy:
+- provider: script
+  skip_cleanup: true
+  script: docker run --rm --privileged -v $PWD:/go/code/indes/rssflow -v /var/run/docker.sock:/var/run/docker.sock -w /go/code/indes/rssflow -e GITHUB_TOKEN=$GITHUB_TOKEN goreleaser/goreleaser:latest-cgo release
+  on:
+    tags: true
+    condition: $TRAVIS_OS_NAME = linux
