@@ -7,13 +7,14 @@ import (
 )
 
 var (
-	BotToken       string
-	Socks5         string
-	TelegraphToken string = "77d1ae436c753a81300ce36b0ffcee22fd304616c4e013524c45d598c39e"
-	Mysql          MysqlConfig
-	EnableMysql    bool
-	UpdateInterval int  = 10
-	ErrorThreshold uint = 100
+	BotToken        string
+	Socks5          string
+	TelegraphToken  string
+	EnableTelegraph bool
+	Mysql           MysqlConfig
+	EnableMysql     bool
+	UpdateInterval  int  = 10
+	ErrorThreshold  uint = 100
 )
 
 type MysqlConfig struct {
@@ -41,7 +42,10 @@ func init() {
 	Socks5 = viper.GetString("socks5")
 
 	if viper.IsSet("telegraph_token") {
+		EnableTelegraph = true
 		TelegraphToken = viper.GetString("telegraph_token")
+	} else {
+		EnableTelegraph = false
 	}
 
 	if viper.IsSet("update_interval") {

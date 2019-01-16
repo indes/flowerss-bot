@@ -51,7 +51,7 @@ mysql:
 | 配置项 | 含义 | 必填 |
 | ------ | ------ | ------ |
 | bot_token | Telegram Bot Token | 必填 |
-| telegraph_token | Telegraph Token, 用于转存原文到 Telegraph | 可忽略（使用默认Token ） |
+| telegraph_token | Telegraph Token, 用于转存原文到 Telegraph | 可忽略（不转存原文到Telegraph ） |
 | update_interval | RSS 源扫描间隔（分钟） | 可忽略（默认10） |
 | socks5 | 用于无法正常 Telegram API 的环境 | 可忽略（能正常连接上 Telegram API 服务器） |
 | mysql | 数据库配置 | 可忽略（使用 SQLite ） |
