@@ -116,6 +116,7 @@ func makeHandle() {
 					err := model.UnsubByUserIDAndSource(m.Sender.ID, source)
 					if err == nil {
 						_, _ = B.Send(m.Sender, "退订成功！")
+						log.Printf("%d unsubscribe [%d]%s %s", m.Sender.ID, source.ID, source.Title, source.Link)
 					} else {
 						_, err = B.Send(m.Sender, err.Error())
 					}

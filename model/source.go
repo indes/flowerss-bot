@@ -159,3 +159,22 @@ func GetSourceById(id int) *Source {
 	db.Where("id=?", id).First(&source)
 	return &source
 }
+
+func (s *Source) GetSubscribeNum() int {
+	db := getConnect()
+	defer db.Close()
+	var subs []Subscribe
+	db.Where("source_id=?", s.ID).Find(&subs)
+	return len(subs)
+}
+
+func (s *Source) DeleteContents() {
+	DeleteContentsBySourceID(s.ID)
+}
+
+func (s *Source) DeleteDueNoSubscriber() {
+	s.DeleteContents()
+	db := getConnect()
+	defer db.Close()
+	db.Delete(&s)
+}
