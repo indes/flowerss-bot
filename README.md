@@ -1,5 +1,6 @@
 # RSSFlow
 
+[![Build Status](https://travis-ci.org/indes/rssflow.svg?branch=master)](https://travis-ci.org/indes/rssflow)
 [![Go Report Card](https://goreportcard.com/badge/github.com/indes/rssflow)](https://goreportcard.com/report/github.com/indes/rssflow)
 [![MIT license](https://img.shields.io/github/license/indes/rssflow.svg)](https://github.com/indes/rssflow/blob/master/LICENSE)
 
@@ -18,8 +19,7 @@ DEMO: https://t.me/rssflowbot
 
 ```shell
 git clone https://github.com/indes/rssflow && cd rssflow
-go model download
-go build .
+make build
 ./rssflow
 ```
 
@@ -34,21 +34,25 @@ go build .
 根据以下模板，新建 `config.yml` 文件。
 
 ```yml
-token: XXX
-socks5: XXX
+bot_token: XXX
+telegraph_toke: xxxx
+socks5: 127.0.0.1:1080
+update_interval: 10
 mysql:
-  host: XXX
-  port: XXX
-  user: XXX
-  password: XXX
-  database: XXX
+  host: 123.123.132.132
+  port: 3306
+  user: user
+  password: pwd
+  database: rssflow
 ```
 
 配置说明：
 
 | 配置项 | 含义 | 必填 |
 | ------ | ------ | ------ |
-| token | Telegram Bot Token | 必填 |
+| bot_token | Telegram Bot Token | 必填 |
+| telegraph_toke | Telegraph Token, 用于转存原文到 Telegraph | 可忽略（使用默认Token ） |
+| update_interval | RSS 源扫描间隔（分钟） | 可忽略（默认10） |
 | socks5 | 用于无法正常 Telegram API 的环境 | 可忽略（能正常连接上 Telegram API 服务器） |
 | mysql | 数据库配置 | 可忽略（使用 SQLite ） |
 
