@@ -26,7 +26,7 @@ func getContentByFeedItem(source *Source, item *rss.Item) (Content, error) {
 
 	html = strings.Replace(html, "<![CDATA[", "", -1)
 	html = strings.Replace(html, "]]>", "", -1)
-	tgpUrl = tgraph.PublishItem(item.Title, html)
+	tgpUrl = PublishItem(source, item, html)
 
 	var c = Content{
 		Title:        item.Title,
@@ -65,4 +65,9 @@ func DeleteContentsBySourceID(sid uint) {
 	db := getConnect()
 	defer db.Close()
 	db.Where("source_id=?", sid).Delete(Content{})
+}
+
+func PublishItem(source *Source, item *rss.Item, html string) string {
+	url, _ := tgraph.PublishHtml(source.Title, item.Title, item.Link, html)
+	return url
 }
