@@ -60,3 +60,9 @@ func GenContentAndCheckByFeedItem(s *Source, item *rss.Item) (*Content, bool, er
 
 	return &content, isBroaded, nil
 }
+
+func DeleteContentsBySourceID(sid uint) {
+	db := getConnect()
+	defer db.Close()
+	db.Where("source_id=?", sid).Delete(Content{})
+}

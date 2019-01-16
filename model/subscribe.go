@@ -53,6 +53,9 @@ func UnsubByUserIDAndSource(userID int, source *Source) error {
 		return errors.New("未订阅该RSS源")
 	}
 	db.Delete(&sub)
+	if source.GetSubscribeNum() < 1 {
+		source.DeleteDueNoSubscriber()
+	}
 	return nil
 }
 
