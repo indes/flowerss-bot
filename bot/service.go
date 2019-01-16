@@ -2,6 +2,7 @@ package bot
 
 import (
 	"fmt"
+	"github.com/indes/rssflow/config"
 	"github.com/indes/rssflow/model"
 	"gopkg.in/tucnak/telebot.v2"
 	"log"
@@ -37,7 +38,7 @@ func SendError(c *telebot.Chat) {
 }
 
 //BroadNews send new contents message to subscriber
-func BroadNews(source *model.Source, subs []model.Subscribe, contents []model.Content) error {
+func BroadNews(source *model.Source, subs []model.Subscribe, contents []model.Content) {
 
 	log.Printf("Source Title: <%s> Subscriber: %d New Contents: %d", source.Title, len(subs), len(contents))
 	var u telebot.User
@@ -60,5 +61,16 @@ func BroadNews(source *model.Source, subs []model.Subscribe, contents []model.Co
 			}
 		}
 	}
-	return nil
+}
+
+func BroadSourceError(source *model.Source) {
+	subs := model.GetSubscriberBySource(source)
+	var u telebot.User
+	for _, sub := range subs {
+		message := fmt.Sprintf("[%s](%s) 已经累计连续%d次更新失败，暂时停止更新", source.Title, source.Link, config.ErrorThreshold)
+		u.ID = int(sub.UserID)
+		_, _ = B.Send(&u, message, &telebot.SendOptions{
+			ParseMode: telebot.ModeMarkdown,
+		})
+	}
 }

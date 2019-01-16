@@ -12,7 +12,8 @@ var (
 	TelegraphToken string = "77d1ae436c753a81300ce36b0ffcee22fd304616c4e013524c45d598c39e"
 	Mysql          MysqlConfig
 	EnableMysql    bool
-	UpdateInterval int = 10
+	UpdateInterval int  = 10
+	ErrorThreshold uint = 100
 )
 
 type MysqlConfig struct {
@@ -59,6 +60,7 @@ func init() {
 	} else {
 		EnableMysql = false
 	}
+
 }
 
 func getInt(s string) int {
@@ -72,5 +74,5 @@ func (m *MysqlConfig) GetMysqlConnectingString() string {
 	host := m.Host
 	port := m.Port
 	db := m.DB
-	return fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8&parseTime=true", usr, pwd, host, port, db)
+	return fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8&parseTime=true", usr, pwd, host, port, db)
 }
