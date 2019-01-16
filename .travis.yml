@@ -1,6 +1,6 @@
-language: go
-go:
-  - 1.11.2
+language: python
+python:
+  - 3.5.1
   
 deploy:
 - provider: script
