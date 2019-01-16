@@ -40,8 +40,8 @@ func init() {
 	BotToken = viper.GetString("bot_token")
 	Socks5 = viper.GetString("socks5")
 
-	if viper.IsSet("telegraph_toke") {
-		TelegraphToken = viper.GetString("telegraph_toke")
+	if viper.IsSet("telegraph_token") {
+		TelegraphToken = viper.GetString("telegraph_token")
 	}
 
 	if viper.IsSet("update_interval") {

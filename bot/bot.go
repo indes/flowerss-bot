@@ -20,9 +20,10 @@ var (
 )
 
 func init() {
-	log.Printf("Token: %s Proxy: %s\n", botToken, socks5Proxy)
 
 	if socks5Proxy != "" {
+		log.Printf("Bot Token: %s Proxy: %s\n", botToken, socks5Proxy)
+
 		dialer, err := proxy.SOCKS5("tcp", socks5Proxy, nil, proxy.Direct)
 		if err != nil {
 			log.Fatal("Error creating dialer, aborting.")
@@ -44,6 +45,8 @@ func init() {
 			return
 		}
 	} else {
+		log.Printf("Bot Token: %s", botToken)
+
 		var err error
 		// creat bot
 		B, err = tb.NewBot(tb.Settings{
