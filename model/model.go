@@ -30,7 +30,7 @@ func init() {
 
 func getConnect() *gorm.DB {
 	if config.EnableMysql {
-		clientConfig := config.GetMysqlConnectingString()
+		clientConfig := config.Mysql.GetMysqlConnectingString()
 		db, err := gorm.Open("mysql", clientConfig)
 		if err != nil {
 			panic("连接数据库失败")

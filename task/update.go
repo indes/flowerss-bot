@@ -2,6 +2,7 @@ package task
 
 import (
 	"github.com/indes/rssflow/bot"
+	"github.com/indes/rssflow/config"
 	"github.com/indes/rssflow/model"
 	"time"
 )
@@ -20,6 +21,6 @@ func Update() {
 				bot.BroadNews(&source, subs, c)
 			}
 		}
-		time.Sleep(10 * time.Minute)
+		time.Sleep(time.Duration(config.UpdateInterval) * time.Minute)
 	}
 }
