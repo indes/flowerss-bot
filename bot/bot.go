@@ -71,7 +71,7 @@ func makeHandle() {
 
 	B.Handle("/start", func(m *tb.Message) {
 		user := model.FindOrInitUser(m.Chat.ID)
-		log.Println("/start " + string(user.ID))
+		log.Printf("/start %d", user.ID)
 		_, _ = B.Send(m.Sender, fmt.Sprintf("hello"))
 	})
 
