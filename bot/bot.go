@@ -71,7 +71,8 @@ func makeHandle() {
 
 	B.Handle("/start", func(m *tb.Message) {
 		user := model.FindOrInitUser(m.Chat.ID)
-		_, _ = B.Send(m.Sender, fmt.Sprintf("hello, %d", user.ID))
+		log.Println("/start " + string(user.ID))
+		_, _ = B.Send(m.Sender, fmt.Sprintf("hello"))
 	})
 
 	B.Handle("/sub", func(m *tb.Message) {
@@ -143,7 +144,6 @@ _italic text_
 [inline URL](http://www.example.com/)
 [inline mention of a user](tg://user?id=123456789)
 `
-
 		_, err := B.Send(m.Sender, message, &tb.SendOptions{
 			ParseMode: tb.ModeMarkdown,
 		})
