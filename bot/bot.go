@@ -71,9 +71,6 @@ func Start() {
 
 func makeHandle() {
 
-	var (
-	//userKeys map[int][][]tb.ReplyButton
-	)
 	B.Handle("/start", func(m *tb.Message) {
 		user := model.FindOrInitUser(m.Chat.ID)
 		log.Printf("/start %d", user.ID)
@@ -84,14 +81,15 @@ func makeHandle() {
 
 		msg := strings.Split(m.Text, " ")
 
-		if len(msg) != 2 {
-			SendError(m.Chat)
-		} else {
+		if len(msg) == 2 && CheckUrl(msg[1]) {
+
 			url := msg[1]
-			if CheckUrl(url) {
-				registFeed(m.Chat, url)
-			} else {
-				SendError(m.Chat)
+			registFeed(m.Chat, url)
+
+		} else {
+			_, err := B.Send(m.Sender, "请回复RSS URL")
+			if err == nil {
+				UserState[m.Sender.ID] = fsm.Sub
 			}
 		}
 	})
@@ -143,10 +141,13 @@ func makeHandle() {
 
 				replyKeys = append(replyKeys, replyButton)
 			}
-			_, _ = B.Send(m.Sender, "请选择你要退订的源", &tb.ReplyMarkup{
+			_, err := B.Send(m.Sender, "请选择你要退订的源", &tb.ReplyMarkup{
 				ReplyKeyboard: replyKeys,
 			})
-			UserState[m.Sender.ID] = fsm.Unsub
+
+			if err == nil {
+				UserState[m.Sender.ID] = fsm.UnSub
+			}
 		}
 
 	})
@@ -193,13 +194,12 @@ _italic text_
 	})
 
 	B.Handle(tb.OnText, func(m *tb.Message) {
-
 		messageRoute(m)
 	})
 }
 
 func messageRoute(m *tb.Message) {
-	if UserState[m.Sender.ID] == fsm.Unsub {
+	if UserState[m.Sender.ID] == fsm.UnSub {
 		str := strings.Split(m.Text, " ")
 		log.Println(str)
 		if len(str) != 2 && !CheckUrl(str[1]) {
@@ -215,8 +215,17 @@ func messageRoute(m *tb.Message) {
 				}, &tb.ReplyMarkup{
 					ReplyKeyboardRemove: true,
 				})
-
+				UserState[m.Sender.ID] = fsm.None
 			}
 		}
+	}
+	if UserState[m.Sender.ID] == fsm.Sub {
+
+		url := strings.Split(m.Text, " ")
+		if !CheckUrl(url[0]) {
+			_, _ = B.Send(m.Sender, "请回复正确的URL")
+			return
+		}
+		registFeed(m.Chat, url[0])
 	}
 }

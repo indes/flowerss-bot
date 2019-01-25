@@ -4,5 +4,6 @@ type UserStatus int
 
 const (
 	None UserStatus = iota
-	Unsub
+	Sub
+	UnSub
 )
