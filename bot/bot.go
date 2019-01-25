@@ -2,6 +2,7 @@ package bot
 
 import (
 	"fmt"
+	"github.com/indes/rssflow/bot/fsm"
 	"github.com/indes/rssflow/config"
 	"github.com/indes/rssflow/model"
 	"golang.org/x/net/proxy"
@@ -13,8 +14,9 @@ import (
 )
 
 var (
-	botToken    = config.BotToken
-	socks5Proxy = config.Socks5
+	botToken                           = config.BotToken
+	socks5Proxy                        = config.Socks5
+	UserState   map[int]fsm.UserStatus = make(map[int]fsm.UserStatus)
 	//B bot
 	B *tb.Bot
 )
@@ -69,6 +71,9 @@ func Start() {
 
 func makeHandle() {
 
+	var (
+	//userKeys map[int][][]tb.ReplyButton
+	)
 	B.Handle("/start", func(m *tb.Message) {
 		user := model.FindOrInitUser(m.Chat.ID)
 		log.Printf("/start %d", user.ID)
@@ -108,26 +113,40 @@ func makeHandle() {
 	B.Handle("/unsub", func(m *tb.Message) {
 		msg := strings.Split(m.Text, " ")
 
-		if len(msg) != 2 {
-			SendError(m.Chat)
-		} else {
+		if len(msg) == 2 && CheckUrl(msg[1]) {
+			//Unsub by url
 			url := msg[1]
-			if CheckUrl(url) {
-				source, _ := model.GetSourceByUrl(url)
-				if source == nil {
-					_, _ = B.Send(m.Sender, "未订阅该RSS源")
-				} else {
-					err := model.UnsubByUserIDAndSource(m.Sender.ID, source)
-					if err == nil {
-						_, _ = B.Send(m.Sender, "退订成功！")
-						log.Printf("%d unsubscribe [%d]%s %s", m.Sender.ID, source.ID, source.Title, source.Link)
-					} else {
-						_, err = B.Send(m.Sender, err.Error())
-					}
-				}
+
+			source, _ := model.GetSourceByUrl(url)
+			if source == nil {
+				_, _ = B.Send(m.Sender, "未订阅该RSS源")
 			} else {
-				SendError(m.Chat)
+				err := model.UnsubByUserIDAndSource(m.Sender.ID, source)
+				if err == nil {
+					_, _ = B.Send(m.Sender, "退订成功！")
+					log.Printf("%d unsubscribe [%d]%s %s", m.Sender.ID, source.ID, source.Title, source.Link)
+				} else {
+					_, err = B.Send(m.Sender, err.Error())
+				}
 			}
+		} else {
+			//Unsub by button
+			sources, _ := model.GetSourcesByUserID(m.Sender.ID)
+			var replyButton []tb.ReplyButton
+			replyKeys := [][]tb.ReplyButton{}
+			for _, source := range sources {
+				// 添加按钮
+				text := fmt.Sprintf("%s %s", source.Title, source.Link)
+				replyButton = []tb.ReplyButton{
+					tb.ReplyButton{Text: text},
+				}
+
+				replyKeys = append(replyKeys, replyButton)
+			}
+			_, _ = B.Send(m.Sender, "请选择你要退订的源", &tb.ReplyMarkup{
+				ReplyKeyboard: replyKeys,
+			})
+			UserState[m.Sender.ID] = fsm.Unsub
 		}
 
 	})
@@ -152,4 +171,52 @@ _italic text_
 	B.Handle(tb.OnText, func(m *tb.Message) {
 
 	})
+
+	replyBtn := tb.ReplyButton{Text: "/ping"}
+
+	inlineBtn := tb.InlineButton{
+		Unique: "sad_moon",
+		Text:   "🌚 Button #2",
+	}
+
+	B.Handle(&replyBtn, func(m *tb.Message) {
+		// on reply button pressed
+		log.Println(m)
+	})
+
+	B.Handle(&inlineBtn, func(c *tb.Callback) {
+		// on inline button pressed (callback!)
+
+		// always respond!
+		_ = B.Respond(c, &tb.CallbackResponse{})
+		B.Send(c.Sender, c.Message.ID)
+	})
+
+	B.Handle(tb.OnText, func(m *tb.Message) {
+
+		messageRoute(m)
+	})
+}
+
+func messageRoute(m *tb.Message) {
+	if UserState[m.Sender.ID] == fsm.Unsub {
+		str := strings.Split(m.Text, " ")
+		log.Println(str)
+		if len(str) != 2 && !CheckUrl(str[1]) {
+			_, _ = B.Send(m.Sender, "请选择正确的指令！")
+		} else {
+			err := model.UnsubByUserIDAndSourceURL(m.Sender.ID, str[1])
+			if err != nil {
+				_, _ = B.Send(m.Sender, "请选择正确的指令！")
+
+			} else {
+				_, _ = B.Send(m.Sender, fmt.Sprintf("[%s](%s) 退订成功", str[0], str[1]), &tb.SendOptions{
+					ParseMode: tb.ModeMarkdown,
+				}, &tb.ReplyMarkup{
+					ReplyKeyboardRemove: true,
+				})
+
+			}
+		}
+	}
 }

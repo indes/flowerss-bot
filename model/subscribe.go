@@ -69,3 +69,12 @@ func GetSubsByUserID(userID int) []Subscribe {
 
 	return subs
 }
+
+func UnsubByUserIDAndSourceURL(userID int, url string) error {
+	source, err := GetSourceByUrl(url)
+	if err != nil {
+		return err
+	}
+	err = UnsubByUserIDAndSource(userID, source)
+	return err
+}
