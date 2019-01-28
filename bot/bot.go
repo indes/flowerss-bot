@@ -77,6 +77,11 @@ func makeHandle() {
 		_, _ = B.Send(m.Sender, fmt.Sprintf("hello"))
 	})
 
+	B.Handle("/export", func(m *tb.Message) {
+
+		_, _ = B.Send(m.Sender, fmt.Sprintf("export"))
+	})
+
 	B.Handle("/sub", func(m *tb.Message) {
 
 		msg := strings.Split(m.Text, " ")
@@ -199,33 +204,40 @@ _italic text_
 }
 
 func messageRoute(m *tb.Message) {
-	if UserState[m.Sender.ID] == fsm.UnSub {
-		str := strings.Split(m.Text, " ")
-		log.Println(str)
-		if len(str) != 2 && !CheckUrl(str[1]) {
-			_, _ = B.Send(m.Sender, "请选择正确的指令！")
-		} else {
-			err := model.UnsubByUserIDAndSourceURL(m.Sender.ID, str[1])
-			if err != nil {
+	switch UserState[m.Sender.ID] {
+	case fsm.UnSub:
+		{
+			str := strings.Split(m.Text, " ")
+			log.Println(str)
+			if len(str) != 2 && !CheckUrl(str[1]) {
 				_, _ = B.Send(m.Sender, "请选择正确的指令！")
-
 			} else {
-				_, _ = B.Send(m.Sender, fmt.Sprintf("[%s](%s) 退订成功", str[0], str[1]), &tb.SendOptions{
-					ParseMode: tb.ModeMarkdown,
-				}, &tb.ReplyMarkup{
-					ReplyKeyboardRemove: true,
-				})
-				UserState[m.Sender.ID] = fsm.None
+				err := model.UnsubByUserIDAndSourceURL(m.Sender.ID, str[1])
+				if err != nil {
+					_, _ = B.Send(m.Sender, "请选择正确的指令！")
+
+				} else {
+					_, _ = B.Send(m.Sender, fmt.Sprintf("[%s](%s) 退订成功", str[0], str[1]), &tb.SendOptions{
+						ParseMode: tb.ModeMarkdown,
+					}, &tb.ReplyMarkup{
+						ReplyKeyboardRemove: true,
+					})
+					UserState[m.Sender.ID] = fsm.None
+				}
 			}
 		}
-	}
-	if UserState[m.Sender.ID] == fsm.Sub {
+	case fsm.Sub:
+		{
 
-		url := strings.Split(m.Text, " ")
-		if !CheckUrl(url[0]) {
-			_, _ = B.Send(m.Sender, "请回复正确的URL")
-			return
+			url := strings.Split(m.Text, " ")
+			if !CheckUrl(url[0]) {
+				_, _ = B.Send(m.Sender, "请回复正确的URL")
+				return
+			}
+			registFeed(m.Chat, url[0])
+
 		}
-		registFeed(m.Chat, url[0])
+
 	}
+
 }
