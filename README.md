@@ -3,6 +3,7 @@
 [![Build Status](https://travis-ci.org/indes/rssflow.svg?branch=master)](https://travis-ci.org/indes/rssflow)
 [![Go Report Card](https://goreportcard.com/badge/github.com/indes/rssflow)](https://goreportcard.com/report/github.com/indes/rssflow)
 [![MIT license](https://img.shields.io/github/license/indes/rssflow.svg)](https://github.com/indes/rssflow/blob/master/LICENSE)
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Findes%2Frssflow.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Findes%2Frssflow?ref=badge_shield)
 
 DEMO: https://t.me/rssflowbot
 
@@ -66,3 +67,6 @@ mysql:
 /ping :)
 ```
 建议配合 [RSSHub](https://github.com/DIYgod/RSSHub) 使用。
+
+## License
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Findes%2Frssflow.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Findes%2Frssflow?ref=badge_large)
