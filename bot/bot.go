@@ -1,12 +1,14 @@
 package bot
 
 import (
+	"bytes"
 	"fmt"
 	"github.com/indes/rssflow/bot/fsm"
 	"github.com/indes/rssflow/config"
 	"github.com/indes/rssflow/model"
 	"golang.org/x/net/proxy"
 	tb "gopkg.in/tucnak/telebot.v2"
+	"html/template"
 	"log"
 	"net/http"
 	"strings"
@@ -70,6 +72,35 @@ func Start() {
 }
 
 func makeHandle() {
+	toggleNoticeKey := tb.InlineButton{
+		Unique: "toggle_notice",
+		Text:   "切换通知",
+	}
+	toggleTelegraphKey := tb.InlineButton{
+		Unique: "toggle_telegraph",
+		Text:   "切换 Telegraph",
+	}
+	feedSettingKeys := [][]tb.InlineButton{}
+	B.Handle(&toggleNoticeKey, func(c *tb.Callback) {
+		// on inline button pressed (callback!)
+
+		// always respond!
+		B.Respond(c, &tb.CallbackResponse{})
+	})
+	B.Handle("/key", func(m *tb.Message) {
+		if !m.Private() {
+			return
+		}
+		toggleNoticeKey.Text = "开启通知"
+
+		feedSettingKeys = append(
+			feedSettingKeys,
+			[]tb.InlineButton{toggleNoticeKey},
+		)
+		_, _ = B.Send(m.Sender, "Hello!", &tb.ReplyMarkup{
+			InlineKeyboard: feedSettingKeys,
+		})
+	})
 
 	B.Handle("/start", func(m *tb.Message) {
 		user := model.FindOrInitUser(m.Chat.ID)
@@ -111,6 +142,30 @@ func makeHandle() {
 			ParseMode:             tb.ModeMarkdown,
 		})
 
+	})
+
+	B.Handle("/set", func(m *tb.Message) {
+
+		sources, _ := model.GetSourcesByUserID(m.Sender.ID)
+
+		var replyButton []tb.ReplyButton
+		replyKeys := [][]tb.ReplyButton{}
+		for _, source := range sources {
+			// 添加按钮
+			text := fmt.Sprintf("%s %s", source.Title, source.Link)
+			replyButton = []tb.ReplyButton{
+				tb.ReplyButton{Text: text},
+			}
+			replyKeys = append(replyKeys, replyButton)
+		}
+		_, err := B.Send(m.Sender, "请选择你要设置的源", &tb.ReplyMarkup{
+			ReplyKeyboard:   replyKeys,
+			OneTimeKeyboard: true,
+		})
+
+		if err == nil {
+			UserState[m.Sender.ID] = fsm.Set
+		}
 	})
 
 	B.Handle("/unsub", func(m *tb.Message) {
@@ -162,82 +217,99 @@ func makeHandle() {
 		_, _ = B.Send(m.Sender, "pong")
 	})
 
-	B.Handle("/test", func(m *tb.Message) {
-		message := `
-*bold text*
-_italic text_
-[inline URL](http://www.example.com/)
-[inline mention of a user](tg://user?id=123456789)
-`
-		_, err := B.Send(m.Sender, message, &tb.SendOptions{
-			ParseMode: tb.ModeMarkdown,
-		})
-		log.Println(err)
-	})
 	B.Handle(tb.OnText, func(m *tb.Message) {
-
-	})
-
-	replyBtn := tb.ReplyButton{Text: "/ping"}
-
-	inlineBtn := tb.InlineButton{
-		Unique: "sad_moon",
-		Text:   "🌚 Button #2",
-	}
-
-	B.Handle(&replyBtn, func(m *tb.Message) {
-		// on reply button pressed
-		log.Println(m)
-	})
-
-	B.Handle(&inlineBtn, func(c *tb.Callback) {
-		// on inline button pressed (callback!)
-
-		// always respond!
-		_ = B.Respond(c, &tb.CallbackResponse{})
-		B.Send(c.Sender, c.Message.ID)
-	})
-
-	B.Handle(tb.OnText, func(m *tb.Message) {
-		messageRoute(m)
-	})
-}
-
-func messageRoute(m *tb.Message) {
-	switch UserState[m.Sender.ID] {
-	case fsm.UnSub:
-		{
-			str := strings.Split(m.Text, " ")
-			log.Println(str)
-			if len(str) != 2 && !CheckUrl(str[1]) {
-				_, _ = B.Send(m.Sender, "请选择正确的指令！")
-			} else {
-				err := model.UnsubByUserIDAndSourceURL(m.Sender.ID, str[1])
-				if err != nil {
+		switch UserState[m.Sender.ID] {
+		case fsm.UnSub:
+			{
+				str := strings.Split(m.Text, " ")
+				if len(str) != 2 && !CheckUrl(str[1]) {
 					_, _ = B.Send(m.Sender, "请选择正确的指令！")
-
 				} else {
-					_, _ = B.Send(m.Sender, fmt.Sprintf("[%s](%s) 退订成功", str[0], str[1]), &tb.SendOptions{
-						ParseMode: tb.ModeMarkdown,
-					}, &tb.ReplyMarkup{
-						ReplyKeyboardRemove: true,
-					})
+					err := model.UnsubByUserIDAndSourceURL(m.Sender.ID, str[1])
+					if err != nil {
+						_, _ = B.Send(m.Sender, "请选择正确的指令！")
+
+					} else {
+						_, _ = B.Send(
+							m.Sender,
+							fmt.Sprintf("[%s](%s) 退订成功", str[0], str[1]),
+							&tb.SendOptions{
+								ParseMode: tb.ModeMarkdown,
+							}, &tb.ReplyMarkup{
+								ReplyKeyboardRemove: true,
+							},
+						)
+						UserState[m.Sender.ID] = fsm.None
+					}
+				}
+			}
+
+		case fsm.Sub:
+			{
+				url := strings.Split(m.Text, " ")
+				if !CheckUrl(url[0]) {
+					_, _ = B.Send(m.Sender, "请回复正确的URL")
+					return
+				}
+				registFeed(m.Chat, url[0])
+				UserState[m.Sender.ID] = fsm.None
+			}
+
+		case fsm.Set:
+			{
+				str := strings.Split(m.Text, " ")
+				if len(str) != 2 && !CheckUrl(str[1]) {
+					_, _ = B.Send(m.Sender, "请选择正确的指令！")
+				} else {
+					source, err := model.GetSourceByUrl(str[1])
+
+					if err != nil {
+						_, _ = B.Send(m.Sender, "请选择正确的指令！")
+						return
+					}
+					sub, err := model.GetSubscribeByUserIDAndSourceID(m.Sender.ID, source.ID)
+					if err != nil {
+						_, _ = B.Send(m.Sender, "请选择正确的指令！")
+						return
+					}
+					t := template.New("setting template")
+					t.Parse(`
+订阅<b>设置</b>
+[id] {{ .sub.ID}}
+[标题] {{ .source.Title }}
+[Link] {{.source.Link}}
+[通知] {{if eq .sub.EnableNotification 0}}关闭{{else if eq .sub.EnableNotification 1}}开启{{end}}
+[Telegraph] {{if eq .sub.EnableTelegraph 0}}关闭{{else if eq .sub.EnableTelegraph 1}}开启{{end}}
+`)
+
+					message := new(bytes.Buffer)
+					if sub.EnableNotification == 1 {
+
+						toggleNoticeKey.Text = "关闭通知"
+					} else {
+						toggleNoticeKey.Text = "开启通知"
+
+					}
+					if sub.EnableTelegraph == 1 {
+						toggleTelegraphKey.Text = "关闭 Telegraph 转码"
+					} else {
+						toggleTelegraphKey.Text = "开启 Telegraph 转码"
+					}
+					feedSettingKeys = append(feedSettingKeys, []tb.InlineButton{toggleNoticeKey, toggleTelegraphKey})
+					_ = t.Execute(message, map[string]interface{}{"source": source, "sub": sub})
+					_, _ = B.Send(
+						m.Sender,
+						message.String(),
+						&tb.SendOptions{
+							ParseMode: tb.ModeHTML,
+						}, &tb.ReplyMarkup{
+							InlineKeyboard: feedSettingKeys,
+						},
+					)
 					UserState[m.Sender.ID] = fsm.None
+
 				}
 			}
 		}
-	case fsm.Sub:
-		{
-
-			url := strings.Split(m.Text, " ")
-			if !CheckUrl(url[0]) {
-				_, _ = B.Send(m.Sender, "请回复正确的URL")
-				return
-			}
-			registFeed(m.Chat, url[0])
-
-		}
-
-	}
-
+	})
 }
