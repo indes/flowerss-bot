@@ -32,9 +32,6 @@ func GetSourceByUrl(url string) (*Source, error) {
 	db := getConnect()
 	defer db.Close()
 	if err := db.Where("link=?", url).Find(&source).Error; err != nil {
-		if err.Error() == "record not found" {
-			return nil, err
-		}
 		return nil, err
 	}
 	return &source, nil

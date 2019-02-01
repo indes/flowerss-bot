@@ -6,4 +6,5 @@ const (
 	None UserStatus = iota
 	Sub
 	UnSub
+	Set
 )

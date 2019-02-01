@@ -3,9 +3,11 @@ package model
 import "errors"
 
 type Subscribe struct {
-	ID       uint `gorm:"primary_key";"AUTO_INCREMENT"`
-	UserID   int64
-	SourceID uint
+	ID                 uint `gorm:"primary_key";"AUTO_INCREMENT"`
+	UserID             int64
+	SourceID           uint
+	EnableNotification int
+	EnableTelegraph    int
 	EditTime
 }
 
@@ -28,13 +30,31 @@ func RegistFeed(userID int64, sourceID uint) error {
 	return nil
 }
 
-func GetSubscribeByUserID(userID int64) []Source {
+func GetSubscribeByUserIDAndSourceID(userID int, sourceID uint) (*Subscribe, error) {
 	db := getConnect()
 	defer db.Close()
-	user := FindOrInitUser(userID)
-	return user.Source
+	var sub Subscribe
+	db.Where("user_id=? and source_id=?", userID, sourceID).First(&sub)
+	if sub.UserID != int64(userID) {
+		return nil, errors.New("未订阅该RSS源")
+	}
+	return &sub, nil
 }
 
+func GetSubscribeByUserIDAndURL(userID int, url string) (*Subscribe, error) {
+	db := getConnect()
+	defer db.Close()
+	var sub Subscribe
+	source, err := GetSourceByUrl(url)
+	if err != nil {
+		return nil, err
+	}
+	db.Where("user_id=? and source_id=?", userID, source.ID).First(&sub)
+	if sub.UserID != int64(userID) {
+		return nil, errors.New("未订阅该RSS源")
+	}
+	return &sub, nil
+}
 func GetSubscriberBySource(s *Source) []Subscribe {
 	db := getConnect()
 	defer db.Close()
