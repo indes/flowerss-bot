@@ -83,8 +83,7 @@ func makeHandle() {
 	}
 
 	B.Handle(&toggleNoticeKey, func(c *tb.Callback) {
-		// on inline button pressed (callback!)
-		// always respond!
+
 		msg := strings.Split(c.Message.Text, "\n")
 		subID, err := strconv.Atoi(strings.Split(msg[1], " ")[1])
 		if err != nil {
@@ -114,6 +113,68 @@ func makeHandle() {
 		feedSettingKeys := [][]tb.InlineButton{}
 
 		err = sub.ToggleNotification()
+		if err != nil {
+			_ = B.Respond(c, &tb.CallbackResponse{
+				Text: "error",
+			})
+			return
+		}
+		sub.Save()
+		text := new(bytes.Buffer)
+		if sub.EnableNotification == 1 {
+			toggleNoticeKey.Text = "关闭通知"
+		} else {
+			toggleNoticeKey.Text = "开启通知"
+
+		}
+		if sub.EnableTelegraph == 1 {
+			toggleTelegraphKey.Text = "关闭 Telegraph 转码"
+		} else {
+			toggleTelegraphKey.Text = "开启 Telegraph 转码"
+		}
+		feedSettingKeys = append(feedSettingKeys, []tb.InlineButton{toggleNoticeKey, toggleTelegraphKey})
+		_ = t.Execute(text, map[string]interface{}{"source": source, "sub": sub})
+		_ = B.Respond(c, &tb.CallbackResponse{
+			Text: "修改成功",
+		})
+		_, _ = B.Edit(c.Message, text.String(), &tb.SendOptions{
+			ParseMode: tb.ModeHTML,
+		}, &tb.ReplyMarkup{
+			InlineKeyboard: feedSettingKeys,
+		})
+	})
+
+	B.Handle(&toggleTelegraphKey, func(c *tb.Callback) {
+
+		msg := strings.Split(c.Message.Text, "\n")
+		subID, err := strconv.Atoi(strings.Split(msg[1], " ")[1])
+		if err != nil {
+			_ = B.Respond(c, &tb.CallbackResponse{
+				Text: "error",
+			})
+			return
+		}
+		sub, err := model.GetSubscribeByID(int(subID))
+		if sub == nil || err != nil {
+			_ = B.Respond(c, &tb.CallbackResponse{
+				Text: "error",
+			})
+			return
+		}
+
+		source := model.GetSourceById(int(sub.SourceID))
+		t := template.New("setting template")
+		t.Parse(`
+订阅<b>设置</b>
+[id] {{ .sub.ID}}
+[标题] {{ .source.Title }}
+[Link] {{.source.Link}}
+[通知] {{if eq .sub.EnableNotification 0}}关闭{{else if eq .sub.EnableNotification 1}}开启{{end}}
+[Telegraph] {{if eq .sub.EnableTelegraph 0}}关闭{{else if eq .sub.EnableTelegraph 1}}开启{{end}}
+`)
+		feedSettingKeys := [][]tb.InlineButton{}
+
+		err = sub.ToggleTelegraph()
 		if err != nil {
 			_ = B.Respond(c, &tb.CallbackResponse{
 				Text: "error",

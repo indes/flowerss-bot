@@ -115,6 +115,16 @@ func (s *Subscribe) ToggleNotification() error {
 	}
 	return nil
 }
+
+func (s *Subscribe) ToggleTelegraph() error {
+	if s.EnableTelegraph != 1 {
+		s.EnableTelegraph = 1
+	} else {
+		s.EnableTelegraph = 0
+	}
+	return nil
+}
+
 func (s *Subscribe) Save() {
 	db := getConnect()
 	defer db.Close()
