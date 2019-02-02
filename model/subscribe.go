@@ -20,6 +20,8 @@ func RegistFeed(userID int64, sourceID uint) error {
 		if err.Error() == "record not found" {
 			subscribe.UserID = userID
 			subscribe.SourceID = sourceID
+			subscribe.EnableNotification = 1
+			subscribe.EnableTelegraph = 1
 			err := db.Create(&subscribe).Error
 			if err == nil {
 				return nil
