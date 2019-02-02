@@ -98,3 +98,26 @@ func UnsubByUserIDAndSourceURL(userID int, url string) error {
 	err = UnsubByUserIDAndSource(userID, source)
 	return err
 }
+
+func GetSubscribeByID(id int) (*Subscribe, error) {
+	db := getConnect()
+	defer db.Close()
+	var sub Subscribe
+	db.Where("id=?  ", id).First(&sub)
+	return &sub, nil
+}
+
+func (s *Subscribe) ToggleNotification() error {
+	if s.EnableNotification != 1 {
+		s.EnableNotification = 1
+	} else {
+		s.EnableNotification = 0
+	}
+	return nil
+}
+func (s *Subscribe) Save() {
+	db := getConnect()
+	defer db.Close()
+	db.Save(&s)
+	return
+}

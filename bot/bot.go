@@ -11,6 +11,7 @@ import (
 	"html/template"
 	"log"
 	"net/http"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -80,26 +81,66 @@ func makeHandle() {
 		Unique: "toggle_telegraph",
 		Text:   "切换 Telegraph",
 	}
-	feedSettingKeys := [][]tb.InlineButton{}
+
 	B.Handle(&toggleNoticeKey, func(c *tb.Callback) {
 		// on inline button pressed (callback!)
-
 		// always respond!
-		B.Respond(c, &tb.CallbackResponse{
-			Text: "修改成功",
-		})
-	})
-	B.Handle("/key", func(m *tb.Message) {
-		if !m.Private() {
+		msg := strings.Split(c.Message.Text, "\n")
+		subID, err := strconv.Atoi(strings.Split(msg[1], " ")[1])
+		if err != nil {
+			_ = B.Respond(c, &tb.CallbackResponse{
+				Text: "error",
+			})
 			return
 		}
-		toggleNoticeKey.Text = "开启通知"
+		sub, err := model.GetSubscribeByID(int(subID))
+		if sub == nil || err != nil {
+			_ = B.Respond(c, &tb.CallbackResponse{
+				Text: "error",
+			})
+			return
+		}
 
-		feedSettingKeys = append(
-			feedSettingKeys,
-			[]tb.InlineButton{toggleNoticeKey},
-		)
-		_, _ = B.Send(m.Sender, "Hello!", &tb.ReplyMarkup{
+		source := model.GetSourceById(int(sub.SourceID))
+		t := template.New("setting template")
+		t.Parse(`
+订阅<b>设置</b>
+[id] {{ .sub.ID}}
+[标题] {{ .source.Title }}
+[Link] {{.source.Link}}
+[通知] {{if eq .sub.EnableNotification 0}}关闭{{else if eq .sub.EnableNotification 1}}开启{{end}}
+[Telegraph] {{if eq .sub.EnableTelegraph 0}}关闭{{else if eq .sub.EnableTelegraph 1}}开启{{end}}
+`)
+		feedSettingKeys := [][]tb.InlineButton{}
+
+		err = sub.ToggleNotification()
+		if err != nil {
+			_ = B.Respond(c, &tb.CallbackResponse{
+				Text: "error",
+			})
+			return
+		}
+		sub.Save()
+		text := new(bytes.Buffer)
+		if sub.EnableNotification == 1 {
+			toggleNoticeKey.Text = "关闭通知"
+		} else {
+			toggleNoticeKey.Text = "开启通知"
+
+		}
+		if sub.EnableTelegraph == 1 {
+			toggleTelegraphKey.Text = "关闭 Telegraph 转码"
+		} else {
+			toggleTelegraphKey.Text = "开启 Telegraph 转码"
+		}
+		feedSettingKeys = append(feedSettingKeys, []tb.InlineButton{toggleNoticeKey, toggleTelegraphKey})
+		_ = t.Execute(text, map[string]interface{}{"source": source, "sub": sub})
+		_ = B.Respond(c, &tb.CallbackResponse{
+			Text: "修改成功",
+		})
+		_, _ = B.Edit(c.Message, text.String(), &tb.SendOptions{
+			ParseMode: tb.ModeHTML,
+		}, &tb.ReplyMarkup{
 			InlineKeyboard: feedSettingKeys,
 		})
 	})
@@ -282,6 +323,7 @@ func makeHandle() {
 [通知] {{if eq .sub.EnableNotification 0}}关闭{{else if eq .sub.EnableNotification 1}}开启{{end}}
 [Telegraph] {{if eq .sub.EnableTelegraph 0}}关闭{{else if eq .sub.EnableTelegraph 1}}开启{{end}}
 `)
+					feedSettingKeys := [][]tb.InlineButton{}
 
 					text := new(bytes.Buffer)
 					if sub.EnableNotification == 1 {
@@ -296,6 +338,7 @@ func makeHandle() {
 					} else {
 						toggleTelegraphKey.Text = "开启 Telegraph 转码"
 					}
+
 					feedSettingKeys = append(feedSettingKeys, []tb.InlineButton{toggleNoticeKey, toggleTelegraphKey})
 					_ = t.Execute(text, map[string]interface{}{"source": source, "sub": sub})
 
@@ -303,7 +346,7 @@ func makeHandle() {
 					delKeyMessage, err := B.Send(m.Sender, "processing", &tb.ReplyMarkup{ReplyKeyboardRemove: true})
 					err = B.Delete(delKeyMessage)
 					//_, err = B.Edit(message, "hello")
-					log.Println(err)
+
 					//_, _ = B.Edit(message,
 					//	text.String(),
 					//	&tb.SendOptions{
@@ -319,8 +362,7 @@ func makeHandle() {
 						&tb.SendOptions{
 							ParseMode: tb.ModeHTML,
 						}, &tb.ReplyMarkup{
-							InlineKeyboard:      feedSettingKeys,
-							ReplyKeyboardRemove: true,
+							InlineKeyboard: feedSettingKeys,
 						},
 					)
 					UserState[m.Sender.ID] = fsm.None
