@@ -45,20 +45,29 @@ func BroadNews(source *model.Source, subs []model.Subscribe, contents []model.Co
 	for _, content := range contents {
 		for _, sub := range subs {
 			var disableNotification bool
+			var telegraphURL string
 			if sub.EnableNotification == 1 {
 				disableNotification = false
 			} else {
 				disableNotification = true
 			}
+
+			if sub.EnableTelegraph == 1 {
+				telegraphURL = content.TelegraphUrl
+
+			} else {
+				telegraphURL = ""
+
+			}
 			u.ID = int(sub.UserID)
+
 			message := `
 *%s*
 %s
 [原文](%s)
 %s
 `
-			message = fmt.Sprintf(message, source.Title, content.Title, content.RawLink, content.TelegraphUrl)
-
+			message = fmt.Sprintf(message, source.Title, content.Title, content.RawLink, telegraphURL)
 			_, err := B.Send(&u, message, &telebot.SendOptions{
 				ParseMode:           telebot.ModeMarkdown,
 				DisableNotification: disableNotification,
