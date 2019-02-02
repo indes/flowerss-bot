@@ -85,7 +85,9 @@ func makeHandle() {
 		// on inline button pressed (callback!)
 
 		// always respond!
-		B.Respond(c, &tb.CallbackResponse{})
+		B.Respond(c, &tb.CallbackResponse{
+			Text: "修改成功",
+		})
 	})
 	B.Handle("/key", func(m *tb.Message) {
 		if !m.Private() {
@@ -159,8 +161,7 @@ func makeHandle() {
 			replyKeys = append(replyKeys, replyButton)
 		}
 		_, err := B.Send(m.Sender, "请选择你要设置的源", &tb.ReplyMarkup{
-			ReplyKeyboard:   replyKeys,
-			OneTimeKeyboard: true,
+			ReplyKeyboard: replyKeys,
 		})
 
 		if err == nil {
@@ -282,7 +283,7 @@ func makeHandle() {
 [Telegraph] {{if eq .sub.EnableTelegraph 0}}关闭{{else if eq .sub.EnableTelegraph 1}}开启{{end}}
 `)
 
-					message := new(bytes.Buffer)
+					text := new(bytes.Buffer)
 					if sub.EnableNotification == 1 {
 
 						toggleNoticeKey.Text = "关闭通知"
@@ -296,14 +297,30 @@ func makeHandle() {
 						toggleTelegraphKey.Text = "开启 Telegraph 转码"
 					}
 					feedSettingKeys = append(feedSettingKeys, []tb.InlineButton{toggleNoticeKey, toggleTelegraphKey})
-					_ = t.Execute(message, map[string]interface{}{"source": source, "sub": sub})
+					_ = t.Execute(text, map[string]interface{}{"source": source, "sub": sub})
+
+					// send null message to remove old keyboard
+					delKeyMessage, err := B.Send(m.Sender, "processing", &tb.ReplyMarkup{ReplyKeyboardRemove: true})
+					err = B.Delete(delKeyMessage)
+					//_, err = B.Edit(message, "hello")
+					log.Println(err)
+					//_, _ = B.Edit(message,
+					//	text.String(),
+					//	&tb.SendOptions{
+					//		ParseMode: tb.ModeHTML,
+					//	}, &tb.ReplyMarkup{
+					//		InlineKeyboard: feedSettingKeys,
+					//	},
+					//)
+
 					_, _ = B.Send(
 						m.Sender,
-						message.String(),
+						text.String(),
 						&tb.SendOptions{
 							ParseMode: tb.ModeHTML,
 						}, &tb.ReplyMarkup{
-							InlineKeyboard: feedSettingKeys,
+							InlineKeyboard:      feedSettingKeys,
+							ReplyKeyboardRemove: true,
 						},
 					)
 					UserState[m.Sender.ID] = fsm.None
