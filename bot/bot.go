@@ -102,7 +102,7 @@ func makeHandle() {
 
 		source := model.GetSourceById(int(sub.SourceID))
 		t := template.New("setting template")
-		t.Parse(`
+		_, _ = t.Parse(`
 订阅<b>设置</b>
 [id] {{ .sub.ID}}
 [标题] {{ .source.Title }}
@@ -164,7 +164,7 @@ func makeHandle() {
 
 		source := model.GetSourceById(int(sub.SourceID))
 		t := template.New("setting template")
-		t.Parse(`
+		_, _ = t.Parse(`
 订阅<b>设置</b>
 [id] {{ .sub.ID}}
 [标题] {{ .source.Title }}
@@ -325,17 +325,18 @@ func makeHandle() {
 		case fsm.UnSub:
 			{
 				str := strings.Split(m.Text, " ")
-				if len(str) != 2 && !CheckUrl(str[1]) {
+				url := str[len(str)-1]
+				if len(str) != 2 && !CheckUrl(url) {
 					_, _ = B.Send(m.Sender, "请选择正确的指令！")
 				} else {
-					err := model.UnsubByUserIDAndSourceURL(m.Sender.ID, str[1])
+					err := model.UnsubByUserIDAndSourceURL(m.Sender.ID, url)
 					if err != nil {
 						_, _ = B.Send(m.Sender, "请选择正确的指令！")
 
 					} else {
 						_, _ = B.Send(
 							m.Sender,
-							fmt.Sprintf("[%s](%s) 退订成功", str[0], str[1]),
+							fmt.Sprintf("[%s](%s) 退订成功", str[0], url),
 							&tb.SendOptions{
 								ParseMode: tb.ModeMarkdown,
 							}, &tb.ReplyMarkup{
@@ -361,10 +362,11 @@ func makeHandle() {
 		case fsm.Set:
 			{
 				str := strings.Split(m.Text, " ")
-				if len(str) != 2 && !CheckUrl(str[1]) {
+				url := str[len(str)-1]
+				if len(str) != 2 && !CheckUrl(url) {
 					_, _ = B.Send(m.Sender, "请选择正确的指令！")
 				} else {
-					source, err := model.GetSourceByUrl(str[1])
+					source, err := model.GetSourceByUrl(url)
 
 					if err != nil {
 						_, _ = B.Send(m.Sender, "请选择正确的指令！")
@@ -376,7 +378,7 @@ func makeHandle() {
 						return
 					}
 					t := template.New("setting template")
-					t.Parse(`
+					_, _ = t.Parse(`
 订阅<b>设置</b>
 [id] {{ .sub.ID}}
 [标题] {{ .source.Title }}
