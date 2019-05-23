@@ -7,7 +7,6 @@
 
 DEMO: https://t.me/rssflowbot
 
-<img src="https://raw.githubusercontent.com/indes/rssflow/master/images/IMG_1525.jpg" width = "300"/>
 <img src="https://raw.githubusercontent.com/indes/rssflow/master/images/rssflow_demo.gif" width = "300"/>
 
 
