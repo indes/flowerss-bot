@@ -42,39 +42,43 @@ func BroadNews(source *model.Source, subs []model.Subscribe, contents []model.Co
 
 	log.Printf("Source Title: <%s> Subscriber: %d New Contents: %d", source.Title, len(subs), len(contents))
 	var u telebot.User
+	var message string
 	for _, content := range contents {
 		for _, sub := range subs {
 			var disableNotification bool
-			var telegraphURL string
 			if sub.EnableNotification == 1 {
 				disableNotification = false
 			} else {
 				disableNotification = true
 			}
 
-			if sub.EnableTelegraph == 1 {
-				telegraphURL = content.TelegraphUrl
-
-			} else {
-				telegraphURL = ""
-
-			}
 			u.ID = int(sub.UserID)
 
-			message := `
+			if sub.EnableTelegraph == 1 {
+				// 补发Telegraph链接
+				message = `
 *%s*
-%s
-[原文](%s)
-%s
+%s | [Telegraph](%s) | [原文](%s)
 `
-			message = fmt.Sprintf(message, source.Title, content.Title, content.RawLink, telegraphURL)
+				message = fmt.Sprintf(message, source.Title, content.Title, content.TelegraphUrl, content.RawLink)
+
+			} else {
+				message = `
+*%s*
+%s | [原文](%s)
+`
+				message = fmt.Sprintf(message, source.Title, content.Title, content.RawLink)
+			}
+
 			_, err := B.Send(&u, message, &telebot.SendOptions{
-				ParseMode:           telebot.ModeMarkdown,
-				DisableNotification: disableNotification,
+				DisableWebPagePreview: false,
+				ParseMode:             telebot.ModeMarkdown,
+				DisableNotification:   disableNotification,
 			})
 			if err != nil {
 				log.Println(err)
 			}
+
 		}
 	}
 }
