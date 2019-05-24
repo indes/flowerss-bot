@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/indes/rssflow/bot"
-	"github.com/indes/rssflow/task"
+	"github.com/indes/flowerss-bot/bot"
+	"github.com/indes/flowerss-bot/task"
 )
 
 func main() {

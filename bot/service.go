@@ -2,8 +2,8 @@ package bot
 
 import (
 	"fmt"
-	"github.com/indes/rssflow/config"
-	"github.com/indes/rssflow/model"
+	"github.com/indes/flowerss-bot/config"
+	"github.com/indes/flowerss-bot/model"
 	"gopkg.in/tucnak/telebot.v2"
 	"log"
 )

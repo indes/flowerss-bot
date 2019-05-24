@@ -3,9 +3,9 @@ package bot
 import (
 	"bytes"
 	"fmt"
-	"github.com/indes/rssflow/bot/fsm"
-	"github.com/indes/rssflow/config"
-	"github.com/indes/rssflow/model"
+	"github.com/indes/flowerss-bot/bot/fsm"
+	"github.com/indes/flowerss-bot/config"
+	"github.com/indes/flowerss-bot/model"
 	"golang.org/x/net/proxy"
 	tb "gopkg.in/tucnak/telebot.v2"
 	"html/template"
