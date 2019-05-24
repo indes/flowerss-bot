@@ -32,7 +32,7 @@ func RegistFeed(userID int64, sourceID uint) error {
 	return nil
 }
 
-func GetSubscribeByUserIDAndSourceID(userID int, sourceID uint) (*Subscribe, error) {
+func GetSubscribeByUserIDAndSourceID(userID int64, sourceID uint) (*Subscribe, error) {
 	db := getConnect()
 	defer db.Close()
 	var sub Subscribe
@@ -66,7 +66,7 @@ func GetSubscriberBySource(s *Source) []Subscribe {
 	return subs
 }
 
-func UnsubByUserIDAndSource(userID int, source *Source) error {
+func UnsubByUserIDAndSource(userID int64, source *Source) error {
 	db := getConnect()
 	defer db.Close()
 	var sub Subscribe
@@ -81,7 +81,7 @@ func UnsubByUserIDAndSource(userID int, source *Source) error {
 	return nil
 }
 
-func GetSubsByUserID(userID int) []Subscribe {
+func GetSubsByUserID(userID int64) []Subscribe {
 	db := getConnect()
 	defer db.Close()
 
@@ -92,7 +92,7 @@ func GetSubsByUserID(userID int) []Subscribe {
 	return subs
 }
 
-func UnsubByUserIDAndSourceURL(userID int, url string) error {
+func UnsubByUserIDAndSourceURL(userID int64, url string) error {
 	source, err := GetSourceByUrl(url)
 	if err != nil {
 		return err

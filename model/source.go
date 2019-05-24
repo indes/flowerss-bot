@@ -117,7 +117,7 @@ func (s *Source) GetNewContents() ([]Content, error) {
 	return newContents, nil
 }
 
-func GetSourcesByUserID(userID int) ([]Source, error) {
+func GetSourcesByUserID(userID int64) ([]Source, error) {
 	db := getConnect()
 	defer db.Close()
 	var sources []Source
