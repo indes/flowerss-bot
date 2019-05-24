@@ -342,6 +342,18 @@ func makeHandle() {
 		_, _ = B.Send(m.Chat, "pong")
 	})
 
+	B.Handle("/help", func(m *tb.Message) {
+		message := `
+命令：
+/sub 订阅源
+/unsub  取消订阅
+/list 查看当前订阅源
+/set 设置订阅
+/help 帮助
+`
+		_, _ = B.Send(m.Chat, message)
+	})
+
 	B.Handle(tb.OnText, func(m *tb.Message) {
 		switch UserState[m.Chat.ID] {
 		case fsm.UnSub:
