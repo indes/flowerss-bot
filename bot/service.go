@@ -34,7 +34,7 @@ func registFeed(chat *telebot.Chat, url string) {
 
 //SendError send error user
 func SendError(c *telebot.Chat) {
-	B.Send(c, "请输入正确的指令！")
+	_, _ = B.Send(c, "请输入正确的指令！")
 }
 
 //BroadNews send new contents message to subscriber
@@ -54,14 +54,12 @@ func BroadNews(source *model.Source, subs []model.Subscribe, contents []model.Co
 
 			u.ID = int(sub.UserID)
 
-			if sub.EnableTelegraph == 1 {
-				// 补发Telegraph链接
+			if sub.EnableTelegraph == 1 && content.TelegraphUrl != "" {
 				message = `
 *%s*
 %s | [Telegraph](%s) | [原文](%s)
 `
 				message = fmt.Sprintf(message, source.Title, content.Title, content.TelegraphUrl, content.RawLink)
-
 			} else {
 				message = `
 *%s*
