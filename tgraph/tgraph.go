@@ -1,7 +1,7 @@
 package tgraph
 
 import (
-	"github.com/indes/rssflow/config"
+	"github.com/indes/flowerss-bot/config"
 	"github.com/meinside/telegraph-go"
 	"log"
 )
@@ -13,8 +13,8 @@ const (
 
 var (
 	authToken  = config.TelegraphToken
-	authorUrl  = "https://github.com/indes/rssflow"
-	authorName = "RSSFlow"
+	authorUrl  = "https://github.com/indes/flowerss-bot"
+	authorName = "flowerss"
 	verbose    = false
 	client     *telegraph.Client
 )

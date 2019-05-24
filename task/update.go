@@ -1,9 +1,9 @@
 package task
 
 import (
-	"github.com/indes/rssflow/bot"
-	"github.com/indes/rssflow/config"
-	"github.com/indes/rssflow/model"
+	"github.com/indes/flowerss-bot/bot"
+	"github.com/indes/flowerss-bot/config"
+	"github.com/indes/flowerss-bot/model"
 	"time"
 )
 

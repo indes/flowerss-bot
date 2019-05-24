@@ -26,7 +26,7 @@ type MysqlConfig struct {
 }
 
 func init() {
-	projectName := "rssflow"
+	projectName := "flowerss-bot"
 
 	viper.SetConfigName("config") // name of config file (without extension)
 	viper.AddConfigPath(".")

@@ -1,13 +1,13 @@
-# RSSFlow
+# flowerss bot
 
-[![Build Status](https://travis-ci.org/indes/rssflow.svg?branch=master)](https://travis-ci.org/indes/rssflow)
-[![Go Report Card](https://goreportcard.com/badge/github.com/indes/rssflow)](https://goreportcard.com/report/github.com/indes/rssflow)
-[![MIT license](https://img.shields.io/github/license/indes/rssflow.svg)](https://github.com/indes/rssflow/blob/master/LICENSE)
-[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Findes%2Frssflow.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Findes%2Frssflow?ref=badge_shield)
+[![Build Status](https://travis-ci.org/indes/flowerss-bot.svg?branch=master)](https://travis-ci.org/indes/flowerss-bot)
+[![Go Report Card](https://goreportcard.com/badge/github.com/indes/flowerss-bot)](https://goreportcard.com/report/github.com/indes/flowerss-bot)
+[![MIT license](https://img.shields.io/github/license/indes/flowerss-bot.svg)](https://github.com/indes/flowerss-bot/blob/master/LICENSE)
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Findes%2Fflowerss-bot.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Findes%2Fflowerss-bot?ref=badge_shield)
 
-DEMO: https://t.me/rssflowbot
+DEMO: https://t.me/flowerssbot
 
-<img src="https://raw.githubusercontent.com/indes/rssflow/master/images/rssflow_demo.gif" width = "300"/>
+<img src="https://raw.githubusercontent.com/indes/flowerss-bot/master/images/flowerss-bot_demo.gif" width = "300"/>
 
 
 ## Features  
@@ -22,16 +22,16 @@ DEMO: https://t.me/rssflowbot
 ### 源码安装
 
 ```shell
-git clone https://github.com/indes/rssflow && cd rssflow
+git clone https://github.com/indes/flowerss-bot && cd flowerss-bot
 make build
-./rssflow
+./flowerss-bot
 ```
 
 ### 下载二进制
 
 **不支持 SQLite**  
 
-从[Releases](https://github.com/indes/rssflow/releases) 页面下载对应的版本。
+从[Releases](https://github.com/indes/flowerss-bot/releases) 页面下载对应的版本。
 
 ## 配置
 
@@ -47,7 +47,7 @@ mysql:
   port: 3306
   user: user
   password: pwd
-  database: rssflow
+  database: flowerss
 ```
 
 配置说明：
@@ -69,7 +69,6 @@ mysql:
 /list 查看当前订阅源
 /ping :)
 ```
-建议配合 [RSSHub](https://github.com/DIYgod/RSSHub) 使用。
 
 ## License
-[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Findes%2Frssflow.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Findes%2Frssflow?ref=badge_large)
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Findes%2Fflowerss-bot.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Findes%2Fflowerss-bot?ref=badge_large)

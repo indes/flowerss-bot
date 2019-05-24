@@ -1,4 +1,4 @@
-project_name: rssflow
+project_name: flowerss-bot
 before:
   hooks:
     - go mod download

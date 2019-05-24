@@ -2,8 +2,8 @@ package model
 
 import (
 	"github.com/SlyMarbo/rss"
-	"github.com/indes/rssflow/config"
-	"github.com/indes/rssflow/tgraph"
+	"github.com/indes/flowerss-bot/config"
+	"github.com/indes/flowerss-bot/tgraph"
 	"strings"
 )
 
