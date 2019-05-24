@@ -2,12 +2,12 @@
 
 [![Build Status](https://travis-ci.org/indes/flowerss-bot.svg?branch=master)](https://travis-ci.org/indes/flowerss-bot)
 [![Go Report Card](https://goreportcard.com/badge/github.com/indes/flowerss-bot)](https://goreportcard.com/report/github.com/indes/flowerss-bot)
-[![MIT license](https://img.shields.io/github/license/indes/flowerss-bot.svg)](https://github.com/indes/flowerss-bot/blob/master/LICENSE)
-[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Findes%2Fflowerss-bot.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Findes%2Fflowerss-bot?ref=badge_shield)
+![GitHub](https://img.shields.io/github/license/indes/flowerss-bot.svg)
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Findes%2Fflowerss-bot.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Findes%2Fflowerss-bot?ref=badge_shield)
 
 DEMO: https://t.me/flowerssbot
 
-<img src="https://raw.githubusercontent.com/indes/flowerss-bot/master/images/flowerss-bot_demo.gif" width = "300"/>
+<img src="https://raw.githubusercontent.com/indes/flowerss-bot/master/images/rssflow_demo.gif" width = "300"/>
 
 
 ## Features  
@@ -67,7 +67,8 @@ mysql:
 /sub [url] 订阅源
 /unsub [url] 取消订阅
 /list 查看当前订阅源
-/ping :)
+/set 设置订阅
+/help 帮助
 ```
 
 ## License

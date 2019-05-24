@@ -1,6 +1,6 @@
 language: go
 go:
-  - 1.11.2
+  - 1.12.5
   
 deploy:
 - provider: script
