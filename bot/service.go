@@ -92,3 +92,26 @@ func BroadSourceError(source *model.Source) {
 		})
 	}
 }
+
+func CheckAdmin(m *telebot.Message) bool {
+	if HasAdminType(m.Chat.Type) {
+		adminList, _ := B.AdminsOf(m.Chat)
+		for _, admin := range adminList {
+			if admin.User.ID == m.Sender.ID {
+				return true
+			}
+		}
+		return false
+	}
+	return true
+}
+
+func HasAdminType(t telebot.ChatType) bool {
+	hasAdmin := []telebot.ChatType{telebot.ChatGroup, telebot.ChatSuperGroup, telebot.ChatChannel, telebot.ChatChannelPrivate}
+	for _, n := range hasAdmin {
+		if t == n {
+			return true
+		}
+	}
+	return false
+}
