@@ -248,19 +248,63 @@ func makeHandle() {
 	})
 
 	B.Handle("/list", func(m *tb.Message) {
-		sources, _ := model.GetSourcesByUserID(m.Chat.ID)
-		message := "当前订阅列表：\n"
-		if len(sources) == 0 {
-			message = "订阅列表为空"
-		} else {
-			for index, source := range sources {
-				message = message + fmt.Sprintf("[[%d]] [%s](%s)\n", index+1, source.Title, source.Link)
+		_, mention := GetUrlAndMentionFromMessage(m)
+		if mention != "" {
+
+			channelChat, err := B.ChatByID(mention)
+			if err != nil {
+				_, _ = B.Send(m.Chat, "error")
+				return
 			}
+			adminList, err := B.AdminsOf(channelChat)
+			if err != nil {
+				_, _ = B.Send(m.Chat, "error")
+				return
+			}
+
+			senderIsAdmin := false
+			for _, admin := range adminList {
+				if m.Sender.ID == admin.User.ID {
+					senderIsAdmin = true
+				}
+			}
+
+			if !senderIsAdmin {
+				_, _ = B.Send(m.Chat, fmt.Sprintf("非频道管理员无法执行此操作"))
+				return
+			}
+
+			sources, _ := model.GetSourcesByUserID(channelChat.ID)
+			message := fmt.Sprintf("频道 [%s](https://t.me/%s) 订阅列表：\n", channelChat.Title, channelChat.Username)
+			if len(sources) == 0 {
+				message = fmt.Sprintf("频道 [%s](https://t.me/%s) 订阅列表为空", channelChat.Title, channelChat.Username)
+			} else {
+				for index, source := range sources {
+					message = message + fmt.Sprintf("[[%d]] [%s](%s)\n", index+1, source.Title, source.Link)
+				}
+			}
+
+			_, _ = B.Send(m.Chat, message, &tb.SendOptions{
+				DisableWebPagePreview: true,
+				ParseMode:             tb.ModeMarkdown,
+			})
+
+		} else {
+			sources, _ := model.GetSourcesByUserID(m.Chat.ID)
+			message := "当前订阅列表：\n"
+			if len(sources) == 0 {
+				message = "订阅列表为空"
+			} else {
+				for index, source := range sources {
+					message = message + fmt.Sprintf("[[%d]] [%s](%s)\n", index+1, source.Title, source.Link)
+				}
+			}
+			_, _ = B.Send(m.Chat, message, &tb.SendOptions{
+				DisableWebPagePreview: true,
+				ParseMode:             tb.ModeMarkdown,
+			})
 		}
-		_, _ = B.Send(m.Chat, message, &tb.SendOptions{
-			DisableWebPagePreview: true,
-			ParseMode:             tb.ModeMarkdown,
-		})
+
 	})
 
 	B.Handle("/set", func(m *tb.Message) {
