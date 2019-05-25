@@ -65,8 +65,8 @@ mysql:
 
 命令：
 ```shell
-/sub [url] 订阅
-/unsub [url] 取消订阅
+/sub [url] 订阅（url为可选）
+/unsub [url] 取消订阅（url为可选）
 /list 查看当前订阅
 /set 设置订阅
 /help 帮助
