@@ -87,7 +87,7 @@ Channel 订阅支持的命令:
  
 例如要给 t.me/debug 频道订阅 [阮一峰的网络日志](http://www.ruanyifeng.com/blog/atom.xml) RSS 更新：
 1. 将 Bot 添加到 debug 频道管理员列表中
-2. 给 Bot 发送 /sub @debug http://www.ruanyifeng.com/blog/atom.xml
+2. 给 Bot 发送 `/sub @debug http://www.ruanyifeng.com/blog/atom.xml` 命令
 
 ## License
 [![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Findes%2Fflowerss-bot.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Findes%2Fflowerss-bot?ref=badge_large)
