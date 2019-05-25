@@ -80,6 +80,17 @@ func UnsubByUserIDAndSource(userID int64, source *Source) error {
 	}
 	return nil
 }
+func GetSubByUserIDAndURL(userID int64, url string) (*Subscribe, error) {
+	db := getConnect()
+	defer db.Close()
+	var sub Subscribe
+	source, err := GetSourceByUrl(url)
+	if err != nil {
+		return &sub, err
+	}
+	err = db.Where("user_id=? and source_id=?", userID, source.ID).First(&sub).Error
+	return &sub, err
+}
 
 func GetSubsByUserID(userID int64) []Subscribe {
 	db := getConnect()
@@ -125,6 +136,17 @@ func (s *Subscribe) ToggleTelegraph() error {
 		s.EnableTelegraph = 0
 	}
 	return nil
+}
+
+func (s *Subscribe) Unsub() (err error) {
+	if s.ID == 0 {
+		return errors.New("can't delete 0 subscribe")
+	}
+	db := getConnect()
+	defer db.Close()
+
+	err = db.Delete(&s).Error
+	return
 }
 
 func (s *Subscribe) Save() {

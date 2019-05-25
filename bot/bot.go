@@ -250,7 +250,6 @@ func makeHandle() {
 	B.Handle("/list", func(m *tb.Message) {
 		_, mention := GetUrlAndMentionFromMessage(m)
 		if mention != "" {
-
 			channelChat, err := B.ChatByID(mention)
 			if err != nil {
 				_, _ = B.Send(m.Chat, "error")
@@ -337,45 +336,119 @@ func makeHandle() {
 	})
 
 	B.Handle("/unsub", func(m *tb.Message) {
-		msg := strings.Split(m.Text, " ")
 
-		if len(msg) == 2 && CheckUrl(msg[1]) {
-			//Unsub by url
-			url := msg[1]
+		url, mention := GetUrlAndMentionFromMessage(m)
 
-			source, _ := model.GetSourceByUrl(url)
-			if source == nil {
-				_, _ = B.Send(m.Chat, "未订阅该RSS源")
-			} else {
-				err := model.UnsubByUserIDAndSource(m.Chat.ID, source)
-				if err == nil {
-					_, _ = B.Send(m.Chat, "退订成功！")
-					log.Printf("%d unsubscribe [%d]%s %s", m.Chat.ID, source.ID, source.Title, source.Link)
+		if mention == "" {
+			if url != "" {
+				//Unsub by url
+				source, _ := model.GetSourceByUrl(url)
+				if source == nil {
+					_, _ = B.Send(m.Chat, "未订阅该RSS源")
 				} else {
-					_, err = B.Send(m.Chat, err.Error())
+					err := model.UnsubByUserIDAndSource(m.Chat.ID, source)
+					if err == nil {
+						_, _ = B.Send(
+							m.Chat,
+							fmt.Sprintf("[%s](%s) 退订成功！", source.Title, source.Link),
+							&tb.SendOptions{
+								DisableWebPagePreview: true,
+								ParseMode:             tb.ModeMarkdown,
+							},
+						)
+						log.Printf("%d unsubscribe [%d]%s %s", m.Chat.ID, source.ID, source.Title, source.Link)
+					} else {
+						_, err = B.Send(m.Chat, err.Error())
+					}
+				}
+			} else {
+				//Unsub by button
+				sources, _ := model.GetSourcesByUserID(m.Chat.ID)
+				var replyButton []tb.ReplyButton
+				replyKeys := [][]tb.ReplyButton{}
+				for _, source := range sources {
+					// 添加按钮
+					text := fmt.Sprintf("%s %s", source.Title, source.Link)
+					replyButton = []tb.ReplyButton{
+						tb.ReplyButton{Text: text},
+					}
+
+					replyKeys = append(replyKeys, replyButton)
+				}
+				_, err := B.Send(m.Chat, "请选择你要退订的源", &tb.ReplyMarkup{
+					ForceReply:    true,
+					ReplyKeyboard: replyKeys,
+				})
+
+				if err == nil {
+					UserState[m.Chat.ID] = fsm.UnSub
 				}
 			}
 		} else {
-			//Unsub by button
-			sources, _ := model.GetSourcesByUserID(m.Chat.ID)
-			var replyButton []tb.ReplyButton
-			replyKeys := [][]tb.ReplyButton{}
-			for _, source := range sources {
-				// 添加按钮
-				text := fmt.Sprintf("%s %s", source.Title, source.Link)
-				replyButton = []tb.ReplyButton{
-					tb.ReplyButton{Text: text},
+			if url != "" {
+				channelChat, err := B.ChatByID(mention)
+				if err != nil {
+					_, _ = B.Send(m.Chat, "error")
+					return
+				}
+				adminList, err := B.AdminsOf(channelChat)
+				if err != nil {
+					_, _ = B.Send(m.Chat, "error")
+					return
 				}
 
-				replyKeys = append(replyKeys, replyButton)
-			}
-			_, err := B.Send(m.Chat, "请选择你要退订的源", &tb.ReplyMarkup{
-				ForceReply:    true,
-				ReplyKeyboard: replyKeys,
-			})
+				senderIsAdmin := false
+				for _, admin := range adminList {
+					if m.Sender.ID == admin.User.ID {
+						senderIsAdmin = true
+					}
+				}
 
-			if err == nil {
-				UserState[m.Chat.ID] = fsm.UnSub
+				if !senderIsAdmin {
+					_, _ = B.Send(m.Chat, fmt.Sprintf("非频道管理员无法执行此操作"))
+					return
+				}
+
+				source, _ := model.GetSourceByUrl(url)
+				sub, err := model.GetSubByUserIDAndURL(channelChat.ID, url)
+
+				if err != nil {
+					if err.Error() == "record not found" {
+						_, _ = B.Send(
+							m.Chat,
+							fmt.Sprintf("频道 [%s](https://t.me/%s) 未订阅该RSS源", channelChat.Title, channelChat.Username),
+							&tb.SendOptions{
+								DisableWebPagePreview: true,
+								ParseMode:             tb.ModeMarkdown,
+							},
+						)
+
+					} else {
+						_, _ = B.Send(m.Chat, "退订失败")
+					}
+					return
+
+				} else {
+
+					err := sub.Unsub()
+					if err == nil {
+						_, _ = B.Send(
+							m.Chat,
+							fmt.Sprintf("频道 [%s](https://t.me/%s) 退订成功 [%s](%s)", source.Title, source.Link),
+							&tb.SendOptions{
+								DisableWebPagePreview: true,
+								ParseMode:             tb.ModeMarkdown,
+							},
+						)
+						log.Printf("%d for [%s]%s unsubscribe [%d]%s %s", m.Chat.ID, source.ID, source.Title, source.Link)
+					} else {
+						_, err = B.Send(m.Chat, err.Error())
+					}
+					return
+				}
+
+			} else {
+				_, _ = B.Send(m.Chat, "频道退订请使用'\\unsub @ChannelID URL' 命令")
 			}
 		}
 
