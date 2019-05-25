@@ -51,8 +51,6 @@ func FeedForChannelRegister(m *tb.Message, url string, channelMention string) {
 				DisableWebPagePreview: true,
 				ParseMode:             tb.ModeMarkdown,
 			})
-		log.Println(err)
-
 	} else {
 		_, _ = B.Edit(msg, "订阅失败")
 	}
