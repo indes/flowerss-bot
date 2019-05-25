@@ -226,29 +226,29 @@ func makeHandle() {
 	})
 
 	B.Handle("/sub", func(m *tb.Message) {
+		url, mention := GetUrlAndMentionFromMessage(m)
 
-		msg := strings.Split(m.Text, " ")
-
-		if len(msg) == 2 && CheckUrl(msg[1]) {
-
-			url := msg[1]
-			registFeed(m.Chat, url)
-
+		if mention == "" {
+			if url != "" {
+				registFeed(m.Chat, url)
+			} else {
+				_, err := B.Send(m.Chat, "请回复RSS URL", &tb.ReplyMarkup{ForceReply: true})
+				if err == nil {
+					UserState[m.Chat.ID] = fsm.Sub
+				}
+			}
 		} else {
-			_, err := B.Send(m.Chat, "请回复RSS URL", &tb.ReplyMarkup{ForceReply: true})
-
-			if err == nil {
-				UserState[m.Chat.ID] = fsm.Sub
+			if url != "" {
+				FeedForChannelRegister(m, url, mention)
+			} else {
+				_, _ = B.Send(m.Chat, "频道订阅请使用'\\sub @ChannelID URL' 命令")
 			}
 		}
+
 	})
 
 	B.Handle("/list", func(m *tb.Message) {
 		sources, _ := model.GetSourcesByUserID(m.Chat.ID)
-		adminList, listerr := B.AdminsOf(m.Chat)
-		log.Println(adminList)
-		log.Println(listerr)
-
 		message := "当前订阅列表：\n"
 		if len(sources) == 0 {
 			message = "订阅列表为空"
@@ -389,6 +389,7 @@ func makeHandle() {
 					_, _ = B.Send(m.Chat, "请回复正确的URL", &tb.ReplyMarkup{ForceReply: true})
 					return
 				}
+
 				registFeed(m.Chat, url[0])
 				UserState[m.Chat.ID] = fsm.None
 			}
