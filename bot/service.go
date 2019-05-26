@@ -141,20 +141,34 @@ func BroadSourceError(source *model.Source) {
 	}
 }
 
-func CheckAdmin(m *tb.Message) bool {
-	if m == nil {
-		return false
-	}
-	if HasAdminType(m.Chat.Type) {
-		adminList, _ := B.AdminsOf(m.Chat)
-		for _, admin := range adminList {
-			if admin.User.ID == m.Sender.ID {
-				return true
+func CheckAdmin(upd *tb.Update) bool {
+
+	if upd.Message != nil {
+		if HasAdminType(upd.Message.Chat.Type) {
+			adminList, _ := B.AdminsOf(upd.Message.Chat)
+			for _, admin := range adminList {
+				if admin.User.ID == upd.Message.Sender.ID {
+					return true
+				}
 			}
+			return false
 		}
-		return false
+
+		return true
+	} else if upd.Callback != nil {
+		if HasAdminType(upd.Callback.Message.Chat.Type) {
+			adminList, _ := B.AdminsOf(upd.Callback.Message.Chat)
+			for _, admin := range adminList {
+				if admin.User.ID == upd.Callback.Sender.ID {
+					return true
+				}
+			}
+			return false
+		}
+
+		return true
 	}
-	return true
+	return false
 }
 
 func HasAdminType(t tb.ChatType) bool {
