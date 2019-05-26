@@ -434,7 +434,7 @@ func makeHandle() {
 					if err == nil {
 						_, _ = B.Send(
 							m.Chat,
-							fmt.Sprintf("频道 [%s](https://t.me/%s) 退订成功 [%s](%s)", source.Title, source.Link),
+							fmt.Sprintf("频道 [%s](https://t.me/%s) 退订成功 [%s](%s)", channelChat.Title, channelChat.Username, source.Title, source.Link),
 							&tb.SendOptions{
 								DisableWebPagePreview: true,
 								ParseMode:             tb.ModeMarkdown,

@@ -45,7 +45,7 @@ func FeedForChannelRegister(m *tb.Message, url string, channelMention string) {
 	log.Printf("%d for %d subscribe [%d]%s %s", m.Chat.ID, channelChat.ID, source.ID, source.Title, source.Link)
 
 	if err == nil {
-		newText := fmt.Sprintf("成功为频道 [%s](https://t.me/%s) 订阅 [%s](%s) ", channelChat.Title, channelChat.Username, source.Title, source.Link)
+		newText := fmt.Sprintf("频道 [%s](https://t.me/%s) 订阅 [%s](%s) 成功", channelChat.Title, channelChat.Username, source.Title, source.Link)
 		_, err = B.Edit(msg, newText,
 			&tb.SendOptions{
 				DisableWebPagePreview: true,
