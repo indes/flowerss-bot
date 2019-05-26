@@ -28,7 +28,10 @@ func init() {
 	poller := &tb.LongPoller{Timeout: 10 * time.Second}
 	spamProtected := tb.NewMiddlewarePoller(poller, func(upd *tb.Update) bool {
 
-		if !CheckAdmin(upd.Message) {
+		//if upd.Message == nil {
+		//	return true
+		//}
+		if !CheckAdmin(upd) {
 			return false
 		}
 
@@ -311,26 +314,27 @@ func makeHandle() {
 		if HasAdminType(m.Chat.Type) {
 			_, _ = B.Send(m.Chat, "Group和Channel暂时不支持该功能")
 		} else {
-			sources, _ := model.GetSourcesByUserID(m.Chat.ID)
 
-			var replyButton []tb.ReplyButton
-			replyKeys := [][]tb.ReplyButton{}
-			for _, source := range sources {
-				// 添加按钮
-				text := fmt.Sprintf("%s %s", source.Title, source.Link)
-				replyButton = []tb.ReplyButton{
-					tb.ReplyButton{Text: text},
-				}
-				replyKeys = append(replyKeys, replyButton)
-			}
-			_, err := B.Send(m.Chat, "请选择你要设置的源", &tb.ReplyMarkup{
-				ForceReply:    true,
-				ReplyKeyboard: replyKeys,
-			})
+		}
+		sources, _ := model.GetSourcesByUserID(m.Chat.ID)
 
-			if err == nil {
-				UserState[m.Chat.ID] = fsm.Set
+		var replyButton []tb.ReplyButton
+		replyKeys := [][]tb.ReplyButton{}
+		for _, source := range sources {
+			// 添加按钮
+			text := fmt.Sprintf("%s %s", source.Title, source.Link)
+			replyButton = []tb.ReplyButton{
+				tb.ReplyButton{Text: text},
 			}
+			replyKeys = append(replyKeys, replyButton)
+		}
+		_, err := B.Send(m.Chat, "请选择你要设置的源", &tb.ReplyMarkup{
+			ForceReply:    true,
+			ReplyKeyboard: replyKeys,
+		})
+
+		if err == nil {
+			UserState[m.Chat.ID] = fsm.Set
 		}
 
 	})
@@ -434,7 +438,7 @@ func makeHandle() {
 					if err == nil {
 						_, _ = B.Send(
 							m.Chat,
-							fmt.Sprintf("频道 [%s](https://t.me/%s) 退订成功 [%s](%s)", channelChat.Title, channelChat.Username, source.Title, source.Link),
+							fmt.Sprintf("频道 [%s](https://t.me/%s) 退订 [%s](%s) 成功", channelChat.Title, channelChat.Username, source.Title, source.Link),
 							&tb.SendOptions{
 								DisableWebPagePreview: true,
 								ParseMode:             tb.ModeMarkdown,
