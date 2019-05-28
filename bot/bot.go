@@ -311,11 +311,11 @@ func makeHandle() {
 
 	B.Handle("/set", func(m *tb.Message) {
 
-		if HasAdminType(m.Chat.Type) {
-			_, _ = B.Send(m.Chat, "Group和Channel暂时不支持该功能")
-		} else {
-
-		}
+		//if HasAdminType(m.Chat.Type) {
+		//	_, _ = B.Send(m.Chat, "Group和Channel暂时不支持该功能")
+		//} else {
+		//
+		//}
 		sources, _ := model.GetSourcesByUserID(m.Chat.ID)
 
 		var replyButton []tb.ReplyButton
