@@ -5,7 +5,8 @@
 ![GitHub](https://img.shields.io/github/license/indes/flowerss-bot.svg)
 [![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Findes%2Fflowerss-bot.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Findes%2Fflowerss-bot?ref=badge_shield)
 
-DEMO: https://t.me/rssflowbot
+DEMO: https://t.me/rssflowbot  
+[问题反馈群组](https://t.me/joinchat/FJ-cikd-yN1Bf1SxWbAKjw) 
 
 <img src="https://raw.githubusercontent.com/indes/flowerss-bot/master/images/rssflow_demo.gif" width = "300"/>
 
@@ -88,6 +89,9 @@ Channel 订阅支持的命令:
 例如要给 t.me/debug 频道订阅 [阮一峰的网络日志](http://www.ruanyifeng.com/blog/atom.xml) RSS 更新：
 1. 将 Bot 添加到 debug 频道管理员列表中
 2. 给 Bot 发送 `/sub @debug http://www.ruanyifeng.com/blog/atom.xml` 命令
+
+### 问题反馈
+如果你在使用过程中遇到问题，请提交Issue，或者到[问题反馈群组](https://t.me/joinchat/FJ-cikd-yN1Bf1SxWbAKjw) 反馈。
 
 ## License
 [![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Findes%2Fflowerss-bot.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Findes%2Fflowerss-bot?ref=badge_large)
