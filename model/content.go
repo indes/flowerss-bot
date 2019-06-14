@@ -32,7 +32,7 @@ func getContentByFeedItem(source *Source, item *rss.Item) (Content, error) {
 	}
 
 	var c = Content{
-		Title:        item.Title,
+		Title:        strings.Trim(item.Title, " "),
 		SourceID:     source.ID,
 		RawID:        item.ID,
 		HashID:       genHashID(source.Link, item.ID),

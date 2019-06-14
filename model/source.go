@@ -95,6 +95,7 @@ func (s *Source) IsSubscribed() bool {
 	db.Where("source_id=?", s.ID).First(&sub)
 	return sub.SourceID == s.ID
 }
+
 func (s *Source) GetNewContents() ([]Content, error) {
 	var newContents []Content
 	feed, err := rss.Fetch(s.Link)
