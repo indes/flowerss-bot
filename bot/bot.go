@@ -485,8 +485,11 @@ func makeHandle() {
 		switch UserState[m.Chat.ID] {
 		case fsm.UnSub:
 			{
+				url, _ := GetUrlAndMentionFromMessage(m)
+				source, _ := model.GetSourceByUrl(url)
+
 				str := strings.Split(m.Text, " ")
-				url := str[len(str)-1]
+
 				if len(str) != 2 && !CheckUrl(url) {
 					_, _ = B.Send(m.Chat, "请选择正确的指令！")
 				} else {
@@ -497,7 +500,7 @@ func makeHandle() {
 					} else {
 						_, _ = B.Send(
 							m.Chat,
-							fmt.Sprintf("[%s](%s) 退订成功", str[0], url),
+							fmt.Sprintf("[%s](%s) 退订成功", source.Title, source.Link),
 							&tb.SendOptions{
 								ParseMode: tb.ModeMarkdown,
 							}, &tb.ReplyMarkup{
@@ -523,6 +526,7 @@ func makeHandle() {
 
 		case fsm.Set:
 			{
+
 				str := strings.Split(m.Text, " ")
 				url := str[len(str)-1]
 				if len(str) != 2 && !CheckUrl(url) {
