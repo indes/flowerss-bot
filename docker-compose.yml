@@ -1,0 +1,20 @@
+version: '3.4'
+
+services:
+  flowerss-bot:
+    build:
+      network: host
+      context: .
+      dockerfile: Dockerfile
+    image: flowerss-bot
+    volumes:
+      - ./conf:/root/.flowerss-bot
+    restart: unless-stopped
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 1g
+      restart_policy:
+        condition: on-failure
