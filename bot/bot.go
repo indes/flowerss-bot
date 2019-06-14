@@ -368,25 +368,30 @@ func makeHandle() {
 			} else {
 				//Unsub by button
 				sources, _ := model.GetSourcesByUserID(m.Chat.ID)
-				var replyButton []tb.ReplyButton
-				replyKeys := [][]tb.ReplyButton{}
-				for _, source := range sources {
-					// 添加按钮
-					text := fmt.Sprintf("%s %s", source.Title, source.Link)
-					replyButton = []tb.ReplyButton{
-						tb.ReplyButton{Text: text},
+				if len(sources) > 0 {
+					var replyButton []tb.ReplyButton
+					replyKeys := [][]tb.ReplyButton{}
+					for _, source := range sources {
+						// 添加按钮
+						text := fmt.Sprintf("%s %s", source.Title, source.Link)
+						replyButton = []tb.ReplyButton{
+							tb.ReplyButton{Text: text},
+						}
+
+						replyKeys = append(replyKeys, replyButton)
 					}
+					_, err := B.Send(m.Chat, "请选择你要退订的源", &tb.ReplyMarkup{
+						ForceReply:    true,
+						ReplyKeyboard: replyKeys,
+					})
 
-					replyKeys = append(replyKeys, replyButton)
+					if err == nil {
+						UserState[m.Chat.ID] = fsm.UnSub
+					}
+				} else {
+					_, _ = B.Send(m.Chat, "您当前没有订阅源。")
 				}
-				_, err := B.Send(m.Chat, "请选择你要退订的源", &tb.ReplyMarkup{
-					ForceReply:    true,
-					ReplyKeyboard: replyKeys,
-				})
 
-				if err == nil {
-					UserState[m.Chat.ID] = fsm.UnSub
-				}
 			}
 		} else {
 			if url != "" {
