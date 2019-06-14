@@ -108,23 +108,29 @@ func BroadNews(source *model.Source, subs []model.Subscribe, contents []model.Co
 %s | [Telegraph](%s) | [原文](%s)
 `
 				message = fmt.Sprintf(message, source.Title, content.Title, content.TelegraphUrl, content.RawLink)
+				_, err := B.Send(&u, message, &tb.SendOptions{
+					DisableWebPagePreview: false,
+					ParseMode:             tb.ModeMarkdown,
+					DisableNotification:   disableNotification,
+				})
+				if err != nil {
+					log.Println(err)
+				}
 			} else {
 				message = `
 *%s*
-%s | [原文](%s)
+[%s](%s)
 `
 				message = fmt.Sprintf(message, source.Title, content.Title, content.RawLink)
+				_, err := B.Send(&u, message, &tb.SendOptions{
+					DisableWebPagePreview: true,
+					ParseMode:             tb.ModeMarkdown,
+					DisableNotification:   disableNotification,
+				})
+				if err != nil {
+					log.Println(err)
+				}
 			}
-
-			_, err := B.Send(&u, message, &tb.SendOptions{
-				DisableWebPagePreview: false,
-				ParseMode:             tb.ModeMarkdown,
-				DisableNotification:   disableNotification,
-			})
-			if err != nil {
-				log.Println(err)
-			}
-
 		}
 	}
 }
