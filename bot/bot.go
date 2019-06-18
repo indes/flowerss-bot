@@ -485,18 +485,27 @@ func makeHandle() {
 		switch UserState[m.Chat.ID] {
 		case fsm.UnSub:
 			{
-				url, _ := GetUrlAndMentionFromMessage(m)
-				source, _ := model.GetSourceByUrl(url)
+				//url, _ := GetUrlAndMentionFromMessage(m)
 
 				str := strings.Split(m.Text, " ")
-
+				url := str[len(str)-1]
 				if len(str) != 2 && !CheckUrl(url) {
 					_, _ = B.Send(m.Chat, "请选择正确的指令！")
 				} else {
-					err := model.UnsubByUserIDAndSourceURL(m.Chat.ID, url)
+
+					source, err := model.GetSourceByUrl(url)
+
 					if err != nil {
 						_, _ = B.Send(m.Chat, "请选择正确的指令！")
+						return
+					}
 
+					//err := model.UnsubByUserIDAndSourceURL(m.Chat.ID, url)
+					err = model.UnsubByUserIDAndSource(m.Chat.ID, source)
+
+					if err != nil {
+						_, _ = B.Send(m.Chat, "请选择正确的指令！")
+						return
 					} else {
 						_, _ = B.Send(
 							m.Chat,
@@ -508,6 +517,7 @@ func makeHandle() {
 							},
 						)
 						UserState[m.Chat.ID] = fsm.None
+						return
 					}
 				}
 			}
