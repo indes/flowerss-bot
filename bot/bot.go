@@ -318,6 +318,10 @@ func makeHandle() {
 		//}
 		sources, _ := model.GetSourcesByUserID(m.Chat.ID)
 
+		if len(sources) <= 0 {
+			_, _ = B.Send(m.Chat, "当前没有订阅源")
+			return
+		}
 		var replyButton []tb.ReplyButton
 		replyKeys := [][]tb.ReplyButton{}
 		for _, source := range sources {
@@ -389,7 +393,7 @@ func makeHandle() {
 						UserState[m.Chat.ID] = fsm.UnSub
 					}
 				} else {
-					_, _ = B.Send(m.Chat, "您当前没有订阅源。")
+					_, _ = B.Send(m.Chat, "当前没有订阅源")
 				}
 
 			}
