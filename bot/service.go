@@ -118,13 +118,13 @@ func BroadNews(source *model.Source, subs []model.Subscribe, contents []model.Co
 				}
 			} else {
 				message = `
-*%s*
-[%s](%s)
+<b>%s</b>
+<a href="%s">%s</a>
 `
-				message = fmt.Sprintf(message, source.Title, content.Title, content.RawLink)
+				message = fmt.Sprintf(message, source.Title, content.RawLink, content.Title)
 				_, err := B.Send(&u, message, &tb.SendOptions{
 					DisableWebPagePreview: true,
-					ParseMode:             tb.ModeMarkdown,
+					ParseMode:             tb.ModeHTML,
 					DisableNotification:   disableNotification,
 				})
 				if err != nil {
