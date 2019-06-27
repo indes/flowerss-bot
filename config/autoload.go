@@ -1,6 +1,7 @@
 package config
 
 import (
+	"flag"
 	"fmt"
 	"github.com/spf13/viper"
 	"strconv"
@@ -26,6 +27,12 @@ type MysqlConfig struct {
 }
 
 func init() {
+	telegramTokenCli := flag.String("k", "", "Telegram Bot Token")
+	telegraphTokenCli := flag.String("tk", "", "Telegraph API Token")
+	socks5Cli := flag.String("s", "", "Socks5 Proxy")
+	intervalCli := flag.Int("i", 0, "Update Interval")
+	flag.Parse()
+
 	projectName := "flowerss-bot"
 
 	viper.SetConfigName("config") // name of config file (without extension)
@@ -38,18 +45,26 @@ func init() {
 		panic(fmt.Errorf("Fatal error config file: %s", err))
 	}
 
-	BotToken = viper.GetString("bot_token")
-	Socks5 = viper.GetString("socks5")
+	if *telegramTokenCli == "" {
+		BotToken = viper.GetString("bot_token")
 
-	if viper.IsSet("telegraph_token") {
+	}
+
+	if *socks5Cli == "" {
+		Socks5 = viper.GetString("socks5")
+	}
+
+	if *telegraphTokenCli == "" && viper.IsSet("telegraph_token") {
 		EnableTelegraph = true
 		TelegraphToken = viper.GetString("telegraph_token")
 	} else {
 		EnableTelegraph = false
 	}
 
-	if viper.IsSet("update_interval") {
+	if *intervalCli == 0 && viper.IsSet("update_interval") {
 		UpdateInterval = viper.GetInt("update_interval")
+	} else {
+		UpdateInterval = 10
 	}
 
 	if viper.IsSet("mysql.host") {

@@ -251,3 +251,4 @@ __pycache__/*
 config.yml
 
 *.db
+.dockerfile
