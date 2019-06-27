@@ -31,7 +31,7 @@ make build
 
 ### 下载二进制
 
-**不支持 SQLite**
+**该版本不支持 SQLite**
 
 从 [Releases](https://github.com/indes/flowerss-bot/releases) 页面下载对应的版本。
 
@@ -74,6 +74,15 @@ mysql:
 | update_interval | RSS 源扫描间隔（分钟） | 可忽略（默认 10） |
 | socks5 | 用于无法正常 Telegram API 的环境 | 可忽略（能正常连接上 Telegram API 服务器） |
 | mysql | 数据库配置 | 可忽略（使用 SQLite ） |
+
+
+### Telegraph Token 申请
+
+```
+curl https://api.telegra.ph/createAccount?short_name=flowerss&author_name=flowerss&author_url=https://github.com/indes/flowerss-bot
+```
+返回的 JSON 中 access_token 字段值即为 Telegraph Token
+
 
 ## 使用
 
