@@ -6,6 +6,7 @@ import (
 )
 
 func main() {
+
 	go task.Update()
 	bot.Start()
 }
