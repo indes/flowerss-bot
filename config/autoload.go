@@ -48,23 +48,36 @@ func init() {
 	if *telegramTokenCli == "" {
 		BotToken = viper.GetString("bot_token")
 
+	} else {
+		BotToken = *telegramTokenCli
 	}
 
 	if *socks5Cli == "" {
 		Socks5 = viper.GetString("socks5")
+	} else {
+		Socks5 = *socks5Cli
 	}
 
-	if *telegraphTokenCli == "" && viper.IsSet("telegraph_token") {
+	if *telegraphTokenCli == "" {
+		if viper.IsSet("telegraph_token") {
+			EnableTelegraph = true
+			TelegraphToken = viper.GetString("telegraph_token")
+		} else {
+			EnableTelegraph = false
+		}
+	} else {
 		EnableTelegraph = true
-		TelegraphToken = viper.GetString("telegraph_token")
-	} else {
-		EnableTelegraph = false
+		TelegraphToken = *telegramTokenCli
 	}
 
-	if *intervalCli == 0 && viper.IsSet("update_interval") {
-		UpdateInterval = viper.GetInt("update_interval")
+	if *intervalCli == 0 {
+		if viper.IsSet("update_interval") {
+			UpdateInterval = viper.GetInt("update_interval")
+		} else {
+			UpdateInterval = 10
+		}
 	} else {
-		UpdateInterval = 10
+		UpdateInterval = *intervalCli
 	}
 
 	if viper.IsSet("mysql.host") {
