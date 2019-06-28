@@ -19,7 +19,17 @@ DEMO: https://t.me/rssflowbot
 
 ## 安装
 
+### Docker 部署
+
+```shell
+docker run -d indes/flowerss-bot -k <bot token> -tk <telegraph token 可省略>
+```
+
+### 下载二进制
+
 **由于 GoReleaser 不支持 Cgo，如果要使用 SQLite 做为数据库，请下载源码自行编译。**
+
+从 [Releases](https://github.com/indes/flowerss-bot/releases) 页面下载对应的版本。
 
 ### 源码安装
 
@@ -27,25 +37,6 @@ DEMO: https://t.me/rssflowbot
 git clone https://github.com/indes/flowerss-bot && cd flowerss-bot
 make build
 ./flowerss-bot
-```
-
-### 下载二进制
-
-**该版本不支持 SQLite**
-
-从 [Releases](https://github.com/indes/flowerss-bot/releases) 页面下载对应的版本。
-
-
-### Docker 部署
-
-请首先确保你安装有 docker 和 docker-compose
-```
-git clone https://github.com/indes/flowerss-bot && cd flowerss-bot
-```
-修改 docker-compose.yml 设置为你自己的配置，拷贝`config.yml.sample`到你自己的数据目录并修改对应设置
-```
-docker-compose build
-docker-compose up -d
 ```
 
 ## 配置
@@ -78,7 +69,7 @@ mysql:
 
 ### Telegraph Token 申请
 
-```
+```shell
 curl https://api.telegra.ph/createAccount?short_name=flowerss&author_name=flowerss&author_url=https://github.com/indes/flowerss-bot
 ```
 返回的 JSON 中 access_token 字段值即为 Telegraph Token
