@@ -10,7 +10,7 @@ import (
 var (
 	BotToken        string
 	Socks5          string
-	TelegraphToken  string
+	TelegraphToken  []string
 	EnableTelegraph bool
 	Mysql           MysqlConfig
 	EnableMysql     bool
@@ -61,13 +61,14 @@ func init() {
 	if *telegraphTokenCli == "" {
 		if viper.IsSet("telegraph_token") {
 			EnableTelegraph = true
-			TelegraphToken = viper.GetString("telegraph_token")
+			//TelegraphToken = viper.GetString("")
+			TelegraphToken = viper.GetStringSlice("telegraph_token")
 		} else {
 			EnableTelegraph = false
 		}
 	} else {
 		EnableTelegraph = true
-		TelegraphToken = *telegramTokenCli
+		TelegraphToken = append(TelegraphToken, *telegramTokenCli)
 	}
 
 	if *intervalCli == 0 {
