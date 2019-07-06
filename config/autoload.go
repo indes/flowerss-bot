@@ -37,8 +37,8 @@ func init() {
 
 `
 	fmt.Println(logo)
-	telegramTokenCli := flag.String("k", "", "Telegram Bot Token")
-	telegraphTokenCli := flag.String("tk", "", "Telegraph API Token")
+	telegramTokenCli := flag.String("b", "", "Telegram Bot Token")
+	telegraphTokenCli := flag.String("t", "", "Telegraph API Token")
 	socks5Cli := flag.String("s", "", "Socks5 Proxy")
 	intervalCli := flag.Int("i", 0, "Update Interval")
 	flag.Parse()
