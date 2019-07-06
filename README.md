@@ -13,8 +13,8 @@ DEMO: https://t.me/rssflowbot
 
 ## Features
 
+- 常见的 RSS Bot 该有的功能
 - 支持 Telegram 应用内 instant view
-- 默认 10 分钟抓取一次
 - 支持为 Group 和 Channel 订阅 RSS 消息
 
 ## 安装
@@ -22,7 +22,7 @@ DEMO: https://t.me/rssflowbot
 ### Docker 部署
 
 ```shell
-docker run -d indes/flowerss-bot -k <bot token> -tk <telegraph token 可省略>
+docker run -d -v ~/data/flowerss:/var/flowerss indes/flowerss-bot -b <bot token> -t <telegraph token 可省略>
 ```
 
 ### 下载二进制
@@ -49,11 +49,13 @@ telegraph_toke: xxxx
 socks5: 127.0.0.1:1080
 update_interval: 10
 mysql:
-  host: 123.123.132.132
+  host: 127.0.0.1
   port: 3306
   user: user
   password: pwd
   database: flowerss
+sqlite:
+  path: ./data.db
 ```
 
 配置说明：
@@ -64,7 +66,8 @@ mysql:
 | telegraph_token | Telegraph Token, 用于转存原文到 Telegraph | 可忽略（不转存原文到 Telegraph ） |
 | update_interval | RSS 源扫描间隔（分钟） | 可忽略（默认 10） |
 | socks5 | 用于无法正常 Telegram API 的环境 | 可忽略（能正常连接上 Telegram API 服务器） |
-| mysql | 数据库配置 | 可忽略（使用 SQLite ） |
+| mysql | MySQL 数据库配置 | 可忽略（使用 SQLite ） |
+|sqlite| SQLite 配置 | 可忽略（已配置mysql时，该项失效）|
 
 
 ### Telegraph Token 申请
