@@ -3,8 +3,10 @@ package model
 import (
 	"github.com/indes/flowerss-bot/config"
 	"github.com/jinzhu/gorm"
+
 	_ "github.com/jinzhu/gorm/dialects/mysql" //mysql driver
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
+	"log"
 	"time"
 )
 
@@ -33,16 +35,18 @@ func getConnect() *gorm.DB {
 		clientConfig := config.Mysql.GetMysqlConnectingString()
 		db, err := gorm.Open("mysql", clientConfig)
 		if err != nil {
-			panic("连接数据库失败")
+			panic("连接MySQL数据库失败")
+		}
+		return db
+	} else {
+		db, err := gorm.Open("sqlite3", config.SQLitePath)
+		if err != nil {
+			log.Println(err.Error())
+			panic("连接SQLite数据库失败")
 		}
 		return db
 	}
 
-	db, err := gorm.Open("sqlite3", "data.db")
-	if err != nil {
-		panic("连接数据库失败")
-	}
-	return db
 }
 
 //EditTime timestamp
