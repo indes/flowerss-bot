@@ -1,13 +1,14 @@
-bot_token: XXX
-telegraph_toke: xxxx
-socks5: 127.0.0.1:1080
+bot_token:
+telegraph_toke:
+socks5:
 update_interval: 10
+
 mysql:
-  host: 123.123.132.132
-  port: 3306
-  user: user
-  password: pwd
-  database: flowerss
+  host:
+  port:
+  user:
+  password:
+  database:
 
 sqlite:
   path: ./data.db
