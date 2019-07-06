@@ -27,6 +27,16 @@ type MysqlConfig struct {
 }
 
 func init() {
+
+	logo := `
+   __ _                                
+  / _| | _____      _____ _ __ ___ ___ 
+ | |_| |/ _ \ \ /\ / / _ \ '__/ __/ __|
+ |  _| | (_) \ V  V /  __/ |  \__ \__ \
+ |_| |_|\___/ \_/\_/ \___|_|  |___/___/
+
+`
+	fmt.Println(logo)
 	telegramTokenCli := flag.String("k", "", "Telegram Bot Token")
 	telegraphTokenCli := flag.String("tk", "", "Telegraph API Token")
 	socks5Cli := flag.String("s", "", "Socks5 Proxy")
