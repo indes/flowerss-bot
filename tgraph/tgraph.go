@@ -23,7 +23,11 @@ var (
 
 func init() {
 	if config.EnableTelegraph {
-		log.Println("Telegraph Enable")
+		if len(authToken) == 1 {
+			log.Println("Telegraph Enabled, Token: ", authToken)
+		} else {
+			log.Println("Telegraph Enabled, Token len: ", len(authToken))
+		}
 		telegraph.Verbose = verbose
 
 		for _, t := range authToken {
