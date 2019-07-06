@@ -8,3 +8,6 @@ mysql:
   user: user
   password: pwd
   database: flowerss
+
+sqlite:
+  path: ./data.db

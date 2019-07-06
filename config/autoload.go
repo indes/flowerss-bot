@@ -4,6 +4,9 @@ import (
 	"flag"
 	"fmt"
 	"github.com/spf13/viper"
+	"log"
+	"os"
+	"path"
 	"strconv"
 )
 
@@ -13,6 +16,7 @@ var (
 	TelegraphToken  []string
 	EnableTelegraph bool
 	Mysql           MysqlConfig
+	SQLitePath      string
 	EnableMysql     bool
 	UpdateInterval  int  = 10
 	ErrorThreshold  uint = 100
@@ -39,6 +43,8 @@ func init() {
 	fmt.Println(logo)
 	telegramTokenCli := flag.String("b", "", "Telegram Bot Token")
 	telegraphTokenCli := flag.String("t", "", "Telegraph API Token")
+	dbPathCli := flag.String("dbpath", "", "Telegraph API Token")
+
 	socks5Cli := flag.String("s", "", "Socks5 Proxy")
 	intervalCli := flag.Int("i", 0, "Update Interval")
 	flag.Parse()
@@ -102,6 +108,28 @@ func init() {
 		}
 	} else {
 		EnableMysql = false
+	}
+
+	if !EnableMysql {
+		if *dbPathCli == "" {
+			if viper.IsSet("sqlite.path") {
+				SQLitePath = viper.GetString("sqlite.path")
+			} else {
+				SQLitePath = "data.db"
+			}
+		} else {
+			SQLitePath = *dbPathCli
+		}
+		log.Println("DB Path: ", SQLitePath)
+		// 判断并创建SQLite目录
+		dir := path.Dir(SQLitePath)
+		_, err := os.Stat(dir)
+		if err != nil {
+			err := os.MkdirAll(dir, os.ModeDir)
+			if err != nil {
+				log.Printf("mkdir failed![%v]\n", err)
+			}
+		}
 	}
 
 }
