@@ -71,14 +71,14 @@ func init() {
 	if *telegraphTokenCli == "" {
 		if viper.IsSet("telegraph_token") {
 			EnableTelegraph = true
-			//TelegraphToken = viper.GetString("")
+
 			TelegraphToken = viper.GetStringSlice("telegraph_token")
 		} else {
 			EnableTelegraph = false
 		}
 	} else {
 		EnableTelegraph = true
-		TelegraphToken = append(TelegraphToken, *telegramTokenCli)
+		TelegraphToken = append(TelegraphToken, *telegraphTokenCli)
 	}
 
 	if *intervalCli == 0 {
