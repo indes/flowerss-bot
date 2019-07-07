@@ -244,7 +244,7 @@ func makeHandle() {
 			if url != "" {
 				FeedForChannelRegister(m, url, mention)
 			} else {
-				_, _ = B.Send(m.Chat, "频道订阅请使用'\\sub @ChannelID URL' 命令")
+				_, _ = B.Send(m.Chat, "频道订阅请使用' /sub @ChannelID URL ' 命令")
 			}
 		}
 
