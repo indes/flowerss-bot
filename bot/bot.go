@@ -20,7 +20,7 @@ var (
 	botToken                             = config.BotToken
 	socks5Proxy                          = config.Socks5
 	UserState   map[int64]fsm.UserStatus = make(map[int64]fsm.UserStatus)
-	//B bot
+
 	B *tb.Bot
 )
 
@@ -28,9 +28,6 @@ func init() {
 	poller := &tb.LongPoller{Timeout: 10 * time.Second}
 	spamProtected := tb.NewMiddlewarePoller(poller, func(upd *tb.Update) bool {
 
-		//if upd.Message == nil {
-		//	return true
-		//}
 		if !CheckAdmin(upd) {
 			return false
 		}
@@ -311,11 +308,6 @@ func makeHandle() {
 
 	B.Handle("/set", func(m *tb.Message) {
 
-		//if HasAdminType(m.Chat.Type) {
-		//	_, _ = B.Send(m.Chat, "Group和Channel暂时不支持该功能")
-		//} else {
-		//
-		//}
 		sources, _ := model.GetSourcesByUserID(m.Chat.ID)
 
 		if len(sources) <= 0 {
@@ -461,7 +453,7 @@ func makeHandle() {
 				}
 
 			} else {
-				_, _ = B.Send(m.Chat, "频道退订请使用'\\unsub @ChannelID URL' 命令")
+				_, _ = B.Send(m.Chat, "频道退订请使用' /unsub @ChannelID URL ' 命令")
 			}
 		}
 
@@ -489,7 +481,6 @@ func makeHandle() {
 		switch UserState[m.Chat.ID] {
 		case fsm.UnSub:
 			{
-				//url, _ := GetUrlAndMentionFromMessage(m)
 
 				str := strings.Split(m.Text, " ")
 				url := str[len(str)-1]
@@ -504,7 +495,6 @@ func makeHandle() {
 						return
 					}
 
-					//err := model.UnsubByUserIDAndSourceURL(m.Chat.ID, url)
 					err = model.UnsubByUserIDAndSource(m.Chat.ID, source)
 
 					if err != nil {
@@ -588,16 +578,6 @@ func makeHandle() {
 					// send null message to remove old keyboard
 					delKeyMessage, err := B.Send(m.Chat, "processing", &tb.ReplyMarkup{ReplyKeyboardRemove: true})
 					err = B.Delete(delKeyMessage)
-					//_, err = B.Edit(message, "hello")
-
-					//_, _ = B.Edit(message,
-					//	text.String(),
-					//	&tb.SendOptions{
-					//		ParseMode: tb.ModeHTML,
-					//	}, &tb.ReplyMarkup{
-					//		InlineKeyboard: feedSettingKeys,
-					//	},
-					//)
 
 					_, _ = B.Send(
 						m.Chat,
