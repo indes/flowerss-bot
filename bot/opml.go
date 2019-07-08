@@ -3,7 +3,6 @@ package bot
 import (
 	"crypto/tls"
 	"encoding/xml"
-	"fmt"
 	"io/ioutil"
 	"net/http"
 	"net/url"
@@ -81,19 +80,32 @@ func GetOPMLByURL(file_url string) (*OPML, error) {
 	}
 	body, _ := ioutil.ReadAll(resp.Body)
 	o, err := NewOPML(body)
-	fmt.Println(string(body))
-
 	if err != nil {
 		return nil, err
 	}
 	return o, err
 }
 
-func (doc OPML) Outlines() []Outline {
-	return doc.Body.Outlines
+func (o OPML) GetFlattenOutlines() ([]Outline, error) {
+	var flattenOutlines []Outline
+	for _, line := range o.Body.Outlines {
+		if line.Outlines != nil {
+			for _, subLine := range line.Outlines {
+				// 查找子outline
+				if subLine.XMLURL != "" {
+					flattenOutlines = append(flattenOutlines, subLine)
+				}
+			}
+		}
+
+		if line.XMLURL != "" {
+			flattenOutlines = append(flattenOutlines, line)
+		}
+	}
+	return flattenOutlines, nil
 }
 
-func (doc OPML) XML() (string, error) {
-	b, err := xml.MarshalIndent(doc, "", "\t")
+func (o OPML) XML() (string, error) {
+	b, err := xml.MarshalIndent(o, "", "\t")
 	return xml.Header + string(b), err
 }
