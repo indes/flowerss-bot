@@ -599,7 +599,41 @@ func makeHandle() {
 		if m.Document.MIME == "text/x-opml+xml" {
 
 			url, _ := B.FileURLByID(m.Document.FileID)
-			_, _ = GetOPMLByURL(url)
+			opml, err := GetOPMLByURL(url)
+			if err != nil {
+				_, _ = B.Send(m.Chat, "如果需要导入订阅，请发送正确的OPML文件。")
+				return
+			}
+			message, _ := B.Send(m.Chat, "处理中，请稍后。")
+			outlines, _ := opml.GetFlattenOutlines()
+			var failImportList []Outline
+			var successImportList []Outline
+
+			for _, outline := range outlines {
+				source, err := model.FindOrNewSourceByUrl(outline.XMLURL)
+				if err != nil {
+					failImportList = append(failImportList, outline)
+					continue
+				}
+				err = model.RegistFeed(m.Chat.ID, source.ID)
+				if err != nil {
+					failImportList = append(failImportList, outline)
+					continue
+				}
+				log.Printf("%d subscribe [%d]%s %s", m.Chat.ID, source.ID, source.Title, source.Link)
+				successImportList = append(successImportList, outline)
+			}
+
+			importReport := fmt.Sprintf("<b>导入成功：%d，导入失败：%d</b>", len(successImportList), len(failImportList))
+
+			_, err = B.Edit(message, importReport, &tb.SendOptions{
+				DisableWebPagePreview: true,
+				ParseMode:             tb.ModeHTML,
+			})
+
+			if err != nil {
+				log.Println(err.Error())
+			}
 
 		} else {
 			_, _ = B.Send(m.Chat, "如果需要导入订阅，请发送正确的OPML文件。")
