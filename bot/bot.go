@@ -593,4 +593,17 @@ func makeHandle() {
 			}
 		}
 	})
+
+	B.Handle(tb.OnDocument, func(m *tb.Message) {
+
+		if m.Document.MIME == "text/x-opml+xml" {
+
+			url, _ := B.FileURLByID(m.Document.FileID)
+			_, _ = GetOPMLByURL(url)
+
+		} else {
+			_, _ = B.Send(m.Chat, "如果需要导入订阅，请发送正确的OPML文件。")
+		}
+
+	})
 }
