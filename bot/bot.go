@@ -472,8 +472,14 @@ func makeHandle() {
 /list 查看当前订阅源
 /set 设置订阅
 /help 帮助
+/import 导入OPML文件
 详细使用方法请看：https://github.com/indes/flowerss-bot
 `
+		_, _ = B.Send(m.Chat, message)
+	})
+
+	B.Handle("/import", func(m *tb.Message) {
+		message := `请直接发送OPML文件。`
 		_, _ = B.Send(m.Chat, message)
 	})
 
