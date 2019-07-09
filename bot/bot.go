@@ -625,7 +625,29 @@ func makeHandle() {
 			}
 
 			importReport := fmt.Sprintf("<b>导入成功：%d，导入失败：%d</b>", len(successImportList), len(failImportList))
+			if len(successImportList) != 0 {
+				successReport := "\n\n<b>以下订阅源导入成功:</b>"
+				for i, line := range successImportList {
+					if line.Text != "" {
+						successReport += fmt.Sprintf("\n[%d] <a href=\"%s\">%s</a>", i+1, line.XMLURL, line.Text)
+					} else {
+						successReport += fmt.Sprintf("\n[%d] %s", i+1, line.XMLURL)
+					}
+				}
+				importReport += successReport
+			}
 
+			if len(failImportList) != 0 {
+				failReport := "\n\n<b>以下订阅源导入失败:</b>"
+				for i, line := range failImportList {
+					if line.Text != "" {
+						failReport += fmt.Sprintf("\n[%d] <a href=\"%s\">%s</a>", i+1, line.XMLURL, line.Text)
+					} else {
+						failReport += fmt.Sprintf("\n[%d] %s", i+1, line.XMLURL)
+					}
+				}
+				importReport += failReport
+			}
 			_, err = B.Edit(message, importReport, &tb.SendOptions{
 				DisableWebPagePreview: true,
 				ParseMode:             tb.ModeHTML,
