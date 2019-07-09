@@ -16,6 +16,7 @@ DEMO: https://t.me/rssflowbot
 - 常见的 RSS Bot 该有的功能
 - 支持 Telegram 应用内 instant view
 - 支持为 Group 和 Channel 订阅 RSS 消息
+- 丰富的订阅设置
 
 ## 安装
 
@@ -86,6 +87,7 @@ curl https://api.telegra.ph/createAccount?short_name=flowerss&author_name=flower
 /unsub [url] 取消订阅（url 为可选）
 /list 查看当前订阅
 /set 设置订阅
+/import 导入OPML文件
 /help 帮助
 ```
 
