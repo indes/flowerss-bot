@@ -64,12 +64,17 @@ func NewOPML(b []byte) (*OPML, error) {
 }
 
 func GetOPMLByURL(file_url string) (*OPML, error) {
+	var proxy *url.URL
 
-	proxy, _ := url.Parse("socks5://" + socks5Proxy)
+	if socks5Proxy != "" {
+		proxy, _ = url.Parse("socks5://" + socks5Proxy)
+	}
+
 	tr := &http.Transport{
 		Proxy:           http.ProxyURL(proxy),
 		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 	}
+
 	client := &http.Client{
 		Transport: tr,
 		Timeout:   time.Second * 5,
