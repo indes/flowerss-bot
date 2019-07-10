@@ -46,7 +46,7 @@ make build
 
 ```yml
 bot_token: XXX
-telegraph_toke: xxxx
+telegraph_token: xxxx
 socks5: 127.0.0.1:1080
 update_interval: 10
 mysql:
