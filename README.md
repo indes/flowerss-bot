@@ -8,7 +8,7 @@
 DEMO: [https://t.me/rssflowbot](https://t.me/rssflowbot)  
 [问题反馈群组](https://t.me/joinchat/FJ-cikd-yN1Bf1SxWbAKjw)
 
-<img src="https://resource.indev.now.sh/flowerss/images/rssflow_demo.gif" width = "300"/>
+<img src="https://github.com/rssflow/img/raw/master/images/rssflow_demo.gif" width = "300"/>
 
 ## Features
 
