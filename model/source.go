@@ -23,6 +23,8 @@ func (s *Source) appendContents(items []*rss.Item) error {
 		c, _ := getContentByFeedItem(s, item)
 		s.Content = append(s.Content, c)
 	}
+	// 开启task更新
+	s.ErrorCount = 0
 	db.Save(&s)
 	return nil
 }
@@ -53,7 +55,8 @@ func FindOrNewSourceByUrl(url string) (*Source, error) {
 			}
 
 			source.Title = feed.Title
-			source.ErrorCount = 0
+			// 避免task更新
+			source.ErrorCount = 101
 
 			// Get contents and insert
 			items := feed.Items
