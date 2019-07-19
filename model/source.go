@@ -153,12 +153,16 @@ func (s *Source) Save() {
 	return
 }
 
-func GetSourceById(id int) *Source {
+func GetSourceById(id int) (*Source, error) {
 	db := getConnect()
 	defer db.Close()
 	var source Source
-	db.Where("id=?", id).First(&source)
-	return &source
+
+	if err := db.Where("id=?", id).First(&source); err.Error != nil {
+		return nil, errors.New("未找到 RSS 源")
+	}
+
+	return &source, nil
 }
 
 func (s *Source) GetSubscribeNum() int {

@@ -108,7 +108,7 @@ func makeHandle() {
 			return
 		}
 
-		source := model.GetSourceById(int(sub.SourceID))
+		source, _ := model.GetSourceById(int(sub.SourceID))
 		t := template.New("setting template")
 		_, _ = t.Parse(`
 订阅<b>设置</b>
@@ -170,7 +170,7 @@ func makeHandle() {
 			return
 		}
 
-		source := model.GetSourceById(int(sub.SourceID))
+		source, _ := model.GetSourceById(int(sub.SourceID))
 		t := template.New("setting template")
 		_, _ = t.Parse(`
 订阅<b>设置</b>
@@ -369,7 +369,7 @@ func makeHandle() {
 					replyKeys := [][]tb.ReplyButton{}
 					for _, source := range sources {
 						// 添加按钮
-						text := fmt.Sprintf("%s %s", source.Title, source.Link)
+						text := fmt.Sprintf("[%d] %s", source.ID, source.Title)
 						replyButton = []tb.ReplyButton{
 							tb.ReplyButton{Text: text},
 						}
@@ -487,14 +487,19 @@ func makeHandle() {
 		switch UserState[m.Chat.ID] {
 		case fsm.UnSub:
 			{
-
 				str := strings.Split(m.Text, " ")
-				url := str[len(str)-1]
-				if len(str) != 2 && !CheckUrl(url) {
+
+				if len(str) < 2 && (strings.HasPrefix(str[0], "[") && strings.HasSuffix(str[0], "]")) {
 					_, _ = B.Send(m.Chat, "请选择正确的指令！")
 				} else {
 
-					source, err := model.GetSourceByUrl(url)
+					var sourceId int
+					if _, err := fmt.Sscanf(str[0], "[%d]", &sourceId); err != nil {
+						_, _ = B.Send(m.Chat, "请选择正确的指令！")
+						return
+					}
+
+					source, err := model.GetSourceById(sourceId)
 
 					if err != nil {
 						_, _ = B.Send(m.Chat, "请选择正确的指令！")
