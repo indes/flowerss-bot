@@ -44,7 +44,7 @@ func init() {
 	telegramTokenCli := flag.String("b", "", "Telegram Bot Token")
 	telegraphTokenCli := flag.String("t", "", "Telegraph API Token")
 	dbPathCli := flag.String("dbpath", "", "Telegraph API Token")
-
+	errorThresholdCli := flag.Int("threshold", 0, "Error Threshold")
 	socks5Cli := flag.String("s", "", "Socks5 Proxy")
 	intervalCli := flag.Int("i", 0, "Update Interval")
 	flag.Parse()
@@ -85,6 +85,16 @@ func init() {
 	} else {
 		EnableTelegraph = true
 		TelegraphToken = append(TelegraphToken, *telegraphTokenCli)
+	}
+
+	if *errorThresholdCli == 0 {
+		if viper.IsSet("error_threshold") {
+			ErrorThreshold = uint(viper.GetInt("error_threshold"))
+		} else {
+			ErrorThreshold = 100
+		}
+	} else {
+		ErrorThreshold = uint(*errorThresholdCli)
 	}
 
 	if *intervalCli == 0 {

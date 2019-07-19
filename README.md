@@ -48,6 +48,7 @@ bot_token: XXX
 telegraph_token: xxxx
 socks5: 127.0.0.1:1080
 update_interval: 10
+error_threshold: 100
 mysql:
   host: 127.0.0.1
   port: 3306
@@ -65,6 +66,7 @@ sqlite:
 | bot_token       | Telegram Bot Token                        | 必填                                       |
 | telegraph_token | Telegraph Token, 用于转存原文到 Telegraph | 可忽略（不转存原文到 Telegraph ）          |
 | update_interval | RSS 源扫描间隔（分钟）                    | 可忽略（默认 10）                          |
+| error_threshold | 源最大出错次数                    | 可忽略（默认 100）                          |
 | socks5          | 用于无法正常 Telegram API 的环境          | 可忽略（能正常连接上 Telegram API 服务器） |
 | mysql           | MySQL 数据库配置                          | 可忽略（使用 SQLite ）                     |
 | sqlite          | SQLite 配置                               | 可忽略（已配置mysql时，该项失效）          |

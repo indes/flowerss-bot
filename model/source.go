@@ -56,7 +56,7 @@ func FindOrNewSourceByUrl(url string) (*Source, error) {
 
 			source.Title = feed.Title
 			// 避免task更新
-			source.ErrorCount = 101
+			source.ErrorCount = config.ErrorThreshold + 1
 
 			// Get contents and insert
 			items := feed.Items
