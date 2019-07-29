@@ -26,7 +26,7 @@ func PublishHtml(sourceTitle string, title string, rawLink string, html string) 
 	rand.Seed(time.Now().Unix()) // initialize global pseudo random generator
 	client := clientPool[rand.Intn(len(clientPool))]
 
-	if page, err := client.CreatePageWithHTML(title+" - "+sourceTitle, authorName, authorUrl, html, true); err == nil {
+	if page, err := client.CreatePageWithHTML(title+" - "+sourceTitle, sourceTitle, rawLink, html, true); err == nil {
 		log.Printf("Created telegraph page url: %s", page.URL)
 		return page.URL, err
 	} else {
