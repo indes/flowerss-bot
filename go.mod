@@ -10,6 +10,7 @@ require (
 	github.com/go-sql-driver/mysql v1.4.1 // indirect
 	github.com/gofrs/uuid v3.2.0+incompatible // indirect
 	github.com/google/go-cmp v0.2.0 // indirect
+	github.com/grokify/html-strip-tags-go v0.0.0-20190921062105-daaa06bf1aaf
 	github.com/jinzhu/gorm v1.9.2
 	github.com/jinzhu/inflection v0.0.0-20180308033659-04140366298a // indirect
 	github.com/jinzhu/now v1.0.0 // indirect
@@ -25,3 +26,5 @@ require (
 	google.golang.org/appengine v1.4.0 // indirect
 	gopkg.in/tucnak/telebot.v2 v2.0.0-20190106130618-430758b3741d
 )
+
+go 1.13

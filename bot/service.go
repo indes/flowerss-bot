@@ -2,10 +2,13 @@ package bot
 
 import (
 	"fmt"
+	strip "github.com/grokify/html-strip-tags-go"
 	"github.com/indes/flowerss-bot/config"
 	"github.com/indes/flowerss-bot/model"
 	tb "gopkg.in/tucnak/telebot.v2"
 	"log"
+	"regexp"
+	"strings"
 )
 
 func FeedForChannelRegister(m *tb.Message, url string, channelMention string) {
@@ -120,8 +123,23 @@ func BroadNews(source *model.Source, subs []model.Subscribe, contents []model.Co
 				message = `
 <b>%s</b>
 <a href="%s">%s</a>
+<b>---------- Preview Text ----------</b>
+%s
 `
-				message = fmt.Sprintf(message, source.Title, content.RawLink, content.Title)
+
+				contentDesc := strip.StripTags(
+					regexp.MustCompile(`\n+`).ReplaceAllLiteralString(
+						strings.ReplaceAll(
+							regexp.MustCompile(`<br(| /)>`).ReplaceAllString(content.Description, "<br>"),
+							"<br>", "\n"),
+						"\n"))
+
+				previewText := []rune(contentDesc)
+				if len(previewText) > 256 {
+					previewText = previewText[0:255]
+				}
+
+				message = fmt.Sprintf(message, source.Title, content.RawLink, content.Title, string(previewText))
 				_, err := B.Send(&u, message, &tb.SendOptions{
 					DisableWebPagePreview: true,
 					ParseMode:             tb.ModeHTML,
