@@ -155,5 +155,5 @@ func (m *MysqlConfig) GetMysqlConnectingString() string {
 	host := m.Host
 	port := m.Port
 	db := m.DB
-	return fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8&parseTime=true", usr, pwd, host, port, db)
+	return fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8mb4&parseTime=true", usr, pwd, host, port, db)
 }
