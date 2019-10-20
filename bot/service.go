@@ -117,7 +117,8 @@ func BroadNews(source *model.Source, subs []model.Subscribe, contents []model.Co
 					DisableNotification:   disableNotification,
 				})
 				if err != nil {
-					log.Println(err)
+					log.Println(err, " [unsubscribe]")
+					_ = sub.Unsub()
 				}
 			} else {
 				message = `
@@ -146,7 +147,8 @@ func BroadNews(source *model.Source, subs []model.Subscribe, contents []model.Co
 					DisableNotification:   disableNotification,
 				})
 				if err != nil {
-					log.Println(err)
+					log.Println(err, " [unsubscribe]")
+					_ = sub.Unsub()
 				}
 			}
 		}
