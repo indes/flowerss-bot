@@ -107,17 +107,18 @@ func BroadNews(source *model.Source, subs []model.Subscribe, contents []model.Co
 
 			if sub.EnableTelegraph == 1 && content.TelegraphUrl != "" {
 				message = `
-*%s*
-%s | [Telegraph](%s) | [原文](%s)
+<b>%s</b>
+%s | <a href="%s">Telegraph</a> | <a href="%s">原文</a>
 `
 				message = fmt.Sprintf(message, source.Title, content.Title, content.TelegraphUrl, content.RawLink)
 				_, err := B.Send(&u, message, &tb.SendOptions{
 					DisableWebPagePreview: false,
-					ParseMode:             tb.ModeMarkdown,
+					ParseMode:             tb.ModeHTML,
 					DisableNotification:   disableNotification,
 				})
 				if err != nil {
-					log.Println(err)
+					log.Println(err, " [unsubscribe]")
+					// _ = sub.Unsub()
 				}
 			} else {
 				message = `
@@ -146,7 +147,8 @@ func BroadNews(source *model.Source, subs []model.Subscribe, contents []model.Co
 					DisableNotification:   disableNotification,
 				})
 				if err != nil {
-					log.Println(err)
+					log.Println(err, " [unsubscribe]")
+					// _ = sub.Unsub()
 				}
 			}
 		}
