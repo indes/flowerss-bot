@@ -51,7 +51,7 @@ bot_token: XXX
 #  - token_1
 #  - token_2
 telegraph_token: xxxx
-ocks5: 127.0.0.1:1080
+socks5: 127.0.0.1:1080
 update_interval: 10
 error_threshold: 100
 mysql:
