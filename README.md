@@ -7,6 +7,7 @@
 
 DEMO: [https://t.me/rssflowbot](https://t.me/rssflowbot)  
 [问题反馈群组](https://t.me/joinchat/FJ-cikd-yN1Bf1SxWbAKjw)
+[Change Log](ChangeLog.md)
 
 <img src="https://github.com/rssflow/img/raw/master/images/rssflow_demo.gif" width = "300"/>
 
@@ -45,6 +46,10 @@ make build
 
 ```yml
 bot_token: XXX
+#多个stelegraph_token可采用数组格式：
+# telegraph_token:
+#  - token_1
+#  - token_2
 telegraph_token: xxxx
 socks5: 127.0.0.1:1080
 update_interval: 10
@@ -111,6 +116,11 @@ Channel 订阅支持的命令：
 
 1. 将 Bot 添加到 debug 频道管理员列表中
 2. 给 Bot 发送 `/sub @debug http://www.ruanyifeng.com/blog/atom.xml` 命令
+
+## 常见问题
+* Q：日志中大量类似于`Create telegraph page error: FLOOD_WAIT_7`的提示  
+  A：原因是创建telegraph页面请求过快触发了接口限制，可尝试在配置文件中添加多个telegraph token
+
 
 ### 问题反馈
 

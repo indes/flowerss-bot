@@ -138,6 +138,19 @@ func (s *Subscribe) ToggleTelegraph() error {
 	return nil
 }
 
+func (s *Source) ToggleEnabled() error {
+	if s.ErrorCount >= 100 {
+		s.ErrorCount = 0
+	} else {
+		s.ErrorCount = 100
+	}
+
+	///TODO a hack for save source changes
+	s.Save()
+
+	return nil
+}
+
 func (s *Subscribe) Unsub() (err error) {
 	if s.ID == 0 {
 		return errors.New("can't delete 0 subscribe")
