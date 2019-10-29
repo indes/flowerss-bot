@@ -46,7 +46,7 @@ make build
 
 ```yml
 bot_token: XXX
-#多个stelegraph_token可采用数组格式：
+#多个telegraph_token可采用数组格式：
 # telegraph_token:
 #  - token_1
 #  - token_2
