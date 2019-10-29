@@ -136,6 +136,7 @@ func GetSourcesByUserID(userID int64) ([]Source, error) {
 
 	return sources, nil
 }
+
 func (s *Source) AddErrorCount() {
 	s.ErrorCount++
 	s.Save()
