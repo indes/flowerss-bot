@@ -43,7 +43,7 @@ func init() {
 	fmt.Println(logo)
 	telegramTokenCli := flag.String("b", "", "Telegram Bot Token")
 	telegraphTokenCli := flag.String("t", "", "Telegraph API Token")
-	dbPathCli := flag.String("dbpath", "", "Telegraph API Token")
+	dbPathCli := flag.String("dbpath", "", "Database Path")
 	errorThresholdCli := flag.Int("threshold", 0, "Error Threshold")
 	socks5Cli := flag.String("s", "", "Socks5 Proxy")
 	intervalCli := flag.Int("i", 0, "Update Interval")
