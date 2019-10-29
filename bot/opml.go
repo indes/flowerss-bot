@@ -3,6 +3,7 @@ package bot
 import (
 	"crypto/tls"
 	"encoding/xml"
+	"errors"
 	"github.com/indes/flowerss-bot/model"
 	"io/ioutil"
 	"net/http"
@@ -81,15 +82,18 @@ func GetOPMLByURL(file_url string) (*OPML, error) {
 		Timeout:   time.Second * 5,
 	}
 	resp, err := client.Get(file_url)
+
 	if err != nil {
-		return nil, err
+		return nil, errors.New("fetch opml file error")
 	}
+
 	body, _ := ioutil.ReadAll(resp.Body)
 	o, err := NewOPML(body)
+
 	if err != nil {
-		return nil, err
+		return nil, errors.New("parse opml file error")
 	}
-	return o, err
+	return o, nil
 }
 
 func (o OPML) GetFlattenOutlines() ([]Outline, error) {

@@ -608,10 +608,18 @@ func makeHandle() {
 
 			url, _ := B.FileURLByID(m.Document.FileID)
 			opml, err := GetOPMLByURL(url)
+
 			if err != nil {
-				_, _ = B.Send(m.Chat, "如果需要导入订阅，请发送正确的OPML文件。")
+				if err.Error() == "fetch opml file error" {
+					_, _ = B.Send(m.Chat,
+						"下载 OPML 文件失败，请检查 bot 服务器能否正常连接至 telegram 服务器或过段时间再尝试导入。")
+
+				} else {
+					_, _ = B.Send(m.Chat, "如果需要导入订阅，请发送正确的 OPML 文件。")
+				}
 				return
 			}
+
 			message, _ := B.Send(m.Chat, "处理中，请稍后。")
 			outlines, _ := opml.GetFlattenOutlines()
 			var failImportList []Outline
