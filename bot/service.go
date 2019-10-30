@@ -116,10 +116,15 @@ func BroadNews(source *model.Source, subs []model.Subscribe, contents []model.Co
 					ParseMode:             tb.ModeHTML,
 					DisableNotification:   disableNotification,
 				})
+
 				if err != nil {
-					log.Println(err, " [unsubscribe]")
-					// _ = sub.Unsub()
+					log.Println(err)
+					if strings.Contains(err.Error(), "Forbidden") {
+						log.Printf("Unsubscribe UserID:%d SourceID:%d", sub.UserID, sub.SourceID)
+						_ = sub.Unsub()
+					}
 				}
+
 			} else {
 				message = `
 <b>%s</b>
@@ -146,9 +151,16 @@ func BroadNews(source *model.Source, subs []model.Subscribe, contents []model.Co
 					ParseMode:             tb.ModeHTML,
 					DisableNotification:   disableNotification,
 				})
+
 				if err != nil {
-					log.Println(err, " [unsubscribe]")
-					// _ = sub.Unsub()
+					log.Println(err)
+					if err != nil {
+						log.Println(err)
+						if strings.Contains(err.Error(), "Forbidden") {
+							log.Printf("Unsubscribe UserID:%d SourceID:%d", sub.UserID, sub.SourceID)
+							_ = sub.Unsub()
+						}
+					}
 				}
 			}
 		}
