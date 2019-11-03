@@ -194,8 +194,33 @@ func makeHandle() {
 	})
 
 	B.Handle("/export", func(m *tb.Message) {
+		sourceList, err := model.GetSourcesByUserID(m.Chat.ID)
 
-		_, _ = B.Send(m.Chat, fmt.Sprintf("export"))
+		if err != nil {
+			log.Println(err.Error())
+			_, _ = B.Send(m.Chat, fmt.Sprintf("导出失败"))
+			return
+		}
+
+		if len(sourceList) == 0 {
+			_, _ = B.Send(m.Chat, fmt.Sprintf("订阅列表为空"))
+			return
+		}
+
+		opmlStr, err := ToOPML(sourceList)
+
+		if err != nil {
+			_, _ = B.Send(m.Chat, fmt.Sprintf("导出失败"))
+			return
+		}
+		opmlFile := &tb.Document{File: tb.FromReader(strings.NewReader(opmlStr))}
+		opmlFile.FileName = "subscriptions.opml"
+		_, err = B.Send(m.Chat, opmlFile)
+
+		if err != nil {
+			_, _ = B.Send(m.Chat, fmt.Sprintf("导出失败"))
+			log.Println("[export]", err)
+		}
 	})
 
 	B.Handle("/sub", func(m *tb.Message) {
@@ -445,7 +470,8 @@ func makeHandle() {
 /list 查看当前订阅源
 /set 设置订阅
 /help 帮助
-/import 导入OPML文件
+/import 导入 OPML 文件
+/export 导出 OPML 文件
 详细使用方法请看：https://github.com/indes/flowerss-bot
 `
 		_, _ = B.Send(m.Chat, message)
@@ -582,10 +608,18 @@ func makeHandle() {
 
 			url, _ := B.FileURLByID(m.Document.FileID)
 			opml, err := GetOPMLByURL(url)
+
 			if err != nil {
-				_, _ = B.Send(m.Chat, "如果需要导入订阅，请发送正确的OPML文件。")
+				if err.Error() == "fetch opml file error" {
+					_, _ = B.Send(m.Chat,
+						"下载 OPML 文件失败，请检查 bot 服务器能否正常连接至 telegram 服务器或过段时间再尝试导入。")
+
+				} else {
+					_, _ = B.Send(m.Chat, "如果需要导入订阅，请发送正确的 OPML 文件。")
+				}
 				return
 			}
+
 			message, _ := B.Send(m.Chat, "处理中，请稍后。")
 			outlines, _ := opml.GetFlattenOutlines()
 			var failImportList []Outline

@@ -7,7 +7,7 @@
 
 DEMO: [https://t.me/rssflowbot](https://t.me/rssflowbot)  
 [问题反馈群组](https://t.me/joinchat/FJ-cikd-yN1Bf1SxWbAKjw)
-[Change Log](ChangeLog.md)
+[Change Log](CHANGELOG.md)
 
 <img src="https://github.com/rssflow/img/raw/master/images/rssflow_demo.gif" width = "300"/>
 
@@ -46,7 +46,7 @@ make build
 
 ```yml
 bot_token: XXX
-#多个stelegraph_token可采用数组格式：
+#多个telegraph_token可采用数组格式：
 # telegraph_token:
 #  - token_1
 #  - token_2
@@ -95,7 +95,8 @@ curl https://api.telegra.ph/createAccount?short_name=flowerss&author_name=flower
 /unsub [url] 取消订阅（url 为可选）
 /list 查看当前订阅
 /set 设置订阅
-/import 导入OPML文件
+/import 导入 OPML 文件
+/export 导出 OPML 文件
 /help 帮助
 ```
 

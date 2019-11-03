@@ -3,6 +3,8 @@ package bot
 import (
 	"crypto/tls"
 	"encoding/xml"
+	"errors"
+	"github.com/indes/flowerss-bot/model"
 	"io/ioutil"
 	"net/http"
 	"net/url"
@@ -80,15 +82,18 @@ func GetOPMLByURL(file_url string) (*OPML, error) {
 		Timeout:   time.Second * 5,
 	}
 	resp, err := client.Get(file_url)
+
 	if err != nil {
-		return nil, err
+		return nil, errors.New("fetch opml file error")
 	}
+
 	body, _ := ioutil.ReadAll(resp.Body)
 	o, err := NewOPML(body)
+
 	if err != nil {
-		return nil, err
+		return nil, errors.New("parse opml file error")
 	}
-	return o, err
+	return o, nil
 }
 
 func (o OPML) GetFlattenOutlines() ([]Outline, error) {
@@ -113,4 +118,21 @@ func (o OPML) GetFlattenOutlines() ([]Outline, error) {
 func (o OPML) XML() (string, error) {
 	b, err := xml.MarshalIndent(o, "", "\t")
 	return xml.Header + string(b), err
+}
+
+func ToOPML(sources []model.Source) (string, error) {
+	O := OPML{}
+	O.XMLName.Local = "opml"
+	O.Version = "2.0"
+	O.XMLName.Space = ""
+	O.Head.Title = "subscriptions in flowerss"
+	O.Head.DateCreated = time.Now().Format(time.RFC1123)
+	for _, s := range sources {
+		outline := Outline{}
+		outline.Text = s.Title
+		outline.Type = "rss"
+		outline.XMLURL = s.Link
+		O.Body.Outlines = append(O.Body.Outlines, outline)
+	}
+	return O.XML()
 }
