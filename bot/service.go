@@ -105,12 +105,35 @@ func BroadNews(source *model.Source, subs []model.Subscribe, contents []model.Co
 
 			u.ID = int(sub.UserID)
 
+			previewText := ""
+
+			if config.PreviewText > 0 {
+				contentDesc := strings.Trim(
+					strip.StripTags(
+						regexp.MustCompile(`\n+`).ReplaceAllLiteralString(
+							strings.ReplaceAll(
+								regexp.MustCompile(`<br(| /)>`).ReplaceAllString(content.Description, "<br>"),
+								"<br>", "\n"),
+							"\n")),
+					"\n")
+
+				contentDescRune := []rune(contentDesc)
+
+				previewText += "\n<b>---------- Preview ----------</b>\n"
+				if len(contentDescRune) > config.PreviewText {
+					previewText += string(contentDescRune[0:config.PreviewText])
+				} else {
+					previewText += contentDesc
+				}
+				previewText += "\n<b>-----------------------------</b>"
+			}
+
 			if sub.EnableTelegraph == 1 && content.TelegraphUrl != "" {
 				message = `
-<b>%s</b>
+<b>%s</b>%s
 %s | <a href="%s">Telegraph</a> | <a href="%s">原文</a>
 `
-				message = fmt.Sprintf(message, source.Title, content.Title, content.TelegraphUrl, content.RawLink)
+				message = fmt.Sprintf(message, source.Title, previewText, content.Title, content.TelegraphUrl, content.RawLink)
 				_, err := B.Send(&u, message, &tb.SendOptions{
 					DisableWebPagePreview: false,
 					ParseMode:             tb.ModeHTML,
@@ -127,25 +150,11 @@ func BroadNews(source *model.Source, subs []model.Subscribe, contents []model.Co
 
 			} else {
 				message = `
-<b>%s</b>
+<b>%s</b>%s
 <a href="%s">%s</a>
-<b>---------- Preview Text ----------</b>
-%s
 `
+				message = fmt.Sprintf(message, source.Title, previewText, content.RawLink, content.Title)
 
-				contentDesc := strip.StripTags(
-					regexp.MustCompile(`\n+`).ReplaceAllLiteralString(
-						strings.ReplaceAll(
-							regexp.MustCompile(`<br(| /)>`).ReplaceAllString(content.Description, "<br>"),
-							"<br>", "\n"),
-						"\n"))
-
-				previewText := []rune(contentDesc)
-				if len(previewText) > 256 {
-					previewText = previewText[0:255]
-				}
-
-				message = fmt.Sprintf(message, source.Title, content.RawLink, content.Title, string(previewText))
 				_, err := B.Send(&u, message, &tb.SendOptions{
 					DisableWebPagePreview: true,
 					ParseMode:             tb.ModeHTML,

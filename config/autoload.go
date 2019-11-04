@@ -15,6 +15,7 @@ var (
 	Socks5          string
 	TelegraphToken  []string
 	EnableTelegraph bool
+	PreviewText     int = 0
 	Mysql           MysqlConfig
 	SQLitePath      string
 	EnableMysql     bool
@@ -43,7 +44,8 @@ func init() {
 	fmt.Println(logo)
 	telegramTokenCli := flag.String("b", "", "Telegram Bot Token")
 	telegraphTokenCli := flag.String("t", "", "Telegraph API Token")
-	dbPathCli := flag.String("dbpath", "", "Database Path")
+	previewTextCli := flag.Int("p", 0, "Preview Text Length")
+	dbPathCli := flag.String("dbpath", "", "Telegraph API Token")
 	errorThresholdCli := flag.Int("threshold", 0, "Error Threshold")
 	socks5Cli := flag.String("s", "", "Socks5 Proxy")
 	intervalCli := flag.Int("i", 0, "Update Interval")
@@ -85,6 +87,16 @@ func init() {
 	} else {
 		EnableTelegraph = true
 		TelegraphToken = append(TelegraphToken, *telegraphTokenCli)
+	}
+
+	if *previewTextCli == 0 {
+		if viper.IsSet("preview_text") {
+			PreviewText = viper.GetInt("preview_text")
+		} else {
+			PreviewText = 0
+		}
+	} else {
+		PreviewText = 0
 	}
 
 	if *errorThresholdCli == 0 {
