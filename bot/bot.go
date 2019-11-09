@@ -194,12 +194,50 @@ func makeHandle() {
 	})
 
 	B.Handle("/export", func(m *tb.Message) {
-		sourceList, err := model.GetSourcesByUserID(m.Chat.ID)
 
-		if err != nil {
-			log.Println(err.Error())
-			_, _ = B.Send(m.Chat, fmt.Sprintf("导出失败"))
-			return
+		mention := GetMentionFromMessage(m)
+		var sourceList []model.Source
+		var err error
+		if mention == "" {
+
+			sourceList, err = model.GetSourcesByUserID(m.Chat.ID)
+			if err != nil {
+				log.Println(err.Error())
+				_, _ = B.Send(m.Chat, fmt.Sprintf("导出失败"))
+				return
+			}
+		} else {
+			channelChat, err := B.ChatByID(mention)
+
+			if err != nil {
+				_, _ = B.Send(m.Chat, "error")
+				return
+			}
+
+			adminList, err := B.AdminsOf(channelChat)
+			if err != nil {
+				_, _ = B.Send(m.Chat, "error")
+				return
+			}
+
+			senderIsAdmin := false
+			for _, admin := range adminList {
+				if m.Sender.ID == admin.User.ID {
+					senderIsAdmin = true
+				}
+			}
+
+			if !senderIsAdmin {
+				_, _ = B.Send(m.Chat, fmt.Sprintf("非频道管理员无法执行此操作"))
+				return
+			}
+
+			sourceList, err = model.GetSourcesByUserID(channelChat.ID)
+			if err != nil {
+				log.Println(err.Error())
+				_, _ = B.Send(m.Chat, fmt.Sprintf("导出失败"))
+				return
+			}
 		}
 
 		if len(sourceList) == 0 {
@@ -214,13 +252,14 @@ func makeHandle() {
 			return
 		}
 		opmlFile := &tb.Document{File: tb.FromReader(strings.NewReader(opmlStr))}
-		opmlFile.FileName = "subscriptions.opml"
+		opmlFile.FileName = fmt.Sprintf("subscriptions_%d.opml", time.Now().Unix())
 		_, err = B.Send(m.Chat, opmlFile)
 
 		if err != nil {
 			_, _ = B.Send(m.Chat, fmt.Sprintf("导出失败"))
 			log.Println("[export]", err)
 		}
+
 	})
 
 	B.Handle("/sub", func(m *tb.Message) {

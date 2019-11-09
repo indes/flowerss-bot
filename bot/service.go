@@ -228,6 +228,18 @@ func HasAdminType(t tb.ChatType) bool {
 	return false
 }
 
+func GetMentionFromMessage(m *tb.Message) (mention string) {
+	for _, entity := range m.Entities {
+		if entity.Type == tb.EntityMention {
+			if mention == "" {
+				mention = m.Text[entity.Offset : entity.Offset+entity.Length]
+
+			}
+		}
+	}
+	return
+}
+
 func GetUrlAndMentionFromMessage(m *tb.Message) (url string, mention string) {
 	for _, entity := range m.Entities {
 		if entity.Type == tb.EntityMention {
