@@ -588,6 +588,7 @@ func makeHandle() {
 /help 帮助
 /import 导入 OPML 文件
 /export 导出 OPML 文件
+/unsuball 取消所有订阅
 详细使用方法请看：https://github.com/indes/flowerss-bot
 `
 		_, _ = B.Send(m.Chat, message)

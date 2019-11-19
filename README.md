@@ -97,6 +97,7 @@ curl https://api.telegra.ph/createAccount?short_name=flowerss&author_name=flower
 /set 设置订阅
 /import 导入 OPML 文件
 /export 导出 OPML 文件
+/unsuball 取消所有订阅
 /help 帮助
 ```
 
@@ -111,6 +112,7 @@ Channel 订阅支持的命令：
 /sub @ChannelID [url] 订阅
 /unsub @ChannelID [url] 取消订阅
 /list @ChannelID 查看当前订阅
+/unsuball @ChannelID 取消所有订阅
 ```
 
 **ChannelID 只有设置为 Public Channel 才有。如果是 Private Channel，可以暂时设置为 Public，订阅完成后改为 Private，不影响 Bot 推送消息。**
