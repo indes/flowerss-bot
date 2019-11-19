@@ -80,6 +80,29 @@ func UnsubByUserIDAndSource(userID int64, source *Source) error {
 	}
 	return nil
 }
+
+func UnsubAllByUserID(userID int64) (success int, fail int, err error) {
+	db := getConnect()
+	defer db.Close()
+	success = 0
+	fail = 0
+	var subs []Subscribe
+
+	db.Where("user_id=?", userID).Find(&subs)
+
+	for _, sub := range subs {
+		err := sub.Unsub()
+		if err != nil {
+			fail += 1
+		} else {
+			success += 1
+		}
+	}
+	err = nil
+
+	return
+}
+
 func GetSubByUserIDAndURL(userID int64, url string) (*Subscribe, error) {
 	db := getConnect()
 	defer db.Close()

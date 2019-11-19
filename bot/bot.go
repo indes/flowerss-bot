@@ -38,13 +38,25 @@ var (
 		Unique: "toggle_notice",
 		Text:   "切换通知",
 	}
+
 	toggleTelegraphKey = tb.InlineButton{
 		Unique: "toggle_telegraph",
 		Text:   "切换 Telegraph",
 	}
+
 	toggleEnabledKey = tb.InlineButton{
 		Unique: "toggle_enabled",
 		Text:   "抓取开关",
+	}
+
+	confirmButton = tb.InlineButton{
+		Unique: "confirm",
+		Text:   "确认",
+	}
+
+	cancelButton = tb.InlineButton{
+		Unique: "cancel",
+		Text:   "取消",
 	}
 )
 
@@ -167,7 +179,7 @@ func toggleCtrlButtons(c *tb.Callback, action string) {
 	})
 }
 
-//Start run bot
+//Start bot
 func Start() {
 	makeHandle()
 	B.Start()
@@ -185,6 +197,48 @@ func makeHandle() {
 
 	B.Handle(&toggleEnabledKey, func(c *tb.Callback) {
 		toggleCtrlButtons(c, "toggleEnabledKey")
+	})
+
+	B.Handle(&confirmButton, func(c *tb.Callback) {
+
+		mention := GetMentionFromMessage(c.Message)
+		var msg string
+		if mention == "" {
+			success, fail, err := model.UnsubAllByUserID(int64(c.Sender.ID))
+			if err != nil {
+				msg = "退订失败"
+			} else {
+				msg = fmt.Sprintf("退订成功：%d\n退订失败：%d", success, fail)
+			}
+
+		} else {
+			channelChat, err := B.ChatByID(mention)
+
+			if err != nil {
+				_, _ = B.Edit(c.Message, "error")
+				return
+			}
+
+			if UserIsAdminChannel(c.Sender.ID, channelChat) {
+				success, fail, err := model.UnsubAllByUserID(channelChat.ID)
+				if err != nil {
+					msg = "退订失败"
+
+				} else {
+					msg = fmt.Sprintf("退订成功：%d\n退订失败：%d", success, fail)
+				}
+
+			} else {
+				msg = "非频道管理员无法执行此操作"
+			}
+		}
+
+		_, _ = B.Edit(c.Message, msg)
+
+	})
+
+	B.Handle(&cancelButton, func(c *tb.Callback) {
+		_, _ = B.Edit(c.Message, "操作取消")
 	})
 
 	B.Handle("/start", func(m *tb.Message) {
@@ -285,7 +339,7 @@ func makeHandle() {
 	})
 
 	B.Handle("/list", func(m *tb.Message) {
-		_, mention := GetUrlAndMentionFromMessage(m)
+		mention := GetMentionFromMessage(m)
 		if mention != "" {
 			channelChat, err := B.ChatByID(mention)
 			if err != nil {
@@ -496,6 +550,29 @@ func makeHandle() {
 
 	})
 
+	B.Handle("/unsuball", func(m *tb.Message) {
+		mention := GetMentionFromMessage(m)
+		confirmKeys := [][]tb.InlineButton{}
+		confirmKeys = append(confirmKeys, []tb.InlineButton{confirmButton, cancelButton})
+		var msg string
+
+		if mention == "" {
+			msg = "是否退订当前用户的所有订阅？"
+		} else {
+			msg = fmt.Sprintf("%s 是否退订该 Channel 所有订阅？", mention)
+		}
+
+		_, _ = B.Send(
+			m.Chat,
+			msg,
+			&tb.SendOptions{
+				ParseMode: tb.ModeHTML,
+			}, &tb.ReplyMarkup{
+				InlineKeyboard: confirmKeys,
+			},
+		)
+	})
+
 	B.Handle("/ping", func(m *tb.Message) {
 
 		_, _ = B.Send(m.Chat, "pong")
@@ -603,16 +680,17 @@ func makeHandle() {
 
 					text := new(bytes.Buffer)
 					if sub.EnableNotification == 1 {
-
 						toggleNoticeKey.Text = "关闭通知"
 					} else {
 						toggleNoticeKey.Text = "开启通知"
 					}
+
 					if sub.EnableTelegraph == 1 {
 						toggleTelegraphKey.Text = "关闭 Telegraph 转码"
 					} else {
 						toggleTelegraphKey.Text = "开启 Telegraph 转码"
 					}
+
 					if source.ErrorCount >= 100 {
 						toggleEnabledKey.Text = "重启更新"
 					} else {

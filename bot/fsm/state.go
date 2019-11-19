@@ -7,4 +7,5 @@ const (
 	Sub
 	UnSub
 	Set
+	UnSubAll
 )

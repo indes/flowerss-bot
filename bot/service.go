@@ -218,6 +218,22 @@ func CheckAdmin(upd *tb.Update) bool {
 	return false
 }
 
+func UserIsAdminChannel(userID int, channelChat *tb.Chat) (isAdmin bool) {
+	adminList, err := B.AdminsOf(channelChat)
+	isAdmin = false
+
+	if err != nil {
+		return
+	}
+
+	for _, admin := range adminList {
+		if userID == admin.User.ID {
+			isAdmin = true
+		}
+	}
+	return
+}
+
 func HasAdminType(t tb.ChatType) bool {
 	hasAdmin := []tb.ChatType{tb.ChatGroup, tb.ChatSuperGroup, tb.ChatChannel, tb.ChatChannelPrivate}
 	for _, n := range hasAdmin {
