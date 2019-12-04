@@ -443,8 +443,12 @@ func unsubCmdCtr(m *tb.Message) {
 }
 
 func unsubFeedItemBtnCtr(c *tb.Callback) {
-	//model.UnsubAllByUserID()
-	log.Print(c.Data)
+
+	if (c.Message.Chat.Type == tb.ChatGroup || c.Message.Chat.Type == tb.ChatSuperGroup) &&
+		!userIsAdminOfGroup(c.Sender.ID, c.Message.Chat) {
+		return
+	}
+
 	data := strings.Split(c.Data, ":")
 	if len(data) == 2 {
 		userID, _ := strconv.Atoi(data[0])
