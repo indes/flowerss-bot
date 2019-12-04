@@ -42,7 +42,7 @@ func toggleCtrlButtons(c *tb.Callback, action string) {
 		return
 	}
 
-	source, _ := model.GetSourceById(int(sub.SourceID))
+	source, _ := model.GetSourceById(sub.SourceID)
 	t := template.New("setting template")
 	_, _ = t.Parse(feedSettingTmpl)
 
@@ -335,31 +335,42 @@ func unsubCmdCtr(m *tb.Message) {
 			}
 		} else {
 			//Unsub by button
-			sources, _ := model.GetSourcesByUserID(m.Chat.ID)
-			if len(sources) > 0 {
-				var replyButton []tb.ReplyButton
-				replyKeys := [][]tb.ReplyButton{}
-				for _, source := range sources {
-					// 添加按钮
-					text := fmt.Sprintf("[%d] %s", source.ID, source.Title)
-					replyButton = []tb.ReplyButton{
-						tb.ReplyButton{Text: text},
+			//sources, _ := model.GetSourcesByUserID(m.Chat.ID)
+
+			subs, err := model.GetSubsByUserID(m.Chat.ID)
+
+			if err != nil {
+				errorCtr(m, "Bot错误，请联系管理员！")
+				return
+			}
+
+			if len(subs) > 0 {
+				unsubFeedItemBtns := [][]tb.InlineButton{}
+
+				for _, sub := range subs {
+					log.Print(sub.ID)
+					source, err := model.GetSourceById(sub.SourceID)
+					if err != nil {
+						errorCtr(m, "Bot错误，请联系管理员！")
+						return
 					}
 
-					replyKeys = append(replyKeys, replyButton)
+					unsubFeedItemBtns = append(unsubFeedItemBtns, []tb.InlineButton{
+						tb.InlineButton{
+							Unique: "unsub_feed_item_btn",
+							Text:   fmt.Sprintf("[%d] %s", sub.SourceID, source.Title),
+							Data:   fmt.Sprintf("%d:%d", sub.UserID, sub.ID),
+							Action: nil,
+						},
+					})
 				}
-				_, err := B.Send(m.Chat, "请选择你要退订的源", &tb.ReplyMarkup{
-					ForceReply:    true,
-					ReplyKeyboard: replyKeys,
-				})
 
-				if err == nil {
-					UserState[m.Chat.ID] = fsm.UnSub
-				}
+				_, _ = B.Send(m.Chat, "请选择你要退订的源", &tb.ReplyMarkup{
+					InlineKeyboard: unsubFeedItemBtns,
+				})
 			} else {
 				_, _ = B.Send(m.Chat, "当前没有订阅源")
 			}
-
 		}
 	} else {
 		if url != "" {
@@ -429,6 +440,23 @@ func unsubCmdCtr(m *tb.Message) {
 		}
 	}
 
+}
+
+func unsubFeedItemBtnCtr(c *tb.Callback) {
+	//model.UnsubAllByUserID()
+	log.Print(c.Data)
+	data := strings.Split(c.Data, ":")
+	if len(data) == 2 {
+		userID, _ := strconv.Atoi(data[0])
+		subID, _ := strconv.Atoi(data[1])
+		err := model.UnsubByUserIDAndSubID(int64(userID), uint(subID))
+
+		if err == nil {
+			_, _ = B.Edit(c.Message, "退订成功")
+			return
+		}
+	}
+	_, _ = B.Edit(c.Message, "退订错误！")
 }
 
 func unsubAllCmdCtr(m *tb.Message) {
@@ -539,7 +567,7 @@ func textCtr(m *tb.Message) {
 				_, _ = B.Send(m.Chat, "请选择正确的指令！")
 			} else {
 
-				var sourceId int
+				var sourceId uint
 				if _, err := fmt.Sscanf(str[0], "[%d]", &sourceId); err != nil {
 					_, _ = B.Send(m.Chat, "请选择正确的指令！")
 					return
@@ -738,4 +766,8 @@ func docCtr(m *tb.Message) {
 		_, _ = B.Send(m.Chat, "如果需要导入订阅，请发送正确的OPML文件。错误代码 01")
 	}
 
+}
+
+func errorCtr(m *tb.Message, errMsg string) {
+	_, _ = B.Send(m.Chat, errMsg)
 }

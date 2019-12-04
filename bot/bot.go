@@ -85,6 +85,8 @@ func makeHandle() {
 
 	B.Handle(&tb.InlineButton{Unique: "unsub_all_cancel_btn"}, unsubAllCancelBtnCtr)
 
+	B.Handle(&tb.InlineButton{Unique:"unsub_feed_item_btn"},unsubFeedItemBtnCtr)
+
 	B.Handle("/start", startCmdCtr)
 
 	B.Handle("/export", exportCmdCtr)

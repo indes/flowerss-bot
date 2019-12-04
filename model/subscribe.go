@@ -58,6 +58,10 @@ func GetSubscribeByUserIDAndURL(userID int, url string) (*Subscribe, error) {
 	return &sub, nil
 }
 func GetSubscriberBySource(s *Source) []Subscribe {
+	if s == nil {
+		return []Subscribe{}
+	}
+
 	db := getConnect()
 	defer db.Close()
 	var subs []Subscribe
@@ -67,14 +71,38 @@ func GetSubscriberBySource(s *Source) []Subscribe {
 }
 
 func UnsubByUserIDAndSource(userID int64, source *Source) error {
+
+	if source == nil {
+		return errors.New("nil pointer")
+	}
+
 	db := getConnect()
 	defer db.Close()
 	var sub Subscribe
 	db.Where("user_id=? and source_id=?", userID, source.ID).First(&sub)
-	if sub.UserID != int64(userID) {
+	if sub.UserID != userID {
 		return errors.New("未订阅该RSS源")
 	}
 	db.Delete(&sub)
+	if source.GetSubscribeNum() < 1 {
+		source.DeleteDueNoSubscriber()
+	}
+	return nil
+}
+
+func UnsubByUserIDAndSubID(userID int64, subID uint) error {
+	db := getConnect()
+	defer db.Close()
+
+	var sub Subscribe
+	db.Where("id=?", subID).First(&sub)
+
+	if sub.UserID != userID {
+		return errors.New("未找到该条订阅")
+	}
+	db.Delete(&sub)
+
+	source, _ := GetSourceById(sub.SourceID)
 	if source.GetSubscribeNum() < 1 {
 		source.DeleteDueNoSubscriber()
 	}
@@ -115,7 +143,7 @@ func GetSubByUserIDAndURL(userID int64, url string) (*Subscribe, error) {
 	return &sub, err
 }
 
-func GetSubsByUserID(userID int64) []Subscribe {
+func GetSubsByUserID(userID int64) ([]Subscribe, error) {
 	db := getConnect()
 	defer db.Close()
 
@@ -123,7 +151,7 @@ func GetSubsByUserID(userID int64) []Subscribe {
 
 	db.Where("user_id=?", userID).Find(&subs)
 
-	return subs
+	return subs, nil
 }
 
 func UnsubByUserIDAndSourceURL(userID int64, url string) error {

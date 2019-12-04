@@ -125,7 +125,12 @@ func GetSourcesByUserID(userID int64) ([]Source, error) {
 	db := getConnect()
 	defer db.Close()
 	var sources []Source
-	subs := GetSubsByUserID(userID)
+	subs, err := GetSubsByUserID(userID)
+
+	if err != nil {
+		return nil, err
+	}
+
 	for _, sub := range subs {
 		var source Source
 		db.Where("id=?", sub.SourceID).First(&source)
@@ -154,7 +159,7 @@ func (s *Source) Save() {
 	return
 }
 
-func GetSourceById(id int) (*Source, error) {
+func GetSourceById(id uint) (*Source, error) {
 	db := getConnect()
 	defer db.Close()
 	var source Source
