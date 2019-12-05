@@ -26,6 +26,13 @@ var (
 )
 
 func toggleCtrlButtons(c *tb.Callback, action string) {
+
+	if (c.Message.Chat.Type == tb.ChatGroup || c.Message.Chat.Type == tb.ChatSuperGroup) &&
+		!userIsAdminOfGroup(c.Sender.ID, c.Message.Chat) {
+		// check admin
+		return
+	}
+
 	msg := strings.Split(c.Message.Text, "\n")
 	subID, err := strconv.Atoi(strings.Split(msg[1], " ")[1])
 	if err != nil {
@@ -268,31 +275,121 @@ func listCmdCtr(m *tb.Message) {
 
 func setCmdCtr(m *tb.Message) {
 
-	sources, _ := model.GetSourcesByUserID(m.Chat.ID)
+	metion := GetMentionFromMessage(m)
 
-	if len(sources) <= 0 {
-		_, _ = B.Send(m.Chat, "当前没有订阅源")
+	if metion == "" {
+		sources, _ := model.GetSourcesByUserID(m.Chat.ID)
+
+		if len(sources) <= 0 {
+			_, _ = B.Send(m.Chat, "当前没有订阅源")
+			return
+		}
+
+		var replyButton []tb.ReplyButton
+		replyKeys := [][]tb.ReplyButton{}
+
+		setFeedItemBtns := [][]tb.InlineButton{}
+		for _, source := range sources {
+			// 添加按钮
+			text := fmt.Sprintf("%s %s", source.Title, source.Link)
+			replyButton = []tb.ReplyButton{
+				tb.ReplyButton{Text: text},
+			}
+			replyKeys = append(replyKeys, replyButton)
+
+			setFeedItemBtns = append(setFeedItemBtns, []tb.InlineButton{
+				tb.InlineButton{
+					Unique: "set_feed_item_btn",
+					Text:   fmt.Sprintf("[%d] %s", source.ID, source.Title),
+					Data:   fmt.Sprintf("%d:%d", m.Chat.ID, source.ID),
+				},
+			})
+		}
+
+		_, _ = B.Send(m.Chat, "请选择你要设置的源", &tb.ReplyMarkup{
+			//ForceReply:     true,
+			//ReplyKeyboard:  replyKeys,
+			InlineKeyboard: setFeedItemBtns,
+		})
+
+	} else {
+
+	}
+
+}
+
+func setFeedItemBtnCtr(c *tb.Callback) {
+
+	if (c.Message.Chat.Type == tb.ChatGroup || c.Message.Chat.Type == tb.ChatSuperGroup) &&
+		!userIsAdminOfGroup(c.Sender.ID, c.Message.Chat) {
 		return
 	}
-	var replyButton []tb.ReplyButton
-	replyKeys := [][]tb.ReplyButton{}
-	for _, source := range sources {
-		// 添加按钮
-		text := fmt.Sprintf("%s %s", source.Title, source.Link)
-		replyButton = []tb.ReplyButton{
-			tb.ReplyButton{Text: text},
-		}
-		replyKeys = append(replyKeys, replyButton)
-	}
-	_, err := B.Send(m.Chat, "请选择你要设置的源", &tb.ReplyMarkup{
-		ForceReply:    true,
-		ReplyKeyboard: replyKeys,
-	})
 
-	if err == nil {
-		UserState[m.Chat.ID] = fsm.Set
+	data := strings.Split(c.Data, ":")
+	chatID, _ := strconv.Atoi(data[0])
+	sourceID, _ := strconv.Atoi(data[1])
+
+	source, err := model.GetSourceById(uint(sourceID))
+
+	if err != nil {
+		_, _ = B.Edit(c.Message, "找不到该订阅源，错误代码01。")
+		return
 	}
 
+	sub, err := model.GetSubscribeByUserIDAndSourceID(int64(chatID), source.ID)
+	if err != nil {
+		_, _ = B.Edit(c.Message, "用户未订阅该rss，错误代码02。")
+		return
+	}
+
+	t := template.New("setting template")
+	_, _ = t.Parse(feedSettingTmpl)
+
+	toggleNoticeKey := tb.InlineButton{
+		Unique: "set_toggle_notice_btn",
+		Text:   "开启通知",
+	}
+	if sub.EnableNotification == 1 {
+		toggleNoticeKey.Text = "关闭通知"
+	}
+
+	toggleTelegraphKey := tb.InlineButton{
+		Unique: "set_toggle_telegraph_btn",
+		Text:   "开启 Telegraph 转码",
+	}
+	if sub.EnableTelegraph == 1 {
+		toggleTelegraphKey.Text = "关闭 Telegraph 转码"
+	}
+
+	toggleEnabledKey := tb.InlineButton{
+		Unique: "set_toggle_update_btn",
+		Text:   "暂停更新",
+	}
+
+	if source.ErrorCount >= 100 {
+		toggleEnabledKey.Text = "重启更新"
+	}
+
+	feedSettingKeys := [][]tb.InlineButton{
+		[]tb.InlineButton{
+			toggleEnabledKey,
+			toggleNoticeKey,
+			toggleTelegraphKey,
+		},
+	}
+
+	text := new(bytes.Buffer)
+
+	_ = t.Execute(text, map[string]interface{}{"source": source, "sub": sub})
+	_, _ = B.Edit(
+		c.Message,
+		text.String(),
+		&tb.SendOptions{
+			ParseMode: tb.ModeHTML,
+		}, &tb.ReplyMarkup{
+			InlineKeyboard: feedSettingKeys,
+		},
+	)
 }
 
 func setToggleNoticeBtnCtr(c *tb.Callback) {
@@ -303,7 +400,7 @@ func setToggleTelegraphBtnCtr(c *tb.Callback) {
 	toggleCtrlButtons(c, "toggleTelegraph")
 }
 
-func SetToggleUpdateBtnCtr(c *tb.Callback) {
+func setToggleUpdateBtnCtr(c *tb.Callback) {
 	toggleCtrlButtons(c, "toggleUpdate")
 }
 
@@ -335,12 +432,11 @@ func unsubCmdCtr(m *tb.Message) {
 			}
 		} else {
 			//Unsub by button
-			//sources, _ := model.GetSourcesByUserID(m.Chat.ID)
 
 			subs, err := model.GetSubsByUserID(m.Chat.ID)
 
 			if err != nil {
-				errorCtr(m, "Bot错误，请联系管理员！")
+				errorCtr(m, "Bot错误，请联系管理员！错误代码01")
 				return
 			}
 
@@ -348,10 +444,10 @@ func unsubCmdCtr(m *tb.Message) {
 				unsubFeedItemBtns := [][]tb.InlineButton{}
 
 				for _, sub := range subs {
-					log.Print(sub.ID)
+
 					source, err := model.GetSourceById(sub.SourceID)
 					if err != nil {
-						errorCtr(m, "Bot错误，请联系管理员！")
+						errorCtr(m, "Bot错误，请联系管理员！错误代码02")
 						return
 					}
 
@@ -446,6 +542,7 @@ func unsubFeedItemBtnCtr(c *tb.Callback) {
 
 	if (c.Message.Chat.Type == tb.ChatGroup || c.Message.Chat.Type == tb.ChatSuperGroup) &&
 		!userIsAdminOfGroup(c.Sender.ID, c.Message.Chat) {
+		// check admin
 		return
 	}
 

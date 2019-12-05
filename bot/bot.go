@@ -15,7 +15,7 @@ var (
 	socks5Proxy                          = config.Socks5
 	UserState   map[int64]fsm.UserStatus = make(map[int64]fsm.UserStatus)
 
-	B              *tb.Bot
+	B *tb.Bot
 )
 
 func init() {
@@ -75,17 +75,19 @@ func Start() {
 }
 
 func makeHandle() {
+	B.Handle(&tb.InlineButton{Unique: "set_feed_item_btn"}, setFeedItemBtnCtr)
+
 	B.Handle(&tb.InlineButton{Unique: "set_toggle_notice_btn"}, setToggleNoticeBtnCtr)
 
-	B.Handle(&tb.InlineButton{Unique: "set_toggle_telegraph_btn"},setToggleTelegraphBtnCtr)
+	B.Handle(&tb.InlineButton{Unique: "set_toggle_telegraph_btn"}, setToggleTelegraphBtnCtr)
 
-	B.Handle(&tb.InlineButton{Unique: "set_toggle_update_btn"}, SetToggleUpdateBtnCtr)
+	B.Handle(&tb.InlineButton{Unique: "set_toggle_update_btn"}, setToggleUpdateBtnCtr)
 
 	B.Handle(&tb.InlineButton{Unique: "unsub_all_confirm_btn"}, unsubAllConfirmBtnCtr)
 
 	B.Handle(&tb.InlineButton{Unique: "unsub_all_cancel_btn"}, unsubAllCancelBtnCtr)
 
-	B.Handle(&tb.InlineButton{Unique:"unsub_feed_item_btn"},unsubFeedItemBtnCtr)
+	B.Handle(&tb.InlineButton{Unique: "unsub_feed_item_btn"}, unsubFeedItemBtnCtr)
 
 	B.Handle("/start", startCmdCtr)
 
