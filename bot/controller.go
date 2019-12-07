@@ -455,7 +455,7 @@ func unsubCmdCtr(m *tb.Message) {
 						tb.InlineButton{
 							Unique: "unsub_feed_item_btn",
 							Text:   fmt.Sprintf("[%d] %s", sub.SourceID, source.Title),
-							Data:   fmt.Sprintf("%d:%d", sub.UserID, sub.ID),
+							Data:   fmt.Sprintf("%d:%d:%d", sub.UserID, sub.ID, source.ID),
 							Action: nil,
 						},
 					})
@@ -547,13 +547,24 @@ func unsubFeedItemBtnCtr(c *tb.Callback) {
 	}
 
 	data := strings.Split(c.Data, ":")
-	if len(data) == 2 {
+	if len(data) == 3 {
 		userID, _ := strconv.Atoi(data[0])
 		subID, _ := strconv.Atoi(data[1])
+		sourceID, _ := strconv.Atoi(data[2])
+		source, _ := model.GetSourceById(uint(sourceID))
+
+		rtnMsg := fmt.Sprintf("[%d] <a href=\"%s\">%s</a> 退订成功", sourceID, source.Link, source.Title)
+
 		err := model.UnsubByUserIDAndSubID(int64(userID), uint(subID))
 
 		if err == nil {
-			_, _ = B.Edit(c.Message, "退订成功")
+			_, _ = B.Edit(
+				c.Message,
+				rtnMsg,
+				&tb.SendOptions{
+					ParseMode: tb.ModeHTML,
+				},
+			)
 			return
 		}
 	}
