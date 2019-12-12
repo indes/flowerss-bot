@@ -3,7 +3,7 @@ package model
 import "errors"
 
 type Subscribe struct {
-	ID                 uint `gorm:"primary_key";"AUTO_INCREMENT"`
+	ID                 uint `gorm:"primary_key;AUTO_INCREMENT"`
 	UserID             int64
 	SourceID           uint
 	EnableNotification int

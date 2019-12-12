@@ -2,13 +2,18 @@ package model
 
 import (
 	"errors"
+	"fmt"
 	"github.com/SlyMarbo/rss"
 	"github.com/indes/flowerss-bot/config"
+	"io/ioutil"
 	"log"
+	"net/http"
+	"strings"
+	"unicode"
 )
 
 type Source struct {
-	ID         uint `gorm:"primary_key";"AUTO_INCREMENT"`
+	ID         uint `gorm:"primary_key;AUTO_INCREMENT"`
 	Link       string
 	Title      string
 	ErrorCount uint
@@ -49,9 +54,27 @@ func FindOrNewSourceByUrl(url string) (*Source, error) {
 			source.Link = url
 
 			// parsing task
-			feed, err := rss.Fetch(url)
+			feed, err := rss.FetchByFunc(func(url string) (resp *http.Response, err error) {
+				resp, err = http.Get(url)
+				if err != nil {
+					return nil, err
+				}
+				defer resp.Body.Close()
+				var data []byte
+				if data, err = ioutil.ReadAll(resp.Body); err != nil {
+					return nil, err
+				}
+				resp.Body = ioutil.NopCloser(strings.NewReader(strings.Map(func(r rune) rune {
+					if unicode.IsPrint(r) {
+						return r
+					}
+					return -1
+				}, string(data))))
+				return
+			}, url)
+
 			if err != nil {
-				return nil, errors.New("Feed 抓取错误")
+				return nil, fmt.Errorf("Feed 抓取错误 %v", err)
 			}
 
 			source.Title = feed.Title
