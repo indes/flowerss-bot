@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/SlyMarbo/rss"
 	"github.com/indes/flowerss-bot/config"
+	"github.com/jinzhu/gorm"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -44,34 +45,37 @@ func GetSourceByUrl(url string) (*Source, error) {
 	return &source, nil
 }
 
+func fetchFunc(url string) (resp *http.Response, err error) {
+	resp, err = http.Get(url)
+	if err != nil {
+		return nil, err
+	}
+	var data []byte
+	if data, err = ioutil.ReadAll(resp.Body); err != nil {
+		_ = resp.Body.Close()
+		return nil, err
+	}
+	_ = resp.Body.Close()
+	resp.Body = ioutil.NopCloser(strings.NewReader(strings.Map(func(r rune) rune {
+		if unicode.IsPrint(r) {
+			return r
+		}
+		return -1
+	}, string(data))))
+	return
+}
+
 func FindOrNewSourceByUrl(url string) (*Source, error) {
 	var source Source
 	db := getConnect()
 	defer db.Close()
 
 	if err := db.Where("link=?", url).Find(&source).Error; err != nil {
-		if err.Error() == "record not found" {
+		if err == gorm.ErrRecordNotFound {
 			source.Link = url
 
 			// parsing task
-			feed, err := rss.FetchByFunc(func(url string) (resp *http.Response, err error) {
-				resp, err = http.Get(url)
-				if err != nil {
-					return nil, err
-				}
-				defer resp.Body.Close()
-				var data []byte
-				if data, err = ioutil.ReadAll(resp.Body); err != nil {
-					return nil, err
-				}
-				resp.Body = ioutil.NopCloser(strings.NewReader(strings.Map(func(r rune) rune {
-					if unicode.IsPrint(r) {
-						return r
-					}
-					return -1
-				}, string(data))))
-				return
-			}, url)
+			feed, err := rss.FetchByFunc(fetchFunc, url)
 
 			if err != nil {
 				return nil, fmt.Errorf("Feed 抓取错误 %v", err)
@@ -124,7 +128,7 @@ func (s *Source) IsSubscribed() bool {
 
 func (s *Source) GetNewContents() ([]Content, error) {
 	var newContents []Content
-	feed, err := rss.Fetch(s.Link)
+	feed, err := rss.FetchByFunc(fetchFunc, s.Link)
 	if err != nil {
 		log.Println("Unable to make request: ", err, " ", s.Link)
 		s.AddErrorCount()

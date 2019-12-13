@@ -1,6 +1,9 @@
 package model
 
-import "errors"
+import (
+	"errors"
+	"github.com/indes/flowerss-bot/config"
+)
 
 type Subscribe struct {
 	ID                 uint `gorm:"primary_key;AUTO_INCREMENT"`
@@ -190,10 +193,10 @@ func (s *Subscribe) ToggleTelegraph() error {
 }
 
 func (s *Source) ToggleEnabled() error {
-	if s.ErrorCount >= 100 {
+	if s.ErrorCount >= config.ErrorThreshold {
 		s.ErrorCount = 0
 	} else {
-		s.ErrorCount = 100
+		s.ErrorCount = config.ErrorThreshold
 	}
 
 	///TODO a hack for save source changes

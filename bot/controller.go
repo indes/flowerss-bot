@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"github.com/indes/flowerss-bot/bot/fsm"
+	"github.com/indes/flowerss-bot/config"
 	"github.com/indes/flowerss-bot/model"
 	tb "gopkg.in/tucnak/telebot.v2"
 	"html/template"
@@ -92,7 +93,7 @@ func toggleCtrlButtons(c *tb.Callback, action string) {
 		Text:   "暂停更新",
 	}
 
-	if source.ErrorCount >= 100 {
+	if source.ErrorCount >= config.ErrorThreshold {
 		toggleEnabledKey.Text = "重启更新"
 	}
 
@@ -366,7 +367,7 @@ func setFeedItemBtnCtr(c *tb.Callback) {
 		Text:   "暂停更新",
 	}
 
-	if source.ErrorCount >= 100 {
+	if source.ErrorCount >= config.ErrorThreshold {
 		toggleEnabledKey.Text = "重启更新"
 	}
 
@@ -768,7 +769,7 @@ func textCtr(m *tb.Message) {
 					Text:   "暂停更新",
 				}
 
-				if source.ErrorCount >= 100 {
+				if source.ErrorCount >= config.ErrorThreshold {
 					toggleEnabledKey.Text = "重启更新"
 				}
 
