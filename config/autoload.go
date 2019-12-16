@@ -118,8 +118,8 @@ func initTPL() {
 	}
 	MessageTpl = template.Must(template.New("message").Parse(tplMsg))
 
-	if viper.IsSet("message_tpl_mode") {
-		switch strings.ToLower(viper.GetString("message_tpl_mode")) {
+	if viper.IsSet("message_mode") {
+		switch strings.ToLower(viper.GetString("message_mode")) {
 		case "md", "markdown":
 			MessageMode = tb.ModeMarkdown
 		case "html":
