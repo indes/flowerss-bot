@@ -1,14 +1,14 @@
 package bot
 
 import (
+	"bytes"
 	"fmt"
-	strip "github.com/grokify/html-strip-tags-go"
+	"log"
+	"strings"
+
 	"github.com/indes/flowerss-bot/config"
 	"github.com/indes/flowerss-bot/model"
 	tb "gopkg.in/tucnak/telebot.v2"
-	"log"
-	"regexp"
-	"strings"
 )
 
 func FeedForChannelRegister(m *tb.Message, url string, channelMention string) {
@@ -92,84 +92,40 @@ func SendError(c *tb.Chat) {
 func BroadNews(source *model.Source, subs []model.Subscribe, contents []model.Content) {
 
 	log.Printf("Source Title: <%s> Subscriber: %d New Contents: %d", source.Title, len(subs), len(contents))
-	var u tb.User
-	var message string
 	for _, content := range contents {
+
+		previewText := trimDescription(content.Description, config.PreviewText)
+		tpldata := &config.TplData{
+			SourceTitle:     source.Title,
+			ContentTitle:    content.Title,
+			RawLink:         content.RawLink,
+			PreviewText:     previewText,
+			TelegraphURL:    content.TelegraphUrl,
+			EnableTelegraph: config.EnableTelegraph,
+		}
+
+		var buf []byte
+		wb := bytes.NewBuffer(buf)
+		if err := config.MessageTpl.Execute(wb, tpldata); err != nil {
+			log.Println(err)
+			return
+		}
+
 		for _, sub := range subs {
-			var disableNotification bool
-			if sub.EnableNotification == 1 {
-				disableNotification = false
-			} else {
-				disableNotification = true
+			u := &tb.User{
+				ID: int(sub.UserID),
 			}
-
-			u.ID = int(sub.UserID)
-
-			previewText := ""
-
-			if config.PreviewText > 0 {
-				contentDesc := strings.Trim(
-					strip.StripTags(
-						regexp.MustCompile(`\n+`).ReplaceAllLiteralString(
-							strings.ReplaceAll(
-								regexp.MustCompile(`<br(| /)>`).ReplaceAllString(content.Description, "<br>"),
-								"<br>", "\n"),
-							"\n")),
-					"\n")
-
-				contentDescRune := []rune(contentDesc)
-
-				previewText += "\n<b>---------- Preview ----------</b>\n"
-				if len(contentDescRune) > config.PreviewText {
-					previewText += string(contentDescRune[0:config.PreviewText])
-				} else {
-					previewText += contentDesc
-				}
-				previewText += "\n<b>-----------------------------</b>"
+			o := &tb.SendOptions{
+				DisableWebPagePreview: false,
+				ParseMode:             config.MessageMode,
+				DisableNotification:   sub.EnableNotification != 1,
 			}
-
-			if sub.EnableTelegraph == 1 && content.TelegraphUrl != "" {
-				message = `
-<b>%s</b>%s
-%s | <a href="%s">Telegraph</a> | <a href="%s">原文</a>
-`
-				message = fmt.Sprintf(message, source.Title, previewText, content.Title, content.TelegraphUrl, content.RawLink)
-				_, err := B.Send(&u, message, &tb.SendOptions{
-					DisableWebPagePreview: false,
-					ParseMode:             tb.ModeHTML,
-					DisableNotification:   disableNotification,
-				})
-
-				if err != nil {
-					log.Println(err)
-					if strings.Contains(err.Error(), "Forbidden") {
-						log.Printf("Unsubscribe UserID:%d SourceID:%d", sub.UserID, sub.SourceID)
-						_ = sub.Unsub()
-					}
-				}
-
-			} else {
-				message = `
-<b>%s</b>%s
-<a href="%s">%s</a>
-`
-				message = fmt.Sprintf(message, source.Title, previewText, content.RawLink, content.Title)
-
-				_, err := B.Send(&u, message, &tb.SendOptions{
-					DisableWebPagePreview: true,
-					ParseMode:             tb.ModeHTML,
-					DisableNotification:   disableNotification,
-				})
-
-				if err != nil {
-					log.Println(err)
-					if err != nil {
-						log.Println(err)
-						if strings.Contains(err.Error(), "Forbidden") {
-							log.Printf("Unsubscribe UserID:%d SourceID:%d", sub.UserID, sub.SourceID)
-							_ = sub.Unsub()
-						}
-					}
+			msg := strings.TrimSpace(string(wb.Bytes()))
+			if _, err := B.Send(u, msg, o); err != nil {
+				log.Println(err)
+				if strings.Contains(err.Error(), "Forbidden") {
+					log.Printf("Unsubscribe UserID:%d SourceID:%d", sub.UserID, sub.SourceID)
+					_ = sub.Unsub()
 				}
 			}
 		}
