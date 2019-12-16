@@ -92,26 +92,28 @@ func SendError(c *tb.Chat) {
 func BroadNews(source *model.Source, subs []model.Subscribe, contents []model.Content) {
 
 	log.Printf("Source Title: <%s> Subscriber: %d New Contents: %d", source.Title, len(subs), len(contents))
+	var buf []byte
+	wb := bytes.NewBuffer(buf)
 	for _, content := range contents {
 
 		previewText := trimDescription(content.Description, config.PreviewText)
-		tpldata := &config.TplData{
-			SourceTitle:     source.Title,
-			ContentTitle:    content.Title,
-			RawLink:         content.RawLink,
-			PreviewText:     previewText,
-			TelegraphURL:    content.TelegraphUrl,
-			EnableTelegraph: config.EnableTelegraph,
-		}
-
-		var buf []byte
-		wb := bytes.NewBuffer(buf)
-		if err := config.MessageTpl.Execute(wb, tpldata); err != nil {
-			log.Println(err)
-			return
-		}
 
 		for _, sub := range subs {
+			tpldata := &config.TplData{
+				SourceTitle:     source.Title,
+				ContentTitle:    content.Title,
+				RawLink:         content.RawLink,
+				PreviewText:     previewText,
+				TelegraphURL:    content.TelegraphUrl,
+				EnableTelegraph: sub.EnableTelegraph == 1 && content.TelegraphUrl != "",
+			}
+
+			wb.Reset()
+			if err := config.MessageTpl.Execute(wb, tpldata); err != nil {
+				log.Println(err)
+				return
+			}
+
 			u := &tb.User{
 				ID: int(sub.UserID),
 			}
