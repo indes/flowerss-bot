@@ -1,7 +1,6 @@
 package bot
 
 import (
-	"bytes"
 	"fmt"
 	"log"
 	"strings"
@@ -92,8 +91,6 @@ func SendError(c *tb.Chat) {
 func BroadNews(source *model.Source, subs []model.Subscribe, contents []model.Content) {
 
 	log.Printf("Source Title: <%s> Subscriber: %d New Contents: %d", source.Title, len(subs), len(contents))
-	var buf []byte
-	wb := bytes.NewBuffer(buf)
 	for _, content := range contents {
 
 		previewText := trimDescription(content.Description, config.PreviewText)
@@ -108,12 +105,6 @@ func BroadNews(source *model.Source, subs []model.Subscribe, contents []model.Co
 				EnableTelegraph: sub.EnableTelegraph == 1 && content.TelegraphUrl != "",
 			}
 
-			wb.Reset()
-			if err := config.MessageTpl.Execute(wb, tpldata); err != nil {
-				log.Println(err)
-				return
-			}
-
 			u := &tb.User{
 				ID: int(sub.UserID),
 			}
@@ -122,12 +113,25 @@ func BroadNews(source *model.Source, subs []model.Subscribe, contents []model.Co
 				ParseMode:             config.MessageMode,
 				DisableNotification:   sub.EnableNotification != 1,
 			}
-			msg := strings.TrimSpace(string(wb.Bytes()))
+			msg, err := tpldata.Render(config.MessageMode)
+			if err != nil {
+				log.Println("BroadNews tpldata.Render err ", err)
+				return
+			}
 			if _, err := B.Send(u, msg, o); err != nil {
 				log.Println(err)
 				if strings.Contains(err.Error(), "Forbidden") {
 					log.Printf("Unsubscribe UserID:%d SourceID:%d", sub.UserID, sub.SourceID)
-					_ = sub.Unsub()
+					sub.Unsub()
+				}
+
+				/*
+					Telegram return error if markdown message has incomplete format.
+					Print the msg to warn the user
+					api error: Bad Request: can't parse entities: Can't find end of the entity starting at byte offset 894
+				*/
+				if strings.Contains(err.Error(), "parse entities") {
+					log.Println("Markdown Err: ", msg)
 				}
 			}
 		}
