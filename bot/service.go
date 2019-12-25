@@ -122,7 +122,16 @@ func BroadNews(source *model.Source, subs []model.Subscribe, contents []model.Co
 				log.Println(err)
 				if strings.Contains(err.Error(), "Forbidden") {
 					log.Printf("Unsubscribe UserID:%d SourceID:%d", sub.UserID, sub.SourceID)
-					_ = sub.Unsub()
+					sub.Unsub()
+				}
+
+				/*
+					Telegram return error if markdown message has incomplete format.
+					Print the msg to warn the user
+					api error: Bad Request: can't parse entities: Can't find end of the entity starting at byte offset 894
+				*/
+				if strings.Contains(err.Error(), "parse entities") {
+					log.Println("Markdown Err: ", msg)
 				}
 			}
 		}
