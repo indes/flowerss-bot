@@ -4,14 +4,16 @@ import (
 	"bytes"
 	"flag"
 	"fmt"
-	"github.com/spf13/viper"
-	tb "gopkg.in/tucnak/telebot.v2"
 	"log"
 	"os"
 	"path"
+	"regexp"
 	"strconv"
 	"strings"
 	"text/template"
+
+	"github.com/spf13/viper"
+	tb "gopkg.in/tucnak/telebot.v2"
 )
 
 var (
@@ -67,6 +69,25 @@ type TplData struct {
 	EnableTelegraph bool
 }
 
+func (t TplData) Render(mode tb.ParseMode) (string, error) {
+
+	var buf []byte
+	wb := bytes.NewBuffer(buf)
+
+	if mode == tb.ModeMarkdown {
+		mkd := regexp.MustCompile("[\\*\\[\\]`_]")
+		t.SourceTitle = mkd.ReplaceAllString(t.SourceTitle, " ")
+		t.ContentTitle = mkd.ReplaceAllString(t.ContentTitle, " ")
+		t.PreviewText = mkd.ReplaceAllString(t.PreviewText, " ")
+	}
+
+	if err := MessageTpl.Execute(wb, t); err != nil {
+		return "", err
+	}
+
+	return strings.TrimSpace(string(wb.Bytes())), nil
+}
+
 func validateTPL() {
 	testData := []TplData{
 		TplData{
@@ -81,7 +102,7 @@ func validateTPL() {
 			"RSS源标识 - 有预览无telegraph的消息",
 			"这是标题",
 			"https://www.github.com/",
-			"这里是很长很长很长的消息预览字数补丁紫薯补丁紫薯补丁紫薯补丁紫薯补丁",
+			"这里是很长很长很长的消息预览字数补丁紫薯补丁紫薯补丁紫薯补丁紫薯补丁[1](123)",
 			"",
 			false,
 		},
@@ -95,15 +116,9 @@ func validateTPL() {
 		},
 	}
 
-	var buf []byte
-	w := bytes.NewBuffer(buf)
-
 	for _, d := range testData {
-		w.Reset()
 		fmt.Println("\n////////////////////////////////////////////")
-		if err := MessageTpl.Execute(os.Stdout, d); err != nil {
-			log.Fatal(err)
-		}
+		fmt.Println(d.Render(MessageMode))
 	}
 	fmt.Println("\n////////////////////////////////////////////")
 }
