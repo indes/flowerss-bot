@@ -805,21 +805,24 @@ func textCtr(m *tb.Message) {
 }
 
 func docCtr(m *tb.Message) {
-
-	if m.FromChannel() {
-		if !UserIsAdminChannel(m.ID, m.Chat) {
-			return
-		}
-	}
 	if m.FromGroup() {
 		if !userIsAdminOfGroup(m.ID, m.Chat) {
 			return
 		}
 	}
 
-	url, _ := B.FileURLByID(m.Document.FileID)
-	opml, err := GetOPMLByURL(url)
+	if m.FromChannel() {
+		if !UserIsAdminChannel(m.ID, m.Chat) {
+			return
+		}
+	}
 
+	url, _ := B.FileURLByID(m.Document.FileID)
+	if !strings.HasSuffix(url, ".opml") {
+		return
+	}
+
+	opml, err := GetOPMLByURL(url)
 	if err != nil {
 		if err.Error() == "fetch opml file error" {
 			_, _ = B.Send(m.Chat,
