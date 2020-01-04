@@ -17,18 +17,19 @@ import (
 )
 
 var (
-	BotToken        string
-	Socks5          string
-	TelegraphToken  []string
-	EnableTelegraph bool
-	PreviewText     int = 0
-	Mysql           MysqlConfig
-	SQLitePath      string
-	EnableMysql     bool
-	UpdateInterval  int  = 10
-	ErrorThreshold  uint = 100
-	MessageTpl      *template.Template
-	MessageMode     tb.ParseMode
+	BotToken         string
+	Socks5           string
+	TelegraphToken   []string
+	EnableTelegraph  bool
+	PreviewText      int = 0
+	Mysql            MysqlConfig
+	SQLitePath       string
+	EnableMysql      bool
+	UpdateInterval   int  = 10
+	ErrorThreshold   uint = 100
+	MessageTpl       *template.Template
+	MessageMode      tb.ParseMode
+	TelegramEndpoint string
 )
 
 const (
@@ -158,6 +159,8 @@ func init() {
 	socks5Cli := flag.String("s", "", "Socks5 Proxy")
 	intervalCli := flag.Int("i", 0, "Update Interval")
 	testTpl := flag.Bool("testtpl", false, "Test Template")
+	TelegramEndpointCli := flag.String("endpoint", "", "Custom Telegram Endpoint")
+
 	flag.Parse()
 
 	projectName := "flowerss-bot"
@@ -214,6 +217,16 @@ func init() {
 		}
 	} else {
 		PreviewText = 0
+	}
+
+	if *TelegramEndpointCli == "" {
+		if viper.IsSet("telegram.endpoint") {
+			TelegramEndpoint = viper.GetString("telegram.endpoint")
+		} else {
+			TelegramEndpoint = ""
+		}
+	} else {
+		TelegramEndpoint = ""
 	}
 
 	if *errorThresholdCli == 0 {

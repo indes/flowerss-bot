@@ -77,6 +77,7 @@ sqlite:
 | socks5          | 用于无法正常 Telegram API 的环境            | 可忽略（能正常连接上 Telegram API 服务器） |
 | mysql           | MySQL 数据库配置                           | 可忽略（使用 SQLite ）                     |
 | sqlite          | SQLite 配置                               | 可忽略（已配置mysql时，该项失效）          |
+| telegram.endpoint         | 自定义telegram bot api url                              | 可忽略（使用默认api url）          |
 
 ### Telegraph Token 申请
 

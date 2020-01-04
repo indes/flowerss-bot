@@ -4,6 +4,7 @@ import (
 	"crypto/tls"
 	"encoding/xml"
 	"errors"
+	"github.com/indes/flowerss-bot/config"
 	"github.com/indes/flowerss-bot/model"
 	"io/ioutil"
 	"net/http"
@@ -68,8 +69,8 @@ func NewOPML(b []byte) (*OPML, error) {
 func GetOPMLByURL(file_url string) (*OPML, error) {
 	var proxy *url.URL
 
-	if socks5Proxy != "" {
-		proxy, _ = url.Parse("socks5://" + socks5Proxy)
+	if config.Socks5 != "" {
+		proxy, _ = url.Parse("socks5://" + config.Socks5)
 	}
 
 	tr := &http.Transport{

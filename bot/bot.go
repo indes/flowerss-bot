@@ -11,27 +11,29 @@ import (
 )
 
 var (
-	botToken                             = config.BotToken
-	socks5Proxy                          = config.Socks5
-	UserState   map[int64]fsm.UserStatus = make(map[int64]fsm.UserStatus)
-
-	B *tb.Bot
+	UserState map[int64]fsm.UserStatus = make(map[int64]fsm.UserStatus)
+	B         *tb.Bot
 )
 
 func init() {
 	poller := &tb.LongPoller{Timeout: 10 * time.Second}
 	spamProtected := tb.NewMiddlewarePoller(poller, func(upd *tb.Update) bool {
-
 		if !CheckAdmin(upd) {
 			return false
 		}
-
 		return true
 	})
-	if socks5Proxy != "" {
-		log.Printf("Bot Token: %s Proxy: %s\n", botToken, socks5Proxy)
 
-		dialer, err := proxy.SOCKS5("tcp", socks5Proxy, nil, proxy.Direct)
+	botSettings := tb.Settings{
+		URL:    config.TelegramEndpoint,
+		Token:  config.BotToken,
+		Poller: spamProtected,
+	}
+
+	if config.Socks5 != "" {
+		log.Printf("Bot Token: %s Proxy: %s Endpoint: %s\n", config.BotToken, config.Socks5, config.TelegramEndpoint)
+
+		dialer, err := proxy.SOCKS5("tcp", config.Socks5, nil, proxy.Direct)
 		if err != nil {
 			log.Fatal("Error creating dialer, aborting.")
 		}
@@ -39,33 +41,21 @@ func init() {
 		httpTransport := &http.Transport{}
 		httpClient := &http.Client{Transport: httpTransport}
 		httpTransport.Dial = dialer.Dial
+		botSettings.Client = httpClient
 
-		// creat bot
-		B, err = tb.NewBot(tb.Settings{
-			Token:  botToken,
-			Poller: spamProtected,
-			Client: httpClient,
-		})
-
-		if err != nil {
-			log.Fatal(err)
-			return
-		}
 	} else {
-		log.Printf("Bot Token: %s", botToken)
-
-		var err error
-		// creat bot
-		B, err = tb.NewBot(tb.Settings{
-			Token:  botToken,
-			Poller: spamProtected,
-		})
-		if err != nil {
-			log.Fatal(err)
-			return
-		}
+		log.Printf("Bot Token: %s Endpoint: %s\n", config.BotToken, config.TelegramEndpoint)
 	}
 
+	// create bot
+	var err error
+
+	B, err = tb.NewBot(botSettings)
+
+	if err != nil {
+		log.Fatal(err)
+		return
+	}
 }
 
 //Start bot

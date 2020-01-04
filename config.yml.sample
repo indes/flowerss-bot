@@ -10,5 +10,8 @@ mysql:
   password:
   database:
 
+telegram:
+  endpoint:
+
 sqlite:
   path: ./data.db
