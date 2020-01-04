@@ -55,6 +55,8 @@ preview_text: 0
 socks5: 127.0.0.1:1080
 update_interval: 10
 error_threshold: 100
+telegram:
+  endpoint: https://xxx.com/
 mysql:
   host: 127.0.0.1
   port: 3306
