@@ -17,19 +17,20 @@ import (
 )
 
 var (
-	BotToken         string
-	Socks5           string
-	TelegraphToken   []string
-	EnableTelegraph  bool
-	PreviewText      int = 0
-	Mysql            MysqlConfig
-	SQLitePath       string
-	EnableMysql      bool
-	UpdateInterval   int  = 10
-	ErrorThreshold   uint = 100
-	MessageTpl       *template.Template
-	MessageMode      tb.ParseMode
-	TelegramEndpoint string
+	BotToken              string
+	Socks5                string
+	TelegraphToken        []string
+	EnableTelegraph       bool
+	PreviewText           int = 0
+	DisableWebPagePreview bool
+	Mysql                 MysqlConfig
+	SQLitePath            string
+	EnableMysql           bool
+	UpdateInterval        int  = 10
+	ErrorThreshold        uint = 100
+	MessageTpl            *template.Template
+	MessageMode           tb.ParseMode
+	TelegramEndpoint      string
 )
 
 const (
@@ -154,6 +155,7 @@ func init() {
 	telegramTokenCli := flag.String("b", "", "Telegram Bot Token")
 	telegraphTokenCli := flag.String("t", "", "Telegraph API Token")
 	previewTextCli := flag.Int("p", 0, "Preview Text Length")
+	DisableWebPagePreviewCli := flag.Bool("disable_web_page_preview", false, "Disable Web Page Preview")
 	dbPathCli := flag.String("dbpath", "", "SQLite DB Path")
 	errorThresholdCli := flag.Int("threshold", 0, "Error Threshold")
 	socks5Cli := flag.String("s", "", "Socks5 Proxy")
@@ -217,6 +219,12 @@ func init() {
 		}
 	} else {
 		PreviewText = 0
+	}
+
+	if viper.IsSet("disable_web_page_preview") {
+		DisableWebPagePreview = viper.GetBool("disable_web_page_preview")
+	} else {
+		DisableWebPagePreview = *DisableWebPagePreviewCli
 	}
 
 	if *TelegramEndpointCli == "" {
