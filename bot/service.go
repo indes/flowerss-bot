@@ -109,7 +109,7 @@ func BroadNews(source *model.Source, subs []model.Subscribe, contents []model.Co
 				ID: int(sub.UserID),
 			}
 			o := &tb.SendOptions{
-				DisableWebPagePreview: false,
+				DisableWebPagePreview: config.DisableWebPagePreview,
 				ParseMode:             config.MessageMode,
 				DisableNotification:   sub.EnableNotification != 1,
 			}
