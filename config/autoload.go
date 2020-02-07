@@ -7,6 +7,7 @@ import (
 	"log"
 	"os"
 	"path"
+	"path/filepath"
 	"regexp"
 	"strconv"
 	"strings"
@@ -17,6 +18,7 @@ import (
 )
 
 var (
+	ProjectName           string = "flowerss"
 	BotToken              string
 	Socks5                string
 	TelegraphToken        []string
@@ -71,87 +73,10 @@ type TplData struct {
 	EnableTelegraph bool
 }
 
-func (t TplData) Render(mode tb.ParseMode) (string, error) {
-
-	var buf []byte
-	wb := bytes.NewBuffer(buf)
-
-	if mode == tb.ModeMarkdown {
-		mkd := regexp.MustCompile("[\\*\\[\\]`_]")
-		t.SourceTitle = mkd.ReplaceAllString(t.SourceTitle, " ")
-		t.ContentTitle = mkd.ReplaceAllString(t.ContentTitle, " ")
-		t.PreviewText = mkd.ReplaceAllString(t.PreviewText, " ")
-	}
-
-	if err := MessageTpl.Execute(wb, t); err != nil {
-		return "", err
-	}
-
-	return strings.TrimSpace(string(wb.Bytes())), nil
-}
-
-func validateTPL() {
-	testData := []TplData{
-		TplData{
-			"RSS 源标识 - 无预览无telegraph的消息",
-			"这是标题",
-			"https://www.github.com/",
-			"",
-			"",
-			false,
-		},
-		TplData{
-			"RSS源标识 - 有预览无telegraph的消息",
-			"这是标题",
-			"https://www.github.com/",
-			"这里是很长很长很长的消息预览字数补丁紫薯补丁紫薯补丁紫薯补丁紫薯补丁[1](123)",
-			"",
-			false,
-		},
-		TplData{
-			"RSS源标识 - 有预览有telegraph的消息",
-			"这是标题",
-			"https://www.github.com/",
-			"这里是很长很长很长的消息预览字数补丁紫薯补丁紫薯补丁紫薯补丁紫薯补丁",
-			"https://telegra.ph/markdown-07-07",
-			true,
-		},
-	}
-
-	for _, d := range testData {
-		fmt.Println("\n////////////////////////////////////////////")
-		fmt.Println(d.Render(MessageMode))
-	}
-	fmt.Println("\n////////////////////////////////////////////")
-}
-
-func initTPL() {
-
-	var tplMsg string
-	if viper.IsSet("message_tpl") {
-		tplMsg = viper.GetString("message_tpl")
-	} else {
-		tplMsg = defaultMessageTpl
-	}
-	MessageTpl = template.Must(template.New("message").Parse(tplMsg))
-
-	if viper.IsSet("message_mode") {
-		switch strings.ToLower(viper.GetString("message_mode")) {
-		case "md", "markdown":
-			MessageMode = tb.ModeMarkdown
-		case "html":
-			MessageMode = tb.ModeHTML
-		default:
-			MessageMode = tb.ModeDefault
-		}
-	} else {
-		MessageMode = tb.ModeMarkdown
-	}
-
-}
-
 func init() {
 
+	workDirFlag := flag.String("d", "./", "work directory of flowerss")
+	configFile := flag.String("c", "", "config file of flowerss")
 	telegramTokenCli := flag.String("b", "", "Telegram Bot Token")
 	telegraphTokenCli := flag.String("t", "", "Telegraph API Token")
 	previewTextCli := flag.Int("p", 0, "Preview Text Length")
@@ -164,13 +89,17 @@ func init() {
 	TelegramEndpointCli := flag.String("endpoint", "", "Custom Telegram Endpoint")
 
 	flag.Parse()
+	workDir := filepath.Clean(*workDirFlag)
 
-	projectName := "flowerss-bot"
+	if *configFile != "" {
+		viper.SetConfigFile(*configFile)
+	} else {
+		viper.SetConfigFile(filepath.Join(workDir, "config.yml"))
 
-	viper.SetConfigName("config") // name of config file (without extension)
-	viper.AddConfigPath(".")
-	viper.AddConfigPath(fmt.Sprintf("$HOME/.%s", projectName))              // call multiple times to add many search paths
-	viper.AddConfigPath(fmt.Sprintf("/data/docker/config/%s", projectName)) // path to look for the config file in
+		//viper.SetConfigName("config")
+		//viper.AddConfigPath(".")
+		//viper.AddConfigPath(fmt.Sprintf("$HOME/.%s", projectName))
+	}
 
 	err := viper.ReadInConfig() // Find and read the config file
 	if err != nil {             // Handle errors reading the config file
@@ -275,7 +204,7 @@ func init() {
 			if viper.IsSet("sqlite.path") {
 				SQLitePath = viper.GetString("sqlite.path")
 			} else {
-				SQLitePath = "data.db"
+				SQLitePath = filepath.Join(workDir, "data.db")
 			}
 		} else {
 			SQLitePath = *dbPathCli
@@ -290,6 +219,85 @@ func init() {
 				log.Printf("mkdir failed![%v]\n", err)
 			}
 		}
+	}
+
+}
+
+func (t TplData) Render(mode tb.ParseMode) (string, error) {
+
+	var buf []byte
+	wb := bytes.NewBuffer(buf)
+
+	if mode == tb.ModeMarkdown {
+		mkd := regexp.MustCompile("[\\*\\[\\]`_]")
+		t.SourceTitle = mkd.ReplaceAllString(t.SourceTitle, " ")
+		t.ContentTitle = mkd.ReplaceAllString(t.ContentTitle, " ")
+		t.PreviewText = mkd.ReplaceAllString(t.PreviewText, " ")
+	}
+
+	if err := MessageTpl.Execute(wb, t); err != nil {
+		return "", err
+	}
+
+	return strings.TrimSpace(string(wb.Bytes())), nil
+}
+
+func validateTPL() {
+	testData := []TplData{
+		TplData{
+			"RSS 源标识 - 无预览无telegraph的消息",
+			"这是标题",
+			"https://www.github.com/",
+			"",
+			"",
+			false,
+		},
+		TplData{
+			"RSS源标识 - 有预览无telegraph的消息",
+			"这是标题",
+			"https://www.github.com/",
+			"这里是很长很长很长的消息预览字数补丁紫薯补丁紫薯补丁紫薯补丁紫薯补丁[1](123)",
+			"",
+			false,
+		},
+		TplData{
+			"RSS源标识 - 有预览有telegraph的消息",
+			"这是标题",
+			"https://www.github.com/",
+			"这里是很长很长很长的消息预览字数补丁紫薯补丁紫薯补丁紫薯补丁紫薯补丁",
+			"https://telegra.ph/markdown-07-07",
+			true,
+		},
+	}
+
+	for _, d := range testData {
+		fmt.Println("\n////////////////////////////////////////////")
+		fmt.Println(d.Render(MessageMode))
+	}
+	fmt.Println("\n////////////////////////////////////////////")
+}
+
+func initTPL() {
+
+	var tplMsg string
+	if viper.IsSet("message_tpl") {
+		tplMsg = viper.GetString("message_tpl")
+	} else {
+		tplMsg = defaultMessageTpl
+	}
+	MessageTpl = template.Must(template.New("message").Parse(tplMsg))
+
+	if viper.IsSet("message_mode") {
+		switch strings.ToLower(viper.GetString("message_mode")) {
+		case "md", "markdown":
+			MessageMode = tb.ModeMarkdown
+		case "html":
+			MessageMode = tb.ModeHTML
+		default:
+			MessageMode = tb.ModeDefault
+		}
+	} else {
+		MessageMode = tb.ModeMarkdown
 	}
 
 }
