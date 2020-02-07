@@ -1,12 +1,14 @@
-FROM golang:1.12-alpine as builder
+FROM golang:1.13-alpine as builder
 #ENV CGO_ENABLED=0
-COPY . /rss
+COPY . /flowerss
 RUN apk add git make gcc libc-dev && \
-    cd /rss && make build
+    cd /flowerss && make build
+
 # Image starts here
 FROM alpine
 COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
-COPY --from=builder /rss/flowerss-bot /bin/
-VOLUME /root/.flowerss-bot
-WORKDIR /
+COPY --from=builder /flowerss/flowerss-bot /bin/
+VOLUME /root/.flowerss
+WORKDIR /root/.flowerss
 ENTRYPOINT ["/bin/flowerss-bot"]
+
