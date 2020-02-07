@@ -77,16 +77,18 @@ func init() {
 
 	workDirFlag := flag.String("d", "./", "work directory of flowerss")
 	configFile := flag.String("c", "", "config file of flowerss")
-	telegramTokenCli := flag.String("b", "", "Telegram Bot Token")
-	telegraphTokenCli := flag.String("t", "", "Telegraph API Token")
-	previewTextCli := flag.Int("p", 0, "Preview Text Length")
-	DisableWebPagePreviewCli := flag.Bool("disable_web_page_preview", false, "Disable Web Page Preview")
-	dbPathCli := flag.String("dbpath", "", "SQLite DB Path")
-	errorThresholdCli := flag.Int("threshold", 0, "Error Threshold")
-	socks5Cli := flag.String("s", "", "Socks5 Proxy")
-	intervalCli := flag.Int("i", 0, "Update Interval")
-	testTpl := flag.Bool("testtpl", false, "Test Template")
-	TelegramEndpointCli := flag.String("endpoint", "", "Custom Telegram Endpoint")
+
+	testTpl := flag.Bool("testtpl", false, "test template")
+
+	//telegramTokenCli := flag.String("b", "", "Telegram Bot Token")
+	//telegraphTokenCli := flag.String("t", "", "Telegraph API Token")
+	//previewTextCli := flag.Int("p", 0, "Preview Text Length")
+	//DisableWebPagePreviewCli := flag.Bool("disable_web_page_preview", false, "Disable Web Page Preview")
+	//dbPathCli := flag.String("dbpath", "", "SQLite DB Path")
+	//errorThresholdCli := flag.Int("threshold", 0, "Error Threshold")
+	//socks5Cli := flag.String("s", "", "Socks5 Proxy")
+	//intervalCli := flag.Int("i", 0, "Update Interval")
+	//TelegramEndpointCli := flag.String("endpoint", "", "Custom Telegram Endpoint")
 
 	flag.Parse()
 	workDir := filepath.Clean(*workDirFlag)
@@ -95,10 +97,6 @@ func init() {
 		viper.SetConfigFile(*configFile)
 	} else {
 		viper.SetConfigFile(filepath.Join(workDir, "config.yml"))
-
-		//viper.SetConfigName("config")
-		//viper.AddConfigPath(".")
-		//viper.AddConfigPath(fmt.Sprintf("$HOME/.%s", projectName))
 	}
 
 	err := viper.ReadInConfig() // Find and read the config file
@@ -114,76 +112,40 @@ func init() {
 
 	fmt.Println(logo)
 
-	if *telegramTokenCli == "" {
-		BotToken = viper.GetString("bot_token")
+	BotToken = viper.GetString("bot_token")
+	Socks5 = viper.GetString("socks5")
 
-	} else {
-		BotToken = *telegramTokenCli
-	}
-
-	if *socks5Cli == "" {
-		Socks5 = viper.GetString("socks5")
-	} else {
-		Socks5 = *socks5Cli
-	}
-
-	if *telegraphTokenCli == "" {
-		if viper.IsSet("telegraph_token") {
-			EnableTelegraph = true
-
-			TelegraphToken = viper.GetStringSlice("telegraph_token")
-		} else {
-			EnableTelegraph = false
-		}
-	} else {
+	if viper.IsSet("telegraph_token") {
 		EnableTelegraph = true
-		TelegraphToken = append(TelegraphToken, *telegraphTokenCli)
+		TelegraphToken = viper.GetStringSlice("telegraph_token")
+	} else {
+		EnableTelegraph = false
 	}
 
-	if *previewTextCli == 0 {
-		if viper.IsSet("preview_text") {
-			PreviewText = viper.GetInt("preview_text")
-		} else {
-			PreviewText = 0
-		}
+	if viper.IsSet("preview_text") {
+		PreviewText = viper.GetInt("preview_text")
 	} else {
 		PreviewText = 0
 	}
 
-	if viper.IsSet("disable_web_page_preview") {
-		DisableWebPagePreview = viper.GetBool("disable_web_page_preview")
+	DisableWebPagePreview = viper.GetBool("disable_web_page_preview")
+
+	if viper.IsSet("telegram.endpoint") {
+		TelegramEndpoint = viper.GetString("telegram.endpoint")
 	} else {
-		DisableWebPagePreview = *DisableWebPagePreviewCli
+		TelegramEndpoint = tb.DefaultApiURL
 	}
 
-	if *TelegramEndpointCli == "" {
-		if viper.IsSet("telegram.endpoint") {
-			TelegramEndpoint = viper.GetString("telegram.endpoint")
-		} else {
-			TelegramEndpoint = ""
-		}
+	if viper.IsSet("error_threshold") {
+		ErrorThreshold = uint(viper.GetInt("error_threshold"))
 	} else {
-		TelegramEndpoint = ""
+		ErrorThreshold = 100
 	}
 
-	if *errorThresholdCli == 0 {
-		if viper.IsSet("error_threshold") {
-			ErrorThreshold = uint(viper.GetInt("error_threshold"))
-		} else {
-			ErrorThreshold = 100
-		}
+	if viper.IsSet("update_interval") {
+		UpdateInterval = viper.GetInt("update_interval")
 	} else {
-		ErrorThreshold = uint(*errorThresholdCli)
-	}
-
-	if *intervalCli == 0 {
-		if viper.IsSet("update_interval") {
-			UpdateInterval = viper.GetInt("update_interval")
-		} else {
-			UpdateInterval = 10
-		}
-	} else {
-		UpdateInterval = *intervalCli
+		UpdateInterval = 10
 	}
 
 	if viper.IsSet("mysql.host") {
@@ -200,16 +162,12 @@ func init() {
 	}
 
 	if !EnableMysql {
-		if *dbPathCli == "" {
-			if viper.IsSet("sqlite.path") {
-				SQLitePath = viper.GetString("sqlite.path")
-			} else {
-				SQLitePath = filepath.Join(workDir, "data.db")
-			}
+		if viper.IsSet("sqlite.path") {
+			SQLitePath = viper.GetString("sqlite.path")
 		} else {
-			SQLitePath = *dbPathCli
+			SQLitePath = filepath.Join(workDir, "data.db")
 		}
-		log.Println("DB Path: ", SQLitePath)
+		log.Println("DB Path:", SQLitePath)
 		// 判断并创建SQLite目录
 		dir := path.Dir(SQLitePath)
 		_, err := os.Stat(dir)
