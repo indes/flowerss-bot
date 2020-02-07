@@ -3,7 +3,6 @@
 [![Build Status](https://travis-ci.org/indes/flowerss-bot.svg?branch=master)](https://travis-ci.org/indes/flowerss-bot)
 [![Go Report Card](https://goreportcard.com/badge/github.com/indes/rssflow)](https://goreportcard.com/report/github.com/indes/flowerss-bot)
 ![GitHub](https://img.shields.io/github/license/indes/flowerss-bot.svg)
-[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Findes%2Fflowerss-bot.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Findes%2Fflowerss-bot?ref=badge_shield)
 
 DEMO: [https://t.me/rssflowbot](https://t.me/rssflowbot)  
 [问题反馈群组](https://t.me/joinchat/FJ-cikd-yN1Bf1SxWbAKjw)
@@ -22,8 +21,21 @@ DEMO: [https://t.me/rssflowbot](https://t.me/rssflowbot)
 
 ### Docker 部署
 
-```shell
-docker run -d -v ~/data/flowerss:/var/flowerss indes/flowerss-bot -b <bot token> -t <telegraph token 可省略>
+#### 1. 下载配置文件
+
+```shell script
+mkdir ~/flowerss && wget -O ~/flowerss/config.yml https://raw.githubusercontent.com/indes/flowerss-bot/master/config.yml.sample
+```
+#### 2. 修改配置文件
+
+```shell script
+vim ~/flowerss/config.yaml
+```
+
+#### 3. 运行
+
+```shell script
+docker run -d -v ~/flowerss:/root/.flowerss indes/flowerss-bot
 ```
 
 ### 下载二进制
@@ -34,7 +46,7 @@ docker run -d -v ~/data/flowerss:/var/flowerss indes/flowerss-bot -b <bot token>
 
 ### 源码安装
 
-```shell
+```shell script
 git clone https://github.com/indes/flowerss-bot && cd flowerss-bot
 make build
 ./flowerss-bot
@@ -70,7 +82,7 @@ sqlite:
 
 配置说明：
 
-| 配置项                     | 含义                                      | 必填                                       |
+| 配置项                     | 含义                                      | 是否必填                                       |
 | --------------------------| ----------------------------------------- | ------------------------------------------ |
 | bot_token                 | Telegram Bot Token                        | 必填                                       |
 | telegraph_token           | Telegraph Token, 用于转存原文到 Telegraph   | 可忽略（不转存原文到 Telegraph ）          |
@@ -84,18 +96,18 @@ sqlite:
 | telegram.endpoint         | 自定义telegram bot api url                | 可忽略（使用默认api url）          |
 
 ### Telegraph Token 申请
-
-```shell
+如果要使用应用内即时预览，必须在配置文件中填写 `telegraph_token` 配置项，Telegraph Token 申请命令如下：
+```shell script
 curl https://api.telegra.ph/createAccount?short_name=flowerss&author_name=flowerss&author_url=https://github.com/indes/flowerss-bot
 ```
 
-返回的 JSON 中 access_token 字段值即为 Telegraph Token
+返回的 JSON 中 access_token 字段值即为 Telegraph Token。
 
 ## 使用
 
 命令：
 
-```shell
+```
 /sub [url] 订阅（url 为可选）
 /unsub [url] 取消订阅（url 为可选）
 /list 查看当前订阅
@@ -128,13 +140,13 @@ Channel 订阅支持的命令：
 2. 给 Bot 发送 `/sub @debug http://www.ruanyifeng.com/blog/atom.xml` 命令
 
 ## 常见问题
-* Q：日志中大量类似于`Create telegraph page error: FLOOD_WAIT_7`的提示  
+* Q：日志中大量类似于 `Create telegraph page error: FLOOD_WAIT_7` 的提示  
   A：原因是创建telegraph页面请求过快触发了接口限制，可尝试在配置文件中添加多个telegraph token
 
 
 ### 问题反馈
 
-如果你在使用过程中遇到问题，请提交 Issue，或者到[问题反馈群组](https://t.me/joinchat/FJ-cikd-yN1Bf1SxWbAKjw) 反馈。
+如果你在使用过程中遇到问题，请提交 Issue，或者到[问题反馈群组](https://t.me/joinchat/FJ-cikd-yN1Bf1SxWbAKjw)反馈。
 
 ## License
 
