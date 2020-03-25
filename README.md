@@ -29,7 +29,7 @@ mkdir ~/flowerss && wget -O ~/flowerss/config.yml https://raw.githubusercontent.
 #### 2. 修改配置文件
 
 ```shell script
-vim ~/flowerss/config.yaml
+vim ~/flowerss/config.yml
 ```
 
 #### 3. 运行
