@@ -11,6 +11,7 @@ type Subscribe struct {
 	SourceID           uint
 	EnableNotification int
 	EnableTelegraph    int
+	Tag                string
 	EditTime
 }
 

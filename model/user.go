@@ -3,6 +3,7 @@ package model
 type User struct {
 	ID     int64    `gorm:"primary_key"`
 	Source []Source `gorm:"many2many:subscribes;"`
+	State  int
 	EditTime
 }
 

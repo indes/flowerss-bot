@@ -16,10 +16,11 @@ func init() {
 
 	db.LogMode(true)
 
+	createOrUpdateTable(db, &User{})
 	createOrUpdateTable(db, &Source{})
+	createOrUpdateTable(db, &Option{})
 	createOrUpdateTable(db, &Subscribe{})
 	createOrUpdateTable(db, &Content{})
-	createOrUpdateTable(db, &User{})
 
 }
 
