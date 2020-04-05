@@ -13,20 +13,22 @@ import (
 func init() {
 	db := getConnect()
 	defer db.Close()
+
 	db.LogMode(true)
-	if !db.HasTable(&Source{}) {
-		db.CreateTable(&Source{})
-	}
 
-	if !db.HasTable(&Subscribe{}) {
-		db.CreateTable(&Subscribe{})
-	}
+	createOrUpdateTable(db, &Source{})
+	createOrUpdateTable(db, &Subscribe{})
+	createOrUpdateTable(db, &Content{})
+	createOrUpdateTable(db, &User{})
 
-	if !db.HasTable(&Content{}) {
-		db.CreateTable(&Content{})
-	}
-	if !db.HasTable(&User{}) {
-		db.CreateTable(&User{})
+}
+
+// createOrUpdateTable create table or Migrate table
+func createOrUpdateTable(db *gorm.DB, model interface{}) {
+	if !db.HasTable(model) {
+		db.CreateTable(model)
+	} else {
+		db.AutoMigrate(model)
 	}
 }
 
@@ -46,7 +48,6 @@ func getConnect() *gorm.DB {
 		}
 		return db
 	}
-
 }
 
 //EditTime timestamp
