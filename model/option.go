@@ -1,7 +1,7 @@
 package model
 
 type Option struct {
-	ID    int64 `gorm:"primary_key"`
+	ID    int `gorm:"primary_key;AUTO_INCREMENT"`
 	Name  string
 	Value string
 	EditTime
