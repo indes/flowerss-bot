@@ -53,7 +53,9 @@ const (
 {{.ContentTitle}} [Telegraph]({{.TelegraphURL}}) | [原文]({{.RawLink}})
 {{- else }}
 [{{.ContentTitle}}]({{.RawLink}})
-{{- end }}`
+{{- end }}
+{{.Tags}}
+`
 )
 
 type MysqlConfig struct {
@@ -70,6 +72,7 @@ type TplData struct {
 	RawLink         string
 	PreviewText     string
 	TelegraphURL    string
+	Tags            string
 	EnableTelegraph bool
 }
 
@@ -208,6 +211,7 @@ func validateTPL() {
 			"https://www.github.com/",
 			"",
 			"",
+			"",
 			false,
 		},
 		TplData{
@@ -216,6 +220,7 @@ func validateTPL() {
 			"https://www.github.com/",
 			"这里是很长很长很长的消息预览字数补丁紫薯补丁紫薯补丁紫薯补丁紫薯补丁[1](123)",
 			"",
+			"#标签",
 			false,
 		},
 		TplData{
@@ -224,6 +229,7 @@ func validateTPL() {
 			"https://www.github.com/",
 			"这里是很长很长很长的消息预览字数补丁紫薯补丁紫薯补丁紫薯补丁紫薯补丁",
 			"https://telegra.ph/markdown-07-07",
+			"#标签1 #标签2",
 			true,
 		},
 	}

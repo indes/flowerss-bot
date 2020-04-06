@@ -102,6 +102,7 @@ func BroadNews(source *model.Source, subs []model.Subscribe, contents []model.Co
 				RawLink:         content.RawLink,
 				PreviewText:     previewText,
 				TelegraphURL:    content.TelegraphUrl,
+				Tags:            sub.Tag,
 				EnableTelegraph: sub.EnableTelegraph == 1 && content.TelegraphUrl != "",
 			}
 
