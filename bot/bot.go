@@ -73,6 +73,8 @@ func makeHandle() {
 
 	B.Handle(&tb.InlineButton{Unique: "set_toggle_update_btn"}, setToggleUpdateBtnCtr)
 
+	B.Handle(&tb.InlineButton{Unique: "set_set_sub_tag_btn"}, setSubTagBtnCtr)
+
 	B.Handle(&tb.InlineButton{Unique: "unsub_all_confirm_btn"}, unsubAllConfirmBtnCtr)
 
 	B.Handle(&tb.InlineButton{Unique: "unsub_all_cancel_btn"}, unsubAllCancelBtnCtr)
@@ -98,6 +100,8 @@ func makeHandle() {
 	B.Handle("/help", helpCmdCtr)
 
 	B.Handle("/import", importCmdCtr)
+
+	B.Handle("/setfeedtag", setFeedTagCmdCtr)
 
 	B.Handle(tb.OnText, textCtr)
 

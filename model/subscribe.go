@@ -3,6 +3,11 @@ package model
 import (
 	"errors"
 	"github.com/indes/flowerss-bot/config"
+	"strings"
+)
+
+const (
+	MaxSubscribeTagLength = 250
 )
 
 type Subscribe struct {
@@ -203,6 +208,15 @@ func (s *Source) ToggleEnabled() error {
 	///TODO a hack for save source changes
 	s.Save()
 
+	return nil
+}
+
+func (s *Subscribe) SetTag(tags []string) error {
+	defer s.Save()
+
+	tagStr := strings.Join(tags, " #")
+
+	s.Tag = "#" + tagStr
 	return nil
 }
 

@@ -17,12 +17,13 @@ import (
 var (
 	feedSettingTmpl = `
 订阅<b>设置</b>
-[id] {{ .sub.ID}}
+[id] {{ .sub.ID }}
 [标题] {{ .source.Title }}
-[Link] {{.source.Link}}
+[Link] {{.source.Link }}
 [抓取更新] {{if ge .source.ErrorCount 100}}暂停{{else if lt .source.ErrorCount 100}}抓取中{{end}}
 [通知] {{if eq .sub.EnableNotification 0}}关闭{{else if eq .sub.EnableNotification 1}}开启{{end}}
 [Telegraph] {{if eq .sub.EnableTelegraph 0}}关闭{{else if eq .sub.EnableTelegraph 1}}开启{{end}}
+[Tag] {{if .sub.Tag}}{{ .sub.Tag }}{{else}}无{{end}}
 `
 )
 
@@ -87,42 +88,6 @@ func toggleCtrlButtons(c *tb.Callback, action string) {
 
 	sub.Save()
 
-	toggleNoticeKey := tb.InlineButton{
-		Unique: "set_toggle_notice_btn",
-		Text:   "开启通知",
-		Data:   c.Data,
-	}
-	if sub.EnableNotification == 1 {
-		toggleNoticeKey.Text = "关闭通知"
-	}
-
-	toggleTelegraphKey := tb.InlineButton{
-		Unique: "set_toggle_telegraph_btn",
-		Text:   "开启 Telegraph 转码",
-		Data:   c.Data,
-	}
-	if sub.EnableTelegraph == 1 {
-		toggleTelegraphKey.Text = "关闭 Telegraph 转码"
-	}
-
-	toggleEnabledKey := tb.InlineButton{
-		Unique: "set_toggle_update_btn",
-		Text:   "暂停更新",
-		Data:   c.Data,
-	}
-
-	if source.ErrorCount >= config.ErrorThreshold {
-		toggleEnabledKey.Text = "重启更新"
-	}
-
-	feedSettingKeys := [][]tb.InlineButton{
-		[]tb.InlineButton{
-			toggleEnabledKey,
-			toggleNoticeKey,
-			toggleTelegraphKey,
-		},
-	}
-
 	text := new(bytes.Buffer)
 
 	_ = t.Execute(text, map[string]interface{}{"source": source, "sub": sub})
@@ -132,7 +97,7 @@ func toggleCtrlButtons(c *tb.Callback, action string) {
 	_, _ = B.Edit(c.Message, text.String(), &tb.SendOptions{
 		ParseMode: tb.ModeHTML,
 	}, &tb.ReplyMarkup{
-		InlineKeyboard: feedSettingKeys,
+		InlineKeyboard: genFeedSetBtn(c, sub, source),
 	})
 }
 
@@ -399,6 +364,56 @@ func setFeedItemBtnCtr(c *tb.Callback) {
 
 	t := template.New("setting template")
 	_, _ = t.Parse(feedSettingTmpl)
+	text := new(bytes.Buffer)
+	_ = t.Execute(text, map[string]interface{}{"source": source, "sub": sub})
+
+	_, _ = B.Edit(
+		c.Message,
+		text.String(),
+		&tb.SendOptions{
+			ParseMode: tb.ModeHTML,
+		}, &tb.ReplyMarkup{
+			InlineKeyboard: genFeedSetBtn(c, sub, source),
+		},
+	)
+}
+
+func setSubTagBtnCtr(c *tb.Callback) {
+
+	// 权限验证
+	if !feedSetAuth(c) {
+		return
+	}
+	data := strings.Split(c.Data, ":")
+	subID, _ := strconv.Atoi(data[1])
+	msg := fmt.Sprintf(
+		"请使用`/setfeedtag 3 tags`命令为该订阅设置标签，tags为需要设置的标签，以空格分隔。（最多设置三个标签） \n例如：`/setfeedtag %d 科技 苹果`。",
+		subID, subID)
+
+	_ = B.Delete(c.Message)
+
+	_, _ = B.Send(
+		c.Message.Chat,
+		msg,
+		//&tb.ReplyMarkup{
+		//	ForceReply: true,
+		//	Selective:  true,
+		//},
+		&tb.SendOptions{ParseMode: tb.ModeMarkdown},
+	)
+
+	//if err == nil {
+	//	UserState[c.Message.Chat.ID] = fsm.SetSubTag
+	//}
+
+}
+
+func genFeedSetBtn(c *tb.Callback, sub *model.Subscribe, source *model.Source) [][]tb.InlineButton {
+	setSubTagKey := tb.InlineButton{
+		Unique: "set_set_sub_tag_btn",
+		Text:   "标签设置",
+		Data:   c.Data,
+	}
 
 	toggleNoticeKey := tb.InlineButton{
 		Unique: "set_toggle_notice_btn",
@@ -432,22 +447,13 @@ func setFeedItemBtnCtr(c *tb.Callback) {
 		[]tb.InlineButton{
 			toggleEnabledKey,
 			toggleNoticeKey,
+		},
+		[]tb.InlineButton{
 			toggleTelegraphKey,
+			setSubTagKey,
 		},
 	}
-
-	text := new(bytes.Buffer)
-
-	_ = t.Execute(text, map[string]interface{}{"source": source, "sub": sub})
-	_, _ = B.Edit(
-		c.Message,
-		text.String(),
-		&tb.SendOptions{
-			ParseMode: tb.ModeHTML,
-		}, &tb.ReplyMarkup{
-			InlineKeyboard: feedSettingKeys,
-		},
-	)
+	return feedSettingKeys
 }
 
 func setToggleNoticeBtnCtr(c *tb.Callback) {
@@ -727,6 +733,43 @@ func importCmdCtr(m *tb.Message) {
 	_, _ = B.Send(m.Chat, message)
 }
 
+func setFeedTagCmdCtr(m *tb.Message) {
+	args := strings.Split(m.Payload, " ")
+
+	if len(args) < 1 {
+		_, _ = B.Send(m.Chat, "命令错误")
+		return
+	}
+
+	// 截短参数
+	if len(args) > 4 {
+		args = args[:4]
+	}
+
+	subID, err := strconv.Atoi(args[0])
+	if err != nil {
+		_, _ = B.Send(m.Chat, "请输入正确的订阅id!")
+		return
+	}
+
+	sub, err := model.GetSubscribeByID(subID)
+
+	if err != nil || sub == nil {
+		return
+	}
+
+	if !checkPermit(int64(m.Sender.ID), sub.UserID) {
+		_, _ = B.Send(m.Chat, "没有权限!")
+		return
+	}
+
+	_ = sub.SetTag(args[1:])
+
+	_, _ = B.Send(m.Chat, "订阅标签设置成功!")
+
+	return
+}
+
 func textCtr(m *tb.Message) {
 	switch UserState[m.Chat.ID] {
 	case fsm.UnSub:
@@ -782,7 +825,10 @@ func textCtr(m *tb.Message) {
 			registFeed(m.Chat, url[0])
 			UserState[m.Chat.ID] = fsm.None
 		}
-
+	case fsm.SetSubTag:
+		{
+			return
+		}
 	case fsm.Set:
 		{
 

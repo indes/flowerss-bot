@@ -7,5 +7,6 @@ const (
 	Sub
 	UnSub
 	Set
+	SetSubTag
 	UnSubAll
 )
