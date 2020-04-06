@@ -112,6 +112,7 @@ curl https://api.telegra.ph/createAccount?short_name=flowerss&author_name=flower
 /unsub [url] 取消订阅（url 为可选）
 /list 查看当前订阅
 /set 设置订阅
+/setfeedtag [sub id] [tag1] [tag2] 设置订阅标签（最多设置三个Tag，以空格分割）
 /import 导入 OPML 文件
 /export 导出 OPML 文件
 /unsuball 取消所有订阅
@@ -128,6 +129,8 @@ Channel 订阅支持的命令：
 ```
 /sub @ChannelID [url] 订阅
 /unsub @ChannelID [url] 取消订阅
+/set 设置订阅
+/setfeedtag [sub id] [tag1] [tag2] 设置订阅标签（最多设置三个标签，以空格分割）
 /list @ChannelID 查看当前订阅
 /unsuball @ChannelID 取消所有订阅
 ```

@@ -719,6 +719,7 @@ func helpCmdCtr(m *tb.Message) {
 /unsub  取消订阅
 /list 查看当前订阅源
 /set 设置订阅
+/setfeedtag 设置订阅标签
 /help 帮助
 /import 导入 OPML 文件
 /export 导出 OPML 文件
