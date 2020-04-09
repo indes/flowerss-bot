@@ -1,35 +1,46 @@
 project_name: flowerss-bot
+env:
+  - GO111MODULE=on
 before:
   hooks:
     - go mod download
 builds:
-- env:
-  - CGO_ENABLED=0
-  goos:
-    - linux
-    - darwin
-    - windows
-  goarch:
-    - 386
-    - amd64
-archive:
-  name_template: "{{.ProjectName}}_{{.Version}}_{{.Os}}-{{.Arch}}"
-  replacements:
-    darwin: Darwin
-    linux: Linux
-    windows: Windows
-    386: 32bit
-    amd64: 64bit
-  format_overrides:
-    - goos: windows
-      format: zip
+  - env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - darwin
+      - windows
+    goarch:
+      - 386
+      - amd64
+
+    ignore:
+      - goos: darwin
+        goarch: 386
 checksum:
-  name_template: 'checksums.txt'
-snapshot:
-  name_template: "{{ .Tag }}-next"
+  name_template: '{{ .ProjectName }}_checksums.txt'
 changelog:
   sort: asc
   filters:
     exclude:
-    - '^docs:'
-    - '^test:'
+      - '^docs:'
+      - '^test:'
+      - Merge pull request
+      - Merge branch
+
+archives:
+  - name_template: '{{ .ProjectName }}_{{ .Os }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}'
+    replacements:
+      darwin: Darwin
+      linux: Linux
+      windows: Windows
+      386: i386
+      # amd64: x86_64
+    format_overrides:
+      - goos: windows
+        format: zip
+    files:
+      - config.yml.sample
+      - LICENSE
+      - README.md
