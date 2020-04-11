@@ -1,10 +1,9 @@
 name: Release
 
 on:
-  pull_request:
-  push:
+  create:
     tags:
-        - 'v*'
+      - v*
 
 jobs:
   goreleaser:
@@ -15,9 +14,9 @@ jobs:
         uses: actions/checkout@v2
       -
         name: Validates GoReleaser Config
-          uses: docker://mailchain/goreleaser-xcgo:latest
-          with:
-            args: check
+        uses: docker://mailchain/goreleaser-xcgo:latest
+        with:
+          args: check
       -
         name: Create release on GitHub
         uses: docker://mailchain/goreleaser-xcgo:latest
