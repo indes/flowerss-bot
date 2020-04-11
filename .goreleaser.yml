@@ -1,46 +1,81 @@
 project_name: flowerss-bot
+
 env:
   - GO111MODULE=on
+
 before:
   hooks:
     - go mod download
+
 builds:
-  - env:
-      - CGO_ENABLED=0
+  - id: darwin
+    ldflags: -s -w -X github.com/indes/flowerss-bot/config.version={{.Version}} -X github.com/indes/flowerss-bot/config.date={{.Date}} -X github.com/indes/flowerss-bot/config.commit={{ .ShortCommit }}
+    env:
+      - CGO_ENABLED=1
+      - CC=o64-clang
+      - CXX=o64-clang++
     goos:
-      - linux
       - darwin
-      - windows
     goarch:
-      - 386
       - amd64
 
-    ignore:
-      - goos: darwin
-        goarch: 386
+  - id: linux
+    ldflags: -s -w -X github.com/indes/flowerss-bot/config.version={{.Version}} -X github.com/indes/flowerss-bot/config.date={{.Date}} -X github.com/indes/flowerss-bot/config.commit={{ .ShortCommit }}
+    env:
+      - CGO_ENABLED=1
+    goos:
+      - linux
+    goarch:
+      - amd64
+
+  - id: windows
+    ldflags: -s -w -X github.com/indes/flowerss-bot/config.version={{.Version}} -X github.com/indes/flowerss-bot/config.date={{.Date}} -X github.com/indes/flowerss-bot/config.commit={{ .ShortCommit }}
+    env:
+      - CGO_ENABLED=1
+      - CC=x86_64-w64-mingw32-gcc
+      - CXX=x86_64-w64-mingw32-g++
+    goos:
+      - windows
+    goarch:
+      - amd64
+
+
+archives:
+  - format: tar.gz
+    format_overrides:
+      - goos: windows
+        format: zip
+    name_template: "{{.ProjectName}}_{{.Version}}_{{.Os}}-{{.Arch}}"
+    replacements:
+      amd64: 64bit
+      386: 32bit
+      arm: ARM
+      arm64: ARM64
+      darwin: macOS
+      linux: Linux
+      windows: Windows
+      openbsd: OpenBSD
+      netbsd: NetBSD
+      freebsd: FreeBSD
+      dragonfly: DragonFlyBSD
+    files:
+      - README.md
+      - config.yml.sample
+      - LICENSE
+
 checksum:
-  name_template: '{{ .ProjectName }}_checksums.txt'
+  name_template: 'checksums.txt'
+
+snapshot:
+  name_template: "{{ .Tag }}-next"
+
 changelog:
   sort: asc
   filters:
     exclude:
       - '^docs:'
       - '^test:'
+      - '^dev:'
+      - 'README'
       - Merge pull request
       - Merge branch
-
-archives:
-  - name_template: '{{ .ProjectName }}_{{ .Os }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}'
-    replacements:
-      darwin: Darwin
-      linux: Linux
-      windows: Windows
-      386: i386
-      # amd64: x86_64
-    format_overrides:
-      - goos: windows
-        format: zip
-    files:
-      - config.yml.sample
-      - LICENSE
-      - README.md
