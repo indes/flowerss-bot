@@ -80,6 +80,7 @@ func init() {
 
 	workDirFlag := flag.String("d", "./", "work directory of flowerss")
 	configFile := flag.String("c", "", "config file of flowerss")
+	printVersionFlag := flag.Bool("v", false, "prints flowerss-bot version")
 
 	testTpl := flag.Bool("testtpl", false, "test template")
 
@@ -94,6 +95,13 @@ func init() {
 	//TelegramEndpointCli := flag.String("endpoint", "", "Custom Telegram Endpoint")
 
 	flag.Parse()
+
+	if *printVersionFlag {
+		// print version
+		fmt.Printf("version %v, commit %v, built at %v", version, commit, date)
+		os.Exit(0)
+	}
+
 	workDir := filepath.Clean(*workDirFlag)
 
 	if *configFile != "" {
