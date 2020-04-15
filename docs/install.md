@@ -1,5 +1,9 @@
 # 部署
 
+## 二进制部署
+
+从 [Releases](https://github.com/indes/flowerss-bot/releases) 页面下载对应的版本解压运行即可。
+
 ## Docker 部署
 
 ### 1. 下载配置文件
@@ -24,10 +28,6 @@ vim ~/flowerss/config.yml
 ```shell script
 docker run -d -v ~/flowerss:/root/.flowerss indes/flowerss-bot
 ```
-
-## 二进制部署
-
-从 [Releases](https://github.com/indes/flowerss-bot/releases) 页面下载对应的版本。
 
 ## 源码编译部署
 
