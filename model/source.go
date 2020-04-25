@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/SlyMarbo/rss"
 	"github.com/indes/flowerss-bot/config"
+	"github.com/indes/flowerss-bot/util"
 	"github.com/jinzhu/gorm"
 	"io/ioutil"
 	"log"
@@ -46,16 +47,30 @@ func GetSourceByUrl(url string) (*Source, error) {
 }
 
 func fetchFunc(url string) (resp *http.Response, err error) {
-	resp, err = http.Get(url)
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	if config.UserAgent != "" {
+		req.Header.Set("User-Agent", config.UserAgent)
+	} else {
+		req.Header.Set("User-Agent", "flowerss/2.0")
+	}
+
+	resp, err = util.HttpClient.Do(req)
+
 	if err != nil {
 		return nil, err
 	}
+	defer resp.Body.Close()
+
 	var data []byte
 	if data, err = ioutil.ReadAll(resp.Body); err != nil {
-		_ = resp.Body.Close()
+
 		return nil, err
 	}
-	_ = resp.Body.Close()
+
 	resp.Body = ioutil.NopCloser(strings.NewReader(strings.Map(func(r rune) rune {
 		if unicode.IsPrint(r) {
 			return r

@@ -33,6 +33,7 @@ var (
 	MessageTpl            *template.Template
 	MessageMode           tb.ParseMode
 	TelegramEndpoint      string
+	UserAgent             string
 )
 
 const (
@@ -125,6 +126,7 @@ func init() {
 
 	BotToken = viper.GetString("bot_token")
 	Socks5 = viper.GetString("socks5")
+	UserAgent = viper.GetString("user_agent")
 
 	if viper.IsSet("telegraph_token") {
 		EnableTelegraph = true

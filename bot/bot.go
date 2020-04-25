@@ -3,10 +3,9 @@ package bot
 import (
 	"github.com/indes/flowerss-bot/bot/fsm"
 	"github.com/indes/flowerss-bot/config"
-	"golang.org/x/net/proxy"
+	"github.com/indes/flowerss-bot/util"
 	tb "gopkg.in/tucnak/telebot.v2"
 	"log"
-	"net/http"
 	"time"
 )
 
@@ -23,34 +22,17 @@ func init() {
 		}
 		return true
 	})
-
-	botSettings := tb.Settings{
-		URL:    config.TelegramEndpoint,
-		Token:  config.BotToken,
-		Poller: spamProtected,
-	}
-
-	if config.Socks5 != "" {
-		log.Printf("Bot Token: %s Proxy: %s Endpoint: %s\n", config.BotToken, config.Socks5, config.TelegramEndpoint)
-
-		dialer, err := proxy.SOCKS5("tcp", config.Socks5, nil, proxy.Direct)
-		if err != nil {
-			log.Fatal("Error creating dialer, aborting.")
-		}
-
-		httpTransport := &http.Transport{}
-		httpClient := &http.Client{Transport: httpTransport}
-		httpTransport.Dial = dialer.Dial
-		botSettings.Client = httpClient
-
-	} else {
-		log.Printf("Bot Token: %s Endpoint: %s\n", config.BotToken, config.TelegramEndpoint)
-	}
+	log.Printf("Bot Token: %s Endpoint: %s\n", config.BotToken, config.TelegramEndpoint)
 
 	// create bot
 	var err error
 
-	B, err = tb.NewBot(botSettings)
+	B, err = tb.NewBot(tb.Settings{
+		URL:    config.TelegramEndpoint,
+		Token:  config.BotToken,
+		Poller: spamProtected,
+		Client: util.HttpClient,
+	})
 
 	if err != nil {
 		log.Fatal(err)
