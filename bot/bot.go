@@ -84,7 +84,9 @@ func makeHandle() {
 	B.Handle("/import", importCmdCtr)
 
 	B.Handle("/setfeedtag", setFeedTagCmdCtr)
-	
+
+	B.Handle("/version", versionCmdCtr)
+
 	B.Handle(tb.OnText, textCtr)
 
 	B.Handle(tb.OnDocument, docCtr)

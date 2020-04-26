@@ -728,7 +728,12 @@ func helpCmdCtr(m *tb.Message) {
 /unsuball 取消所有订阅
 详细使用方法请看：https://github.com/indes/flowerss-bot
 `
+
 	_, _ = B.Send(m.Chat, message)
+}
+
+func versionCmdCtr(m *tb.Message) {
+	_, _ = B.Send(m.Chat, config.AppVersionInfo())
 }
 
 func importCmdCtr(m *tb.Message) {

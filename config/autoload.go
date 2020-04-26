@@ -99,7 +99,7 @@ func init() {
 
 	if *printVersionFlag {
 		// print version
-		fmt.Printf("version %v, commit %v, built at %v", version, commit, date)
+		fmt.Printf(AppVersionInfo())
 		os.Exit(0)
 	}
 
