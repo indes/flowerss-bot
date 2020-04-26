@@ -385,27 +385,29 @@ func setSubTagBtnCtr(c *tb.Callback) {
 		return
 	}
 	data := strings.Split(c.Data, ":")
-	subID, _ := strconv.Atoi(data[1])
+	ownID, _ := strconv.Atoi(data[0])
+	sourceID, _ := strconv.Atoi(data[1])
+
+	sub, err := model.GetSubscribeByUserIDAndSourceID(int64(ownID), uint(sourceID))
+	if err != nil {
+		_, _ = B.Send(
+			c.Message.Chat,
+			"系统错误，代码04",
+		)
+		return
+	}
 	msg := fmt.Sprintf(
-		"请使用`/setfeedtag 3 tags`命令为该订阅设置标签，tags为需要设置的标签，以空格分隔。（最多设置三个标签） \n例如：`/setfeedtag %d 科技 苹果`。",
-		subID, subID)
+		"请使用`/setfeedtag %d tags`命令为该订阅设置标签，tags为需要设置的标签，以空格分隔。（最多设置三个标签） \n"+
+			"例如：`/setfeedtag %d 科技 苹果`",
+		sub.ID, sub.ID)
 
 	_ = B.Delete(c.Message)
 
 	_, _ = B.Send(
 		c.Message.Chat,
 		msg,
-		//&tb.ReplyMarkup{
-		//	ForceReply: true,
-		//	Selective:  true,
-		//},
 		&tb.SendOptions{ParseMode: tb.ModeMarkdown},
 	)
-
-	//if err == nil {
-	//	UserState[c.Message.Chat.ID] = fsm.SetSubTag
-	//}
-
 }
 
 func genFeedSetBtn(c *tb.Callback, sub *model.Subscribe, source *model.Source) [][]tb.InlineButton {
