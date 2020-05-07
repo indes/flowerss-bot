@@ -22,8 +22,6 @@ type Subscribe struct {
 
 func RegistFeed(userID int64, sourceID uint) error {
 	var subscribe Subscribe
-	db := getConnect()
-	defer db.Close()
 
 	if err := db.Where("user_id=? and source_id=?", userID, sourceID).Find(&subscribe).Error; err != nil {
 		if err.Error() == "record not found" {
@@ -31,8 +29,7 @@ func RegistFeed(userID int64, sourceID uint) error {
 			subscribe.SourceID = sourceID
 			subscribe.EnableNotification = 1
 			subscribe.EnableTelegraph = 1
-			err := db.Create(&subscribe).Error
-			if err == nil {
+			if db.Create(&subscribe).Error == nil {
 				return nil
 			}
 		}
@@ -42,8 +39,6 @@ func RegistFeed(userID int64, sourceID uint) error {
 }
 
 func GetSubscribeByUserIDAndSourceID(userID int64, sourceID uint) (*Subscribe, error) {
-	db := getConnect()
-	defer db.Close()
 	var sub Subscribe
 	db.Where("user_id=? and source_id=?", userID, sourceID).First(&sub)
 	if sub.UserID != int64(userID) {
@@ -53,8 +48,6 @@ func GetSubscribeByUserIDAndSourceID(userID int64, sourceID uint) (*Subscribe, e
 }
 
 func GetSubscribeByUserIDAndURL(userID int, url string) (*Subscribe, error) {
-	db := getConnect()
-	defer db.Close()
 	var sub Subscribe
 	source, err := GetSourceByUrl(url)
 	if err != nil {
@@ -66,13 +59,12 @@ func GetSubscribeByUserIDAndURL(userID int, url string) (*Subscribe, error) {
 	}
 	return &sub, nil
 }
+
 func GetSubscriberBySource(s *Source) []Subscribe {
 	if s == nil {
 		return []Subscribe{}
 	}
 
-	db := getConnect()
-	defer db.Close()
 	var subs []Subscribe
 
 	db.Where("source_id=?", s.ID).Find(&subs)
@@ -80,13 +72,10 @@ func GetSubscriberBySource(s *Source) []Subscribe {
 }
 
 func UnsubByUserIDAndSource(userID int64, source *Source) error {
-
 	if source == nil {
 		return errors.New("nil pointer")
 	}
 
-	db := getConnect()
-	defer db.Close()
 	var sub Subscribe
 	db.Where("user_id=? and source_id=?", userID, source.ID).First(&sub)
 	if sub.UserID != userID {
@@ -100,9 +89,6 @@ func UnsubByUserIDAndSource(userID int64, source *Source) error {
 }
 
 func UnsubByUserIDAndSubID(userID int64, subID uint) error {
-	db := getConnect()
-	defer db.Close()
-
 	var sub Subscribe
 	db.Where("id=?", subID).First(&sub)
 
@@ -119,8 +105,6 @@ func UnsubByUserIDAndSubID(userID int64, subID uint) error {
 }
 
 func UnsubAllByUserID(userID int64) (success int, fail int, err error) {
-	db := getConnect()
-	defer db.Close()
 	success = 0
 	fail = 0
 	var subs []Subscribe
@@ -141,8 +125,6 @@ func UnsubAllByUserID(userID int64) (success int, fail int, err error) {
 }
 
 func GetSubByUserIDAndURL(userID int64, url string) (*Subscribe, error) {
-	db := getConnect()
-	defer db.Close()
 	var sub Subscribe
 	source, err := GetSourceByUrl(url)
 	if err != nil {
@@ -153,9 +135,6 @@ func GetSubByUserIDAndURL(userID int64, url string) (*Subscribe, error) {
 }
 
 func GetSubsByUserID(userID int64) ([]Subscribe, error) {
-	db := getConnect()
-	defer db.Close()
-
 	var subs []Subscribe
 
 	db.Where("user_id=?", userID).Find(&subs)
@@ -173,8 +152,6 @@ func UnsubByUserIDAndSourceURL(userID int64, url string) error {
 }
 
 func GetSubscribeByID(id int) (*Subscribe, error) {
-	db := getConnect()
-	defer db.Close()
 	var sub Subscribe
 	db.Where("id=?  ", id).First(&sub)
 	return &sub, nil
@@ -220,20 +197,14 @@ func (s *Subscribe) SetTag(tags []string) error {
 	return nil
 }
 
-func (s *Subscribe) Unsub() (err error) {
+func (s *Subscribe) Unsub() error {
 	if s.ID == 0 {
 		return errors.New("can't delete 0 subscribe")
 	}
-	db := getConnect()
-	defer db.Close()
 
-	err = db.Delete(&s).Error
-	return
+	return db.Delete(&s).Error
 }
 
 func (s *Subscribe) Save() {
-	db := getConnect()
-	defer db.Close()
 	db.Save(&s)
-	return
 }

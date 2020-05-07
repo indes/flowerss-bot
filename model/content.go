@@ -47,8 +47,6 @@ func getContentByFeedItem(source *Source, item *rss.Item) (Content, error) {
 }
 
 func GenContentAndCheckByFeedItem(s *Source, item *rss.Item) (*Content, bool, error) {
-	db := getConnect()
-	defer db.Close()
 	var (
 		content   Content
 		isBroaded bool
@@ -68,8 +66,6 @@ func GenContentAndCheckByFeedItem(s *Source, item *rss.Item) (*Content, bool, er
 }
 
 func DeleteContentsBySourceID(sid uint) {
-	db := getConnect()
-	defer db.Close()
 	db.Delete(Content{}, "source_id = ?", sid)
 }
 
