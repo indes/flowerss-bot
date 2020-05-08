@@ -24,8 +24,6 @@ type Source struct {
 }
 
 func (s *Source) appendContents(items []*rss.Item) error {
-	db := getConnect()
-	defer db.Close()
 	for _, item := range items {
 		c, _ := getContentByFeedItem(s, item)
 		s.Content = append(s.Content, c)
@@ -38,8 +36,6 @@ func (s *Source) appendContents(items []*rss.Item) error {
 
 func GetSourceByUrl(url string) (*Source, error) {
 	var source Source
-	db := getConnect()
-	defer db.Close()
 	if err := db.Where("link=?", url).Find(&source).Error; err != nil {
 		return nil, err
 	}
@@ -82,8 +78,6 @@ func fetchFunc(url string) (resp *http.Response, err error) {
 
 func FindOrNewSourceByUrl(url string) (*Source, error) {
 	var source Source
-	db := getConnect()
-	defer db.Close()
 
 	if err := db.Where("link=?", url).Find(&source).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
@@ -114,11 +108,7 @@ func FindOrNewSourceByUrl(url string) (*Source, error) {
 
 func GetSources() []Source {
 	var sources []Source
-
-	db := getConnect()
-	defer db.Close()
 	db.Find(&sources)
-
 	return sources
 }
 
@@ -134,8 +124,6 @@ func GetSubscribedNormalSources() []Source {
 }
 
 func (s *Source) IsSubscribed() bool {
-	db := getConnect()
-	defer db.Close()
 	var sub Subscribe
 	db.Where("source_id=?", s.ID).First(&sub)
 	return sub.SourceID == s.ID
@@ -164,8 +152,6 @@ func (s *Source) GetNewContents() ([]Content, error) {
 }
 
 func GetSourcesByUserID(userID int64) ([]Source, error) {
-	db := getConnect()
-	defer db.Close()
 	var sources []Source
 	subs, err := GetSubsByUserID(userID)
 
@@ -195,15 +181,10 @@ func (s *Source) EraseErrorCount() {
 }
 
 func (s *Source) Save() {
-	db := getConnect()
-	defer db.Close()
 	db.Save(&s)
-	return
 }
 
 func GetSourceById(id uint) (*Source, error) {
-	db := getConnect()
-	defer db.Close()
 	var source Source
 
 	if err := db.Where("id=?", id).First(&source); err.Error != nil {
@@ -214,8 +195,6 @@ func GetSourceById(id uint) (*Source, error) {
 }
 
 func (s *Source) GetSubscribeNum() int {
-	db := getConnect()
-	defer db.Close()
 	var subs []Subscribe
 	db.Where("source_id=?", s.ID).Find(&subs)
 	return len(subs)
@@ -227,7 +206,5 @@ func (s *Source) DeleteContents() {
 
 func (s *Source) DeleteDueNoSubscriber() {
 	s.DeleteContents()
-	db := getConnect()
-	defer db.Close()
 	db.Delete(&s)
 }
