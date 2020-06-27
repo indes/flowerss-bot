@@ -85,6 +85,12 @@ func makeHandle() {
 
 	B.Handle("/setfeedtag", setFeedTagCmdCtr)
 
+	B.Handle("/setinterval", setIntervalCmdCtr)
+
+	B.Handle("/activeall", activeAllCmdCtr)
+
+	B.Handle("/pauseall", pauseAllCmdCtr)
+
 	B.Handle("/version", versionCmdCtr)
 
 	B.Handle(tb.OnText, textCtr)

@@ -129,6 +129,19 @@ func (s *Source) IsSubscribed() bool {
 	return sub.SourceID == s.ID
 }
 
+func (s *Source) NeedUpdate() bool {
+	var sub Subscribe
+	db.Where("source_id=?", s.ID).First(&sub)
+	if sub.Interval <= sub.WaitTime {
+		sub.WaitTime = 0
+		return true
+	} else {
+		sub.WaitTime += config.UpdateInterval
+		db.Save(&sub)
+		return false
+	}
+}
+
 func (s *Source) GetNewContents() ([]Content, error) {
 	var newContents []Content
 	feed, err := rss.FetchByFunc(fetchFunc, s.Link)
@@ -168,6 +181,44 @@ func GetSourcesByUserID(userID int64) ([]Source, error) {
 	}
 
 	return sources, nil
+}
+
+func ActiveSourcesByUserID(userID int64) error {
+	subs, err := GetSubsByUserID(userID)
+
+	if err != nil {
+		return err
+	}
+
+	for _, sub := range subs {
+		var source Source
+		db.Where("id=?", sub.SourceID).First(&source)
+		if source.ID == sub.SourceID {
+			source.ErrorCount = 0
+			db.Save(&source)
+		}
+	}
+
+	return nil
+}
+
+func PauseSourcesByUserID(userID int64) error {
+	subs, err := GetSubsByUserID(userID)
+
+	if err != nil {
+		return err
+	}
+
+	for _, sub := range subs {
+		var source Source
+		db.Where("id=?", sub.SourceID).First(&source)
+		if source.ID == sub.SourceID {
+			source.ErrorCount = config.ErrorThreshold + 1
+			db.Save(&source)
+		}
+	}
+
+	return nil
 }
 
 func (s *Source) AddErrorCount() {

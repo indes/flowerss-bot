@@ -28,6 +28,9 @@ DEMO: [https://t.me/rssflowbot](https://t.me/rssflowbot)
 /list 查看当前订阅
 /set 设置订阅
 /setfeedtag [sub id] [tag1] [tag2] 设置订阅标签（最多设置三个Tag，以空格分割）
+/setinterval [interval] [sub id] 设置订阅刷新频率（以空格分割）
+/activeall 开启所有订阅
+/pauseall 暂停所有订阅
 /import 导入 OPML 文件
 /export 导出 OPML 文件
 /unsuball 取消所有订阅

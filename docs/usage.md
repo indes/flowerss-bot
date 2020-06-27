@@ -8,6 +8,9 @@
 /list 查看当前订阅
 /set 设置订阅
 /setfeedtag [sub id] [tag1] [tag2] 设置订阅标签（最多设置三个Tag，以空格分割）
+/setinterval [interval] [sub id] 设置订阅刷新频率（可设置多个sub id，以空格分割）
+/activeall 开启所有订阅
+/pauseall 暂停所有订阅
 /import 导入 OPML 文件
 /export 导出 OPML 文件
 /unsuball 取消所有订阅
@@ -26,6 +29,8 @@ Channel 订阅支持的命令：
 /unsub @ChannelID [url] 取消订阅
 /list @ChannelID 查看当前订阅
 /unsuball @ChannelID 取消所有订阅
+/activeall @ChannelID 开启所有订阅
+/pauseall @ChannelID 暂停所有订阅
 ```
 
 **ChannelID 只有设置为 Public Channel 才有。如果是 Private Channel，可以暂时设置为 Public，订阅完成后改为 Private，不影响 Bot 推送消息。**

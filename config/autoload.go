@@ -4,6 +4,8 @@ import (
 	"bytes"
 	"flag"
 	"fmt"
+	"github.com/spf13/viper"
+	tb "gopkg.in/tucnak/telebot.v2"
 	"log"
 	"os"
 	"path"
@@ -12,9 +14,6 @@ import (
 	"strconv"
 	"strings"
 	"text/template"
-
-	"github.com/spf13/viper"
-	tb "gopkg.in/tucnak/telebot.v2"
 )
 
 var (

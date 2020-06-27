@@ -15,6 +15,9 @@ func Update() {
 	for {
 		sources := model.GetSubscribedNormalSources()
 		for _, source := range sources {
+			if !source.NeedUpdate() {
+				continue
+			}
 			c, err := source.GetNewContents()
 			if err == nil {
 				subs := model.GetSubscriberBySource(&source)

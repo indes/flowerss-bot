@@ -17,6 +17,8 @@ type Subscribe struct {
 	EnableNotification int
 	EnableTelegraph    int
 	Tag                string
+	Interval           int
+	WaitTime           int
 	EditTime
 }
 
@@ -29,6 +31,8 @@ func RegistFeed(userID int64, sourceID uint) error {
 			subscribe.SourceID = sourceID
 			subscribe.EnableNotification = 1
 			subscribe.EnableTelegraph = 1
+			subscribe.Interval = config.UpdateInterval
+			subscribe.WaitTime = config.UpdateInterval
 			if db.Create(&subscribe).Error == nil {
 				return nil
 			}
@@ -153,8 +157,8 @@ func UnsubByUserIDAndSourceURL(userID int64, url string) error {
 
 func GetSubscribeByID(id int) (*Subscribe, error) {
 	var sub Subscribe
-	db.Where("id=?  ", id).First(&sub)
-	return &sub, nil
+	err := db.Where("id=?  ", id).First(&sub).Error
+	return &sub, err
 }
 
 func (s *Subscribe) ToggleNotification() error {
@@ -194,6 +198,12 @@ func (s *Subscribe) SetTag(tags []string) error {
 	tagStr := strings.Join(tags, " #")
 
 	s.Tag = "#" + tagStr
+	return nil
+}
+
+func (s *Subscribe) SetInterval(intelval int) error {
+	defer s.Save()
+	s.Interval = intelval
 	return nil
 }
 
