@@ -3,15 +3,16 @@ package model
 import (
 	"errors"
 	"fmt"
-	"github.com/SlyMarbo/rss"
-	"github.com/indes/flowerss-bot/config"
-	"github.com/indes/flowerss-bot/util"
-	"github.com/jinzhu/gorm"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"strings"
 	"unicode"
+
+	"github.com/SlyMarbo/rss"
+	"github.com/indes/flowerss-bot/config"
+	"github.com/indes/flowerss-bot/util"
+	"github.com/jinzhu/gorm"
 )
 
 type Source struct {
@@ -176,6 +177,25 @@ func GetSourcesByUserID(userID int64) ([]Source, error) {
 		var source Source
 		db.Where("id=?", sub.SourceID).First(&source)
 		if source.ID == sub.SourceID {
+			sources = append(sources, source)
+		}
+	}
+
+	return sources, nil
+}
+
+func GetErrorSourcesByUserID(userID int64) ([]Source, error) {
+	var sources []Source
+	subs, err := GetSubsByUserID(userID)
+
+	if err != nil {
+		return nil, err
+	}
+
+	for _, sub := range subs {
+		var source Source
+		db.Where("id=?", sub.SourceID).First(&source)
+		if source.ID == sub.SourceID && source.ErrorCount >= config.ErrorThreshold {
 			sources = append(sources, source)
 		}
 	}

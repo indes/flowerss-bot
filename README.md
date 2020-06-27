@@ -27,6 +27,7 @@ DEMO: [https://t.me/rssflowbot](https://t.me/rssflowbot)
 /unsub [url] 取消订阅（url 为可选）
 /list 查看当前订阅
 /set 设置订阅
+/check 检查当前订阅
 /setfeedtag [sub id] [tag1] [tag2] 设置订阅标签（最多设置三个Tag，以空格分割）
 /setinterval [interval] [sub id] 设置订阅刷新频率（以空格分割）
 /activeall 开启所有订阅

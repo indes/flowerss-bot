@@ -7,6 +7,7 @@
 /unsub [url] 取消订阅（url 为可选）
 /list 查看当前订阅
 /set 设置订阅
+/check 检查当前订阅
 /setfeedtag [sub id] [tag1] [tag2] 设置订阅标签（最多设置三个Tag，以空格分割）
 /setinterval [interval] [sub id] 设置订阅刷新频率（可设置多个sub id，以空格分割）
 /activeall 开启所有订阅
@@ -28,6 +29,7 @@ Channel 订阅支持的命令：
 /sub @ChannelID [url] 订阅
 /unsub @ChannelID [url] 取消订阅
 /list @ChannelID 查看当前订阅
+/check @ChannelID 检查当前订阅
 /unsuball @ChannelID 取消所有订阅
 /activeall @ChannelID 开启所有订阅
 /pauseall @ChannelID 暂停所有订阅

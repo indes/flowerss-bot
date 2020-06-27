@@ -1,12 +1,13 @@
 package bot
 
 import (
+	"log"
+	"time"
+
 	"github.com/indes/flowerss-bot/bot/fsm"
 	"github.com/indes/flowerss-bot/config"
 	"github.com/indes/flowerss-bot/util"
 	tb "gopkg.in/tucnak/telebot.v2"
-	"log"
-	"time"
 )
 
 var (
@@ -86,6 +87,8 @@ func makeHandle() {
 	B.Handle("/setfeedtag", setFeedTagCmdCtr)
 
 	B.Handle("/setinterval", setIntervalCmdCtr)
+
+	B.Handle("/check", checkCmdCtr)
 
 	B.Handle("/activeall", activeAllCmdCtr)
 

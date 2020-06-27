@@ -3,15 +3,16 @@ package bot
 import (
 	"bytes"
 	"fmt"
-	"github.com/indes/flowerss-bot/bot/fsm"
-	"github.com/indes/flowerss-bot/config"
-	"github.com/indes/flowerss-bot/model"
-	tb "gopkg.in/tucnak/telebot.v2"
 	"html/template"
 	"log"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/indes/flowerss-bot/bot/fsm"
+	"github.com/indes/flowerss-bot/config"
+	"github.com/indes/flowerss-bot/model"
+	tb "gopkg.in/tucnak/telebot.v2"
 )
 
 var (
@@ -231,8 +232,8 @@ func listCmdCtr(m *tb.Message) {
 		if len(sources) == 0 {
 			message = fmt.Sprintf("频道 [%s](https://t.me/%s) 订阅列表为空", channelChat.Title, channelChat.Username)
 		} else {
-			for index, source := range sources {
-				message = message + fmt.Sprintf("[[%d]] [%s](%s)\n", index+1, source.Title, source.Link)
+			for _, source := range sources {
+				message = message + fmt.Sprintf("[[%d]] [%s](%s)\n", source.ID, source.Title, source.Link)
 			}
 		}
 
@@ -247,8 +248,67 @@ func listCmdCtr(m *tb.Message) {
 		if len(sources) == 0 {
 			message = "订阅列表为空"
 		} else {
-			for index, source := range sources {
-				message = message + fmt.Sprintf("[[%d]] [%s](%s)\n", index+1, source.Title, source.Link)
+			for _, source := range sources {
+				message = message + fmt.Sprintf("[[%d]] [%s](%s)\n", source.ID, source.Title, source.Link)
+			}
+		}
+		_, _ = B.Send(m.Chat, message, &tb.SendOptions{
+			DisableWebPagePreview: true,
+			ParseMode:             tb.ModeMarkdown,
+		})
+	}
+
+}
+
+func checkCmdCtr(m *tb.Message) {
+	mention := GetMentionFromMessage(m)
+	if mention != "" {
+		channelChat, err := B.ChatByID(mention)
+		if err != nil {
+			_, _ = B.Send(m.Chat, "error")
+			return
+		}
+		adminList, err := B.AdminsOf(channelChat)
+		if err != nil {
+			_, _ = B.Send(m.Chat, "error")
+			return
+		}
+
+		senderIsAdmin := false
+		for _, admin := range adminList {
+			if m.Sender.ID == admin.User.ID {
+				senderIsAdmin = true
+			}
+		}
+
+		if !senderIsAdmin {
+			_, _ = B.Send(m.Chat, fmt.Sprintf("非频道管理员无法执行此操作"))
+			return
+		}
+
+		sources, _ := model.GetErrorSourcesByUserID(channelChat.ID)
+		message := fmt.Sprintf("频道 [%s](https://t.me/%s) 失效订阅的列表：\n", channelChat.Title, channelChat.Username)
+		if len(sources) == 0 {
+			message = fmt.Sprintf("频道 [%s](https://t.me/%s) 所有订阅正常", channelChat.Title, channelChat.Username)
+		} else {
+			for _, source := range sources {
+				message = message + fmt.Sprintf("[[%d]] [%s](%s)\n", source.ID, source.Title, source.Link)
+			}
+		}
+
+		_, _ = B.Send(m.Chat, message, &tb.SendOptions{
+			DisableWebPagePreview: true,
+			ParseMode:             tb.ModeMarkdown,
+		})
+
+	} else {
+		sources, _ := model.GetErrorSourcesByUserID(m.Chat.ID)
+		message := "失效订阅的列表：\n"
+		if len(sources) == 0 {
+			message = "所有订阅正常"
+		} else {
+			for _, source := range sources {
+				message = message + fmt.Sprintf("[[%d]] [%s](%s)\n", source.ID, source.Title, source.Link)
 			}
 		}
 		_, _ = B.Send(m.Chat, message, &tb.SendOptions{
@@ -723,6 +783,7 @@ func helpCmdCtr(m *tb.Message) {
 /unsub  取消订阅
 /list 查看当前订阅源
 /set 设置订阅
+/check 检查当前订阅
 /setfeedtag 设置订阅标签
 /setinterval 设置订阅刷新频率
 /activeall 开启所有订阅
