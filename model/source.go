@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"sort"
 	"strings"
 	"unicode"
 
@@ -121,6 +122,9 @@ func GetSubscribedNormalSources() []Source {
 			subscribedSources = append(subscribedSources, source)
 		}
 	}
+	sort.SliceStable(subscribedSources, func(i, j int) bool {
+		return subscribedSources[i].ID < subscribedSources[j].ID
+	})
 	return subscribedSources
 }
 
@@ -181,6 +185,10 @@ func GetSourcesByUserID(userID int64) ([]Source, error) {
 		}
 	}
 
+	sort.SliceStable(sources, func(i, j int) bool {
+		return sources[i].ID < sources[j].ID
+	})
+
 	return sources, nil
 }
 
@@ -199,6 +207,10 @@ func GetErrorSourcesByUserID(userID int64) ([]Source, error) {
 			sources = append(sources, source)
 		}
 	}
+
+	sort.SliceStable(sources, func(i, j int) bool {
+		return sources[i].ID < sources[j].ID
+	})
 
 	return sources, nil
 }
