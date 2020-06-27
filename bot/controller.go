@@ -917,7 +917,7 @@ func textCtr(m *tb.Message) {
 
 func docCtr(m *tb.Message) {
 	if m.FromGroup() {
-		if !userIsAdminOfGroup(m.ID, m.Chat) {
+		if !userIsAdminOfGroup(m.Sender.ID, m.Chat) {
 			return
 		}
 	}
