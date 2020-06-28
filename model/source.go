@@ -137,12 +137,12 @@ func (s *Source) IsSubscribed() bool {
 func (s *Source) NeedUpdate() bool {
 	var sub Subscribe
 	db.Where("source_id=?", s.ID).First(&sub)
+	sub.WaitTime += config.UpdateInterval
+	db.Save(&sub)
 	if sub.Interval <= sub.WaitTime {
 		sub.WaitTime = 0
 		return true
 	} else {
-		sub.WaitTime += config.UpdateInterval
-		db.Save(&sub)
 		return false
 	}
 }
