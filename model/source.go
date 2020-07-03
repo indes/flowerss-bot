@@ -3,15 +3,17 @@ package model
 import (
 	"errors"
 	"fmt"
+	"io/ioutil"
+	"log"
+	"net/http"
+	"sort"
+	"strings"
+	"unicode"
+
 	"github.com/SlyMarbo/rss"
 	"github.com/indes/flowerss-bot/config"
 	"github.com/indes/flowerss-bot/util"
 	"github.com/jinzhu/gorm"
-	"io/ioutil"
-	"log"
-	"net/http"
-	"strings"
-	"unicode"
 )
 
 type Source struct {
@@ -120,6 +122,9 @@ func GetSubscribedNormalSources() []Source {
 			subscribedSources = append(subscribedSources, source)
 		}
 	}
+	sort.SliceStable(subscribedSources, func(i, j int) bool {
+		return subscribedSources[i].ID < subscribedSources[j].ID
+	})
 	return subscribedSources
 }
 
@@ -127,6 +132,19 @@ func (s *Source) IsSubscribed() bool {
 	var sub Subscribe
 	db.Where("source_id=?", s.ID).First(&sub)
 	return sub.SourceID == s.ID
+}
+
+func (s *Source) NeedUpdate() bool {
+	var sub Subscribe
+	db.Where("source_id=?", s.ID).First(&sub)
+	sub.WaitTime += config.UpdateInterval
+	db.Save(&sub)
+	if sub.Interval <= sub.WaitTime {
+		sub.WaitTime = 0
+		return true
+	} else {
+		return false
+	}
 }
 
 func (s *Source) GetNewContents() ([]Content, error) {
@@ -167,7 +185,72 @@ func GetSourcesByUserID(userID int64) ([]Source, error) {
 		}
 	}
 
+	sort.SliceStable(sources, func(i, j int) bool {
+		return sources[i].ID < sources[j].ID
+	})
+
 	return sources, nil
+}
+
+func GetErrorSourcesByUserID(userID int64) ([]Source, error) {
+	var sources []Source
+	subs, err := GetSubsByUserID(userID)
+
+	if err != nil {
+		return nil, err
+	}
+
+	for _, sub := range subs {
+		var source Source
+		db.Where("id=?", sub.SourceID).First(&source)
+		if source.ID == sub.SourceID && source.ErrorCount >= config.ErrorThreshold {
+			sources = append(sources, source)
+		}
+	}
+
+	sort.SliceStable(sources, func(i, j int) bool {
+		return sources[i].ID < sources[j].ID
+	})
+
+	return sources, nil
+}
+
+func ActiveSourcesByUserID(userID int64) error {
+	subs, err := GetSubsByUserID(userID)
+
+	if err != nil {
+		return err
+	}
+
+	for _, sub := range subs {
+		var source Source
+		db.Where("id=?", sub.SourceID).First(&source)
+		if source.ID == sub.SourceID {
+			source.ErrorCount = 0
+			db.Save(&source)
+		}
+	}
+
+	return nil
+}
+
+func PauseSourcesByUserID(userID int64) error {
+	subs, err := GetSubsByUserID(userID)
+
+	if err != nil {
+		return err
+	}
+
+	for _, sub := range subs {
+		var source Source
+		db.Where("id=?", sub.SourceID).First(&source)
+		if source.ID == sub.SourceID {
+			source.ErrorCount = config.ErrorThreshold + 1
+			db.Save(&source)
+		}
+	}
+
+	return nil
 }
 
 func (s *Source) AddErrorCount() {
