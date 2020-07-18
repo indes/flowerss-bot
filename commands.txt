@@ -1,0 +1,13 @@
+sub -  /sub [url] 订阅（url 为可选）订阅 （url 为可选）
+unsub - /unsub [url] 取消订阅（url 为可选）
+list - 查看当前订阅
+set - 设置订阅
+check - 检查当前订阅
+setfeedtag - /setfeedtag [sub id] [tag1] [tag2] 设置订阅标签（最多设置三个Tag，以空格分割）
+setinterval - /setinterval [interval] [sub id] 设置订阅刷新频率（可设置多个sub id，以空格分割）
+activeall - 开启所有订阅
+pauseall - 暂停所有订阅
+import - 导入 OPML 文件
+export - 导出 OPML 文件
+unsuball - 取消所有订阅
+help - 帮助
