@@ -9,7 +9,7 @@ import (
 
 const (
 	//verbose = false
-	html = `<h1>hello</h1>`
+	htmlContent = `<h1>hello</h1>`
 )
 
 var (
