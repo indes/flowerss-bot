@@ -1,10 +1,12 @@
 package util
 
 import (
-	"github.com/indes/flowerss-bot/config"
-	"golang.org/x/net/proxy"
 	"log"
 	"net/http"
+	"time"
+
+	"github.com/indes/flowerss-bot/config"
+	"golang.org/x/net/proxy"
 )
 
 var (
@@ -13,7 +15,7 @@ var (
 
 func clientInit() {
 	httpTransport := &http.Transport{}
-	HttpClient = &http.Client{Transport: httpTransport}
+	HttpClient = &http.Client{Transport: httpTransport, Timeout: 15 * time.Second}
 	// set proxy
 	if config.Socks5 != "" {
 		log.Printf("Proxy: %s\n", config.Socks5)
