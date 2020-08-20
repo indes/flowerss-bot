@@ -4,8 +4,6 @@ import (
 	"bytes"
 	"flag"
 	"fmt"
-	"github.com/spf13/viper"
-	tb "gopkg.in/tucnak/telebot.v2"
 	"log"
 	"os"
 	"path"
@@ -14,6 +12,9 @@ import (
 	"strconv"
 	"strings"
 	"text/template"
+
+	"github.com/spf13/viper"
+	tb "gopkg.in/tucnak/telebot.v2"
 )
 
 var (
@@ -21,6 +22,9 @@ var (
 	BotToken              string
 	Socks5                string
 	TelegraphToken        []string
+	TelegraphAccountName  string
+	TelegraphAuthorName   string = "flowerss-bot"
+	TelegraphAuthorURL    string
 	EnableTelegraph       bool
 	PreviewText           int = 0
 	DisableWebPagePreview bool
@@ -132,6 +136,19 @@ func init() {
 		TelegraphToken = viper.GetStringSlice("telegraph_token")
 	} else {
 		EnableTelegraph = false
+	}
+
+	if viper.IsSet("telegraph_account") {
+		EnableTelegraph = true
+		TelegraphAccountName = viper.GetString("telegraph_account")
+
+		if viper.IsSet("telegraph_author_name") {
+			TelegraphAuthorName = viper.GetString("telegraph_author_name")
+		}
+
+		if viper.IsSet("telegraph_author_url") {
+			TelegraphAuthorURL = viper.GetString("telegraph_author_url")
+		}
 	}
 
 	if viper.IsSet("preview_text") {
