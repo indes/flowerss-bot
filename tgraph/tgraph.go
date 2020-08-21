@@ -2,9 +2,10 @@ package tgraph
 
 import (
 	"fmt"
+	"log"
+
 	"github.com/indes/flowerss-bot/config"
 	"github.com/indes/telegraph-go"
-	"log"
 )
 
 const (
@@ -38,8 +39,17 @@ func init() {
 		}
 
 		if len(clientPool) == 0 {
-			config.EnableTelegraph = false
-			log.Println("Telegraph token error, telegraph disabled")
+			if config.TelegraphAccountName == "" {
+				config.EnableTelegraph = false
+				log.Println("Telegraph token error, telegraph disabled")
+			} else if len(authToken) == 0 {
+				// create account
+				if client, err := telegraph.Create(config.TelegraphAccountName, config.TelegraphAuthorName, config.TelegraphAuthorURL, config.Socks5); err != nil {
+					log.Println("create telegraph account fail: ", err)
+				} else {
+					clientPool = append(clientPool, client)
+				}
+			}
 		}
 	}
 
