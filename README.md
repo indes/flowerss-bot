@@ -4,7 +4,6 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/indes/rssflow)](https://goreportcard.com/report/github.com/indes/flowerss-bot)
 ![GitHub](https://img.shields.io/github/license/indes/flowerss-bot.svg)
 
-DEMO: [https://t.me/rssflowbot](https://t.me/rssflowbot)  
 [安装与使用文档](https://flowerss-bot.now.sh/)  
 
 <img src="https://github.com/rssflow/img/raw/master/images/rssflow_demo.gif" width = "300"/>
