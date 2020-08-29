@@ -4,14 +4,16 @@ import (
 	"crypto/tls"
 	"encoding/xml"
 	"errors"
-	"github.com/indes/flowerss-bot/config"
-	"github.com/indes/flowerss-bot/model"
 	"io/ioutil"
 	"net/http"
 	"net/url"
 	"time"
+
+	"github.com/indes/flowerss-bot/config"
+	"github.com/indes/flowerss-bot/model"
 )
 
+// OPML opml struct
 type OPML struct {
 	XMLName xml.Name `xml:"opml"`
 	Version string   `xml:"version,attr"`
@@ -19,6 +21,7 @@ type OPML struct {
 	Body    Body     `xml:"body"`
 }
 
+// Head opml head
 type Head struct {
 	Title           string `xml:"title"`
 	DateCreated     string `xml:"dateCreated,omitempty"`
@@ -35,10 +38,12 @@ type Head struct {
 	WindowRight     string `xml:"windowRight,omitempty"`
 }
 
+// Body opml body
 type Body struct {
 	Outlines []Outline `xml:"outline"`
 }
 
+// Outline opml outline
 type Outline struct {
 	Outlines     []Outline `xml:"outline"`
 	Text         string    `xml:"text,attr"`
@@ -56,6 +61,7 @@ type Outline struct {
 	Description  string    `xml:"description,attr,omitempty"`
 }
 
+// NewOPML gen OPML form []byte
 func NewOPML(b []byte) (*OPML, error) {
 	var root OPML
 	err := xml.Unmarshal(b, &root)
@@ -66,7 +72,8 @@ func NewOPML(b []byte) (*OPML, error) {
 	return &root, nil
 }
 
-func GetOPMLByURL(file_url string) (*OPML, error) {
+// GetOPMLByURL get OPML form url
+func GetOPMLByURL(fileURL string) (*OPML, error) {
 	var proxy *url.URL
 
 	if config.Socks5 != "" {
@@ -82,7 +89,7 @@ func GetOPMLByURL(file_url string) (*OPML, error) {
 		Transport: tr,
 		Timeout:   time.Second * 5,
 	}
-	resp, err := client.Get(file_url)
+	resp, err := client.Get(fileURL)
 
 	if err != nil {
 		return nil, errors.New("fetch opml file error")
@@ -97,6 +104,7 @@ func GetOPMLByURL(file_url string) (*OPML, error) {
 	return o, nil
 }
 
+// GetFlattenOutlines make all outline at the same xml level
 func (o OPML) GetFlattenOutlines() ([]Outline, error) {
 	var flattenOutlines []Outline
 	for _, line := range o.Body.Outlines {
@@ -116,11 +124,13 @@ func (o OPML) GetFlattenOutlines() ([]Outline, error) {
 	return flattenOutlines, nil
 }
 
+// XML dump OPML to xml file
 func (o OPML) XML() (string, error) {
 	b, err := xml.MarshalIndent(o, "", "\t")
 	return xml.Header + string(b), err
 }
 
+// ToOPML dump OPML to opml file
 func ToOPML(sources []model.Source) (string, error) {
 	O := OPML{}
 	O.XMLName.Local = "opml"

@@ -10,6 +10,7 @@ import (
 	tb "gopkg.in/tucnak/telebot.v2"
 )
 
+// FeedForChannelRegister register feed for channel
 func FeedForChannelRegister(m *tb.Message, url string, channelMention string) {
 	msg, err := B.Send(m.Chat, "处理中...")
 	channelChat, err := B.ChatByID(channelMention)
@@ -47,7 +48,13 @@ func FeedForChannelRegister(m *tb.Message, url string, channelMention string) {
 	log.Printf("%d for %d subscribe [%d]%s %s", m.Chat.ID, channelChat.ID, source.ID, source.Title, source.Link)
 
 	if err == nil {
-		newText := fmt.Sprintf("频道 [%s](https://t.me/%s) 订阅 [%s](%s) 成功", channelChat.Title, channelChat.Username, source.Title, source.Link)
+		newText := fmt.Sprintf(
+			"频道 [%s](https://t.me/%s) 订阅 [%s](%s) 成功",
+			channelChat.Title,
+			channelChat.Username,
+			source.Title,
+			source.Link,
+		)
 		_, err = B.Edit(msg, newText,
 			&tb.SendOptions{
 				DisableWebPagePreview: true,
@@ -139,6 +146,7 @@ func BroadNews(source *model.Source, subs []model.Subscribe, contents []model.Co
 	}
 }
 
+// BroadSourceError send feed updata error message to subscribers
 func BroadSourceError(source *model.Source) {
 	subs := model.GetSubscriberBySource(source)
 	var u tb.User
@@ -151,6 +159,7 @@ func BroadSourceError(source *model.Source) {
 	}
 }
 
+// CheckAdmin check user is admin of group/channel
 func CheckAdmin(upd *tb.Update) bool {
 
 	if upd.Message != nil {
@@ -161,6 +170,7 @@ func CheckAdmin(upd *tb.Update) bool {
 					return true
 				}
 			}
+
 			return false
 		}
 
@@ -173,6 +183,7 @@ func CheckAdmin(upd *tb.Update) bool {
 					return true
 				}
 			}
+
 			return false
 		}
 
@@ -198,6 +209,7 @@ func userIsAdminOfGroup(userID int, groupChat *tb.Chat) (isAdmin bool) {
 	return
 }
 
+// UserIsAdminChannel check if the user is the administrator of channel
 func UserIsAdminChannel(userID int, channelChat *tb.Chat) (isAdmin bool) {
 	adminList, err := B.AdminsOf(channelChat)
 	isAdmin = false
@@ -214,6 +226,7 @@ func UserIsAdminChannel(userID int, channelChat *tb.Chat) (isAdmin bool) {
 	return
 }
 
+// HasAdminType check if the message is sent in the group/channel environment
 func HasAdminType(t tb.ChatType) bool {
 	hasAdmin := []tb.ChatType{tb.ChatGroup, tb.ChatSuperGroup, tb.ChatChannel, tb.ChatChannelPrivate}
 	for _, n := range hasAdmin {
@@ -224,19 +237,20 @@ func HasAdminType(t tb.ChatType) bool {
 	return false
 }
 
+// GetMentionFromMessage get message mention
 func GetMentionFromMessage(m *tb.Message) (mention string) {
 	for _, entity := range m.Entities {
 		if entity.Type == tb.EntityMention {
 			if mention == "" {
 				mention = m.Text[entity.Offset : entity.Offset+entity.Length]
-
 			}
 		}
 	}
 	return
 }
 
-func GetUrlAndMentionFromMessage(m *tb.Message) (url string, mention string) {
+// GetURLAndMentionFromMessage get URL and mention from message
+func GetURLAndMentionFromMessage(m *tb.Message) (url string, mention string) {
 	for _, entity := range m.Entities {
 		if entity.Type == tb.EntityMention {
 			if mention == "" {

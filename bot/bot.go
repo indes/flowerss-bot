@@ -11,8 +11,11 @@ import (
 )
 
 var (
+	// UserState 用户状态，用于标示当前用户操作所在状态
 	UserState map[int64]fsm.UserStatus = make(map[int64]fsm.UserStatus)
-	B         *tb.Bot
+
+	// B telebot
+	B *tb.Bot
 )
 
 func init() {

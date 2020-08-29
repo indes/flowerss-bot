@@ -111,7 +111,7 @@ func startCmdCtr(m *tb.Message) {
 
 func subCmdCtr(m *tb.Message) {
 
-	url, mention := GetUrlAndMentionFromMessage(m)
+	url, mention := GetURLAndMentionFromMessage(m)
 
 	if mention == "" {
 		if url != "" {
@@ -534,7 +534,7 @@ func setToggleUpdateBtnCtr(c *tb.Callback) {
 
 func unsubCmdCtr(m *tb.Message) {
 
-	url, mention := GetUrlAndMentionFromMessage(m)
+	url, mention := GetURLAndMentionFromMessage(m)
 
 	if mention == "" {
 		if url != "" {
@@ -640,28 +640,26 @@ func unsubCmdCtr(m *tb.Message) {
 				}
 				return
 
-			} else {
-
-				err := sub.Unsub()
-				if err == nil {
-					_, _ = B.Send(
-						m.Chat,
-						fmt.Sprintf("频道 [%s](https://t.me/%s) 退订 [%s](%s) 成功", channelChat.Title, channelChat.Username, source.Title, source.Link),
-						&tb.SendOptions{
-							DisableWebPagePreview: true,
-							ParseMode:             tb.ModeMarkdown,
-						},
-					)
-					log.Printf("%d for [%s]%s unsubscribe [%d]%s %s", m.Chat.ID, source.ID, source.Title, source.Link)
-				} else {
-					_, err = B.Send(m.Chat, err.Error())
-				}
-				return
 			}
 
-		} else {
-			_, _ = B.Send(m.Chat, "频道退订请使用' /unsub @ChannelID URL ' 命令")
+			err = sub.Unsub()
+			if err == nil {
+				_, _ = B.Send(
+					m.Chat,
+					fmt.Sprintf("频道 [%s](https://t.me/%s) 退订 [%s](%s) 成功", channelChat.Title, channelChat.Username, source.Title, source.Link),
+					&tb.SendOptions{
+						DisableWebPagePreview: true,
+						ParseMode:             tb.ModeMarkdown,
+					},
+				)
+				log.Printf("%d for [%d]%s unsubscribe %s", m.Chat.ID, source.ID, source.Title, source.Link)
+			} else {
+				_, err = B.Send(m.Chat, err.Error())
+			}
+			return
+
 		}
+		_, _ = B.Send(m.Chat, "频道退订请使用' /unsub @ChannelID URL ' 命令")
 	}
 
 }
@@ -990,13 +988,13 @@ func textCtr(m *tb.Message) {
 				_, _ = B.Send(m.Chat, "请选择正确的指令！")
 			} else {
 
-				var sourceId uint
-				if _, err := fmt.Sscanf(str[0], "[%d]", &sourceId); err != nil {
+				var sourceID uint
+				if _, err := fmt.Sscanf(str[0], "[%d]", &sourceID); err != nil {
 					_, _ = B.Send(m.Chat, "请选择正确的指令！")
 					return
 				}
 
-				source, err := model.GetSourceById(sourceId)
+				source, err := model.GetSourceById(sourceID)
 
 				if err != nil {
 					_, _ = B.Send(m.Chat, "请选择正确的指令！")
@@ -1008,26 +1006,26 @@ func textCtr(m *tb.Message) {
 				if err != nil {
 					_, _ = B.Send(m.Chat, "请选择正确的指令！")
 					return
-				} else {
-					_, _ = B.Send(
-						m.Chat,
-						fmt.Sprintf("[%s](%s) 退订成功", source.Title, source.Link),
-						&tb.SendOptions{
-							ParseMode: tb.ModeMarkdown,
-						}, &tb.ReplyMarkup{
-							ReplyKeyboardRemove: true,
-						},
-					)
-					UserState[m.Chat.ID] = fsm.None
-					return
 				}
+
+				_, _ = B.Send(
+					m.Chat,
+					fmt.Sprintf("[%s](%s) 退订成功", source.Title, source.Link),
+					&tb.SendOptions{
+						ParseMode: tb.ModeMarkdown,
+					}, &tb.ReplyMarkup{
+						ReplyKeyboardRemove: true,
+					},
+				)
+				UserState[m.Chat.ID] = fsm.None
+				return
 			}
 		}
 
 	case fsm.Sub:
 		{
 			url := strings.Split(m.Text, " ")
-			if !CheckUrl(url[0]) {
+			if !CheckURL(url[0]) {
 				_, _ = B.Send(m.Chat, "请回复正确的URL", &tb.ReplyMarkup{ForceReply: true})
 				return
 			}
@@ -1041,10 +1039,9 @@ func textCtr(m *tb.Message) {
 		}
 	case fsm.Set:
 		{
-
 			str := strings.Split(m.Text, " ")
 			url := str[len(str)-1]
-			if len(str) != 2 && !CheckUrl(url) {
+			if len(str) != 2 && !CheckURL(url) {
 				_, _ = B.Send(m.Chat, "请选择正确的指令！")
 			} else {
 				source, err := model.GetSourceByUrl(url)

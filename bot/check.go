@@ -4,6 +4,7 @@ import (
 	valid "github.com/asaskevich/govalidator"
 )
 
-func CheckUrl(s string) bool {
+// CheckURL check if the string is a URL
+func CheckURL(s string) bool {
 	return valid.IsURL(s)
 }

@@ -2,7 +2,7 @@ package bot
 
 import "testing"
 
-func TestCheckUrl(t *testing.T) {
+func TestCheckURL(t *testing.T) {
 	type args struct {
 		s string
 	}
@@ -17,8 +17,8 @@ func TestCheckUrl(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := CheckUrl(tt.s); got != tt.want {
-				t.Errorf("CheckUrl() = %v, want %v", got, tt.want)
+			if got := CheckURL(tt.s); got != tt.want {
+				t.Errorf("CheckURL() = %v, want %v", got, tt.want)
 			}
 		})
 	}

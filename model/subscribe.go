@@ -2,8 +2,9 @@ package model
 
 import (
 	"errors"
-	"github.com/indes/flowerss-bot/config"
 	"strings"
+
+	"github.com/indes/flowerss-bot/config"
 )
 
 const (
