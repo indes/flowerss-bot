@@ -201,9 +201,9 @@ func (s *Subscribe) SetTag(tags []string) error {
 	return nil
 }
 
-func (s *Subscribe) SetInterval(intelval int) error {
+func (s *Subscribe) SetInterval(interval int) error {
 	defer s.Save()
-	s.Interval = intelval
+	s.Interval = interval
 	return nil
 }
 
