@@ -108,9 +108,9 @@ func BroadNews(source *model.Source, subs []model.Subscribe, contents []model.Co
 				ContentTitle:    content.Title,
 				RawLink:         content.RawLink,
 				PreviewText:     previewText,
-				TelegraphURL:    content.TelegraphUrl,
+				TelegraphURL:    content.TelegraphURL,
 				Tags:            sub.Tag,
-				EnableTelegraph: sub.EnableTelegraph == 1 && content.TelegraphUrl != "",
+				EnableTelegraph: sub.EnableTelegraph == 1 && content.TelegraphURL != "",
 			}
 
 			u := &tb.User{

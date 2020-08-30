@@ -4,14 +4,16 @@ import (
 	"github.com/indes/flowerss-bot/config"
 	"github.com/jinzhu/gorm"
 
-	_ "github.com/jinzhu/gorm/dialects/mysql" //mysql driver
-	_ "github.com/jinzhu/gorm/dialects/sqlite"
 	"log"
 	"time"
+
+	_ "github.com/jinzhu/gorm/dialects/mysql" //mysql driver
+	_ "github.com/jinzhu/gorm/dialects/sqlite"
 )
 
 var db *gorm.DB
 
+// ConnectDB connect to db and update table
 func ConnectDB() {
 	var err error
 
