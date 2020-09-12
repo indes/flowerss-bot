@@ -230,7 +230,6 @@ func listCmdCtr(m *tb.Message) {
 			return
 		}
 
-
 		sources, _ := model.GetSourcesByUserID(channelChat.ID)
 		rspMessage = fmt.Sprintf("频道 [%s](https://t.me/%s) 订阅列表：\n", channelChat.Title, channelChat.Username)
 		if len(sources) == 0 {
@@ -240,7 +239,7 @@ func listCmdCtr(m *tb.Message) {
 				rspMessage = rspMessage + fmt.Sprintf("[[%d]] [%s](%s)\n", sub.ID, source.Title, source.Link)
 			}
 		}
-	}else{
+	} else {
 		// private chat or group
 		if m.Chat.Type != tb.ChatPrivate && !checkPermitOfChat(int64(m.Sender.ID), m.Chat) {
 			// 无权限
@@ -598,7 +597,6 @@ func unsubCmdCtr(m *tb.Message) {
 							Unique: "unsub_feed_item_btn",
 							Text:   fmt.Sprintf("[%d] %s", sub.SourceID, source.Title),
 							Data:   fmt.Sprintf("%d:%d:%d", sub.UserID, sub.ID, source.ID),
-							Action: nil,
 						},
 					})
 				}
