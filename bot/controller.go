@@ -820,41 +820,59 @@ func importCmdCtr(m *tb.Message) {
 }
 
 func setFeedTagCmdCtr(m *tb.Message) {
+	mention := GetMentionFromMessage(m)
 	args := strings.Split(m.Payload, " ")
 
 	if len(args) < 1 {
-		_, _ = B.Send(m.Chat, "/setfeedtag [sub id] [tag1] [tag2] 设置订阅标签（最多设置三个Tag，以空格分割）")
+		B.Send(m.Chat, "/setfeedtag [sub id] [tag1] [tag2] 设置订阅标签（最多设置三个Tag，以空格分割）")
 		return
 	}
 
-	// 截短参数
-	if len(args) > 4 {
-		args = args[:4]
-	}
-
-	subID, err := strconv.Atoi(args[0])
-	if err != nil {
-		_, _ = B.Send(m.Chat, "请输入正确的订阅id!")
-		return
+	var subID int
+	var err error
+	if mention == "" {
+		// 截短参数
+		if len(args) > 4 {
+			args = args[:4]
+		}
+		subID, err = strconv.Atoi(args[0])
+		if err != nil {
+			B.Send(m.Chat, "请输入正确的订阅id!")
+			return
+		}
+	} else {
+		if len(args) > 5 {
+			args = args[:5]
+		}
+		subID, err = strconv.Atoi(args[1])
+		if err != nil {
+			B.Send(m.Chat, "请输入正确的订阅id!")
+			return
+		}
 	}
 
 	sub, err := model.GetSubscribeByID(subID)
-
 	if err != nil || sub == nil {
-		_, _ = B.Send(m.Chat, "请输入正确的订阅id!")
+		B.Send(m.Chat, "请输入正确的订阅id!")
 		return
 	}
 
 	if !checkPermit(int64(m.Sender.ID), sub.UserID) {
-		_, _ = B.Send(m.Chat, "没有权限!")
+		B.Send(m.Chat, "没有权限!")
 		return
 	}
 
-	_ = sub.SetTag(args[1:])
+	if mention == "" {
+		err = sub.SetTag(args[1:])
+	} else {
+		err = sub.SetTag(args[2:])
+	}
 
-	_, _ = B.Send(m.Chat, "订阅标签设置成功!")
-
-	return
+	if err != nil {
+		B.Send(m.Chat, "订阅标签设置失败!")
+		return
+	}
+	B.Send(m.Chat, "订阅标签设置成功!")
 }
 
 func setIntervalCmdCtr(m *tb.Message) {
