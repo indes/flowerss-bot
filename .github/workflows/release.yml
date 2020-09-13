@@ -30,28 +30,4 @@ jobs:
           goarch: ${{ matrix.goarch }}
           extra_files: config.yml.sample README.md
           build_flags: -v
-          ldflags: -X 'github.com/indes/flowerss-bot/config.commit=`git rev-parse --short HEAD`' -X 'github.com/indes/flowerss-bot/config.date=`${{ env.BUILD_TIME }}`' -X 'github.com/indes/flowerss-bot/config.version=`${{ env.APP_VERSION }}`'
-
-  darwin-releases-matrix:
-    name: Release Matrix
-    runs-on: macos-latest
-    strategy:
-      matrix:
-        goos: [ darwin ]
-        goarch: [ amd64 ]
-    steps:
-      - uses: actions/checkout@v2
-
-      - name: Set APP_VERSION env
-        run: echo ::set-env name=APP_VERSION::$(echo ${GITHUB_REF} | rev | cut -d'/' -f 1 | rev )
-      - name: Set BUILD_TIME env
-        run: echo ::set-env name=BUILD_TIME::$(date)
-
-      - uses: wangyoucao577/go-release-action@master
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          goos: ${{ matrix.goos }}
-          goarch: ${{ matrix.goarch }}
-          extra_files: config.yml.sample README.md
-          build_flags: -v
-          ldflags: -X 'github.com/indes/flowerss-bot/config.commit=`git rev-parse --short HEAD`' -X 'github.com/indes/flowerss-bot/config.date=`${{ env.BUILD_TIME }}`' -X 'github.com/indes/flowerss-bot/config.version=`${{ env.APP_VERSION }}`'
+          ldflags: -X 'github.com/indes/flowerss-bot/config.commit=${{ github.sha }}' -X 'github.com/indes/flowerss-bot/config.date=${{ env.BUILD_TIME }}' -X 'github.com/indes/flowerss-bot/config.version=${{ env.APP_VERSION }}'
