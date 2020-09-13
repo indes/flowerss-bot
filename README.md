@@ -37,3 +37,4 @@
 /unsuball 取消所有订阅
 /help 帮助
 ```
+详细使用方法请查阅项目[使用文档](https://flowerss-bot.now.sh/#/usage)。 
