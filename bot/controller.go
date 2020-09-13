@@ -813,7 +813,9 @@ func versionCmdCtr(m *tb.Message) {
 }
 
 func importCmdCtr(m *tb.Message) {
-	message := `请直接发送OPML文件。`
+	message := `请直接发送OPML文件，
+如果需要为channel导入OPML，请在发送文件的时候附上channel id，例如@telegram
+`
 	_, _ = B.Send(m.Chat, message)
 }
 
