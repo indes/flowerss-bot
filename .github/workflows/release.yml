@@ -1,9 +1,8 @@
 name: Release
 
 on:
-  push:
-    tags:
-      - '*'
+  release:
+    types: [created]
 
 jobs:
   linux-releases-matrix:
@@ -47,8 +46,6 @@ jobs:
         run: echo ::set-env name=APP_VERSION::$(echo ${GITHUB_REF} | rev | cut -d'/' -f 1 | rev )
       - name: Set BUILD_TIME env
         run: echo ::set-env name=BUILD_TIME::$(date)
-      - name: Environment Printer
-        uses: managedkaos/print-env@v1.0
 
       - uses: wangyoucao577/go-release-action@master
         with:
