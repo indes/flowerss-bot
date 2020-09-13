@@ -1144,6 +1144,7 @@ func textCtr(m *tb.Message) {
 	}
 }
 
+// docCtr Document handler
 func docCtr(m *tb.Message) {
 	if m.FromGroup() {
 		if !userIsAdminOfGroup(m.Sender.ID, m.Chat) {
@@ -1159,6 +1160,7 @@ func docCtr(m *tb.Message) {
 
 	url, _ := B.FileURLByID(m.Document.FileID)
 	if !strings.HasSuffix(url, ".opml") {
+		B.Send(m.Chat, "如果需要导入订阅，请发送正确的 OPML 文件。")
 		return
 	}
 
@@ -1179,6 +1181,24 @@ func docCtr(m *tb.Message) {
 		return
 	}
 
+	userID := m.Chat.ID
+	mention := GetMentionFromMessage(m)
+	if mention != "" {
+		// import for channel
+		channelChat, err := B.ChatByID(mention)
+		if err != nil {
+			_, _ = B.Send(m.Chat, "获取channel信息错误，请检查channel id是否正确")
+			return
+		}
+
+		if !checkPermitOfChat(int64(m.Sender.ID), channelChat) {
+			_, _ = B.Send(m.Chat, fmt.Sprintf("非频道管理员无法执行此操作"))
+			return
+		}
+
+		userID = channelChat.ID
+	}
+
 	message, _ := B.Send(m.Chat, "处理中，请稍后...")
 	outlines, _ := opml.GetFlattenOutlines()
 	var failImportList []Outline
@@ -1190,7 +1210,7 @@ func docCtr(m *tb.Message) {
 			failImportList = append(failImportList, outline)
 			continue
 		}
-		err = model.RegistFeed(m.Chat.ID, source.ID)
+		err = model.RegistFeed(userID, source.ID)
 		if err != nil {
 			failImportList = append(failImportList, outline)
 			continue
@@ -1223,20 +1243,11 @@ func docCtr(m *tb.Message) {
 		}
 		importReport += failReport
 	}
-	_, err = B.Edit(message, importReport, &tb.SendOptions{
+
+	_, _ = B.Edit(message, importReport, &tb.SendOptions{
 		DisableWebPagePreview: true,
 		ParseMode:             tb.ModeHTML,
 	})
-
-	//if err != nil {
-	//	log.Println(err.Error())
-	//}
-	//if m.Document.MIME == "text/x-opml+xml" || m.Document.MIME == "application/xml" {
-	//
-	//} else {
-	//	_, _ = B.Send(m.Chat, "如果需要导入订阅，请发送正确的OPML文件。错误代码 01")
-	//}
-
 }
 
 func errorCtr(m *tb.Message, errMsg string) {
