@@ -4,6 +4,8 @@ import (
 	"bytes"
 	"flag"
 	"fmt"
+	"github.com/spf13/viper"
+	tb "gopkg.in/tucnak/telebot.v2"
 	"log"
 	"os"
 	"path"
@@ -13,9 +15,6 @@ import (
 	"strings"
 	"testing"
 	"text/template"
-
-	"github.com/spf13/viper"
-	tb "gopkg.in/tucnak/telebot.v2"
 )
 
 type RunType string

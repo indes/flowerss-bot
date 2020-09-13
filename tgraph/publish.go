@@ -3,7 +3,7 @@ package tgraph
 import (
 	"fmt"
 	"html"
-	"log"
+	"github.com/indes/flowerss-bot/log"
 	"math/rand"
 	"time"
 )

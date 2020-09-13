@@ -4,14 +4,15 @@ import (
 	"bytes"
 	"fmt"
 	"html/template"
-	"log"
 	"strconv"
 	"strings"
 	"time"
 
 	"github.com/indes/flowerss-bot/bot/fsm"
 	"github.com/indes/flowerss-bot/config"
+	"github.com/indes/flowerss-bot/log"
 	"github.com/indes/flowerss-bot/model"
+
 	tb "gopkg.in/tucnak/telebot.v2"
 )
 
@@ -784,6 +785,7 @@ func unsubAllConfirmBtnCtr(c *tb.Callback) {
 
 func pingCmdCtr(m *tb.Message) {
 	_, _ = B.Send(m.Chat, "pong")
+	log.DebugWithMessage(m, "ping")
 }
 
 func helpCmdCtr(m *tb.Message) {

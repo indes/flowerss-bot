@@ -2,7 +2,7 @@ package tgraph
 
 import (
 	"fmt"
-	"log"
+	"github.com/indes/flowerss-bot/log"
 
 	"github.com/indes/flowerss-bot/config"
 	"github.com/indes/telegraph-go"

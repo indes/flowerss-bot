@@ -1,11 +1,11 @@
 package bot
 
 import (
-	"log"
 	"time"
 
 	"github.com/indes/flowerss-bot/bot/fsm"
 	"github.com/indes/flowerss-bot/config"
+	"github.com/indes/flowerss-bot/log"
 	"github.com/indes/flowerss-bot/util"
 	tb "gopkg.in/tucnak/telebot.v2"
 )
@@ -29,7 +29,10 @@ func init() {
 		}
 		return true
 	})
-	log.Printf("Bot Token: %s Endpoint: %s\n", config.BotToken, config.TelegramEndpoint)
+	log.Infow("init telegram bot",
+		"token", config.BotToken,
+		"endpoint", config.TelegramEndpoint,
+	)
 
 	// create bot
 	var err error

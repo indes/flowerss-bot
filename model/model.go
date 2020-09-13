@@ -2,13 +2,15 @@ package model
 
 import (
 	"github.com/indes/flowerss-bot/config"
+	"github.com/indes/flowerss-bot/log"
 	"github.com/jinzhu/gorm"
-
-	"log"
-	"time"
+	"go.uber.org/zap"
 
 	_ "github.com/jinzhu/gorm/dialects/mysql" //mysql driver
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
+
+	"moul.io/zapgorm"
+	"time"
 )
 
 var db *gorm.DB
@@ -26,12 +28,13 @@ func ConnectDB() {
 		db, err = gorm.Open("sqlite3", config.SQLitePath)
 	}
 	if err != nil {
-		log.Fatal(err.Error())
+		log.Logger.Fatal(err.Error())
 	}
 
 	db.DB().SetMaxIdleConns(10)
 	db.DB().SetMaxOpenConns(50)
 	db.LogMode(true)
+	db.SetLogger(zapgorm.New(log.Logger.WithOptions(zap.AddCallerSkip(7))))
 
 	createOrUpdateTable(&Subscribe{})
 	createOrUpdateTable(&User{})

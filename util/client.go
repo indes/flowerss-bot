@@ -1,7 +1,7 @@
 package util
 
 import (
-	"log"
+	"github.com/indes/flowerss-bot/log"
 	"net/http"
 	"time"
 
@@ -18,7 +18,9 @@ func clientInit() {
 	HttpClient = &http.Client{Transport: httpTransport, Timeout: 15 * time.Second}
 	// set proxy
 	if config.Socks5 != "" {
-		log.Printf("Proxy: %s\n", config.Socks5)
+		log.Infow("enable proxy",
+			"socks5", config.Socks5,
+		)
 
 		dialer, err := proxy.SOCKS5("tcp", config.Socks5, nil, proxy.Direct)
 		if err != nil {

@@ -2,11 +2,12 @@ package bot
 
 import (
 	"fmt"
-	"log"
 	"strings"
 
 	"github.com/indes/flowerss-bot/config"
+	"github.com/indes/flowerss-bot/log"
 	"github.com/indes/flowerss-bot/model"
+
 	tb "gopkg.in/tucnak/telebot.v2"
 )
 
@@ -96,8 +97,12 @@ func SendError(c *tb.Chat) {
 
 //BroadNews send new contents message to subscriber
 func BroadNews(source *model.Source, subs []model.Subscribe, contents []model.Content) {
-
-	log.Printf("Source Title: <%s> Subscriber: %d New Contents: %d", source.Title, len(subs), len(contents))
+	log.Infow("broadcast news",
+		"feed id", source.ID,
+		"feed title", source.Title,
+		"subscriber count", len(subs),
+		"new contents", len(contents),
+	)
 	for _, content := range contents {
 
 		previewText := trimDescription(content.Description, config.PreviewText)
