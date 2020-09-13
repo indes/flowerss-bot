@@ -35,7 +35,7 @@ jobs:
 
   darwin-releases-matrix:
     name: Release Matrix
-    runs-on: darwin-latest
+    runs-on: macos-latest
     strategy:
       matrix:
         goos: [ darwin ]
