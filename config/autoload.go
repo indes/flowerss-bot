@@ -213,15 +213,14 @@ func init() {
 }
 
 func (t TplData) Render(mode tb.ParseMode) (string, error) {
-
 	var buf []byte
 	wb := bytes.NewBuffer(buf)
 
 	if mode == tb.ModeMarkdown {
-		mkd := regexp.MustCompile("[\\*\\[\\]`_]")
-		t.SourceTitle = mkd.ReplaceAllString(t.SourceTitle, " ")
-		t.ContentTitle = mkd.ReplaceAllString(t.ContentTitle, " ")
-		t.PreviewText = mkd.ReplaceAllString(t.PreviewText, " ")
+		mkd := regexp.MustCompile("(\\[|\\*|\\`|\\_)")
+		t.SourceTitle = mkd.ReplaceAllString(t.SourceTitle, "\\$1")
+		t.ContentTitle = mkd.ReplaceAllString(t.ContentTitle, "\\$1")
+		t.PreviewText = mkd.ReplaceAllString(t.PreviewText, "\\$1")
 	}
 
 	if err := MessageTpl.Execute(wb, t); err != nil {
