@@ -25,4 +25,4 @@ jobs:
           token: ${{ secrets.CODECOV_TOKEN }}
           file: ./coverage.txt
           flags: unittests
-          name: codecov-umbrella
+          name: codecov-umbrella-${{ matrix.os }}-${{ matrix.go-version }}
