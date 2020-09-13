@@ -19,6 +19,9 @@ var (
 )
 
 func init() {
+	if config.RunMode == config.TestMode {
+		return
+	}
 	poller := &tb.LongPoller{Timeout: 10 * time.Second}
 	spamProtected := tb.NewMiddlewarePoller(poller, func(upd *tb.Update) bool {
 		if !CheckAdmin(upd) {
@@ -46,8 +49,10 @@ func init() {
 
 //Start bot
 func Start() {
-	makeHandle()
-	B.Start()
+	if config.RunMode != config.TestMode {
+		makeHandle()
+		B.Start()
+	}
 }
 
 func makeHandle() {

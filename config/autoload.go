@@ -11,11 +11,14 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	"testing"
 	"text/template"
 
 	"github.com/spf13/viper"
 	tb "gopkg.in/tucnak/telebot.v2"
 )
+
+type RunType string
 
 var (
 	ProjectName           string = "flowerss"
@@ -37,6 +40,7 @@ var (
 	MessageMode           tb.ParseMode
 	TelegramEndpoint      string
 	UserAgent             string
+	RunMode               RunType = ReleaseMode
 )
 
 const (
@@ -60,6 +64,8 @@ const (
 {{- end }}
 {{.Tags}}
 `
+	TestMode    RunType = "Test"
+	ReleaseMode RunType = "Release"
 )
 
 type MysqlConfig struct {
@@ -81,6 +87,10 @@ type TplData struct {
 }
 
 func init() {
+	if isInTests() {
+		// 测试环境
+		RunMode = TestMode
+	}
 
 	workDirFlag := flag.String("d", "./", "work directory of flowerss")
 	configFile := flag.String("c", "", "config file of flowerss")
@@ -88,16 +98,7 @@ func init() {
 
 	testTpl := flag.Bool("testtpl", false, "test template")
 
-	//telegramTokenCli := flag.String("b", "", "Telegram Bot Token")
-	//telegraphTokenCli := flag.String("t", "", "Telegraph API Token")
-	//previewTextCli := flag.Int("p", 0, "Preview Text Length")
-	//DisableWebPagePreviewCli := flag.Bool("disable_web_page_preview", false, "Disable Web Page Preview")
-	//dbPathCli := flag.String("dbpath", "", "SQLite DB Path")
-	//errorThresholdCli := flag.Int("threshold", 0, "Error Threshold")
-	//socks5Cli := flag.String("s", "", "Socks5 Proxy")
-	//intervalCli := flag.Int("i", 0, "Update Interval")
-	//TelegramEndpointCli := flag.String("endpoint", "", "Custom Telegram Endpoint")
-
+	testing.Init()
 	flag.Parse()
 
 	if *printVersionFlag {
@@ -114,19 +115,21 @@ func init() {
 		viper.SetConfigFile(filepath.Join(workDir, "config.yml"))
 	}
 
-	err := viper.ReadInConfig() // Find and read the config file
-	if err != nil {             // Handle errors reading the config file
-		panic(fmt.Errorf("Fatal error config file: %s", err))
-	}
-
 	initTPL()
 	if *testTpl {
 		validateTPL()
 		os.Exit(0)
 	}
 
-	fmt.Println(logo)
+	if RunMode == TestMode {
+		return
+	}
 
+	fmt.Println(logo)
+	err := viper.ReadInConfig() // Find and read the config file
+	if err != nil {             // Handle errors reading the config file
+		panic(fmt.Errorf("Fatal error config file: %s", err))
+	}
 	BotToken = viper.GetString("bot_token")
 	Socks5 = viper.GetString("socks5")
 	UserAgent = viper.GetString("user_agent")
@@ -207,7 +210,6 @@ func init() {
 			}
 		}
 	}
-
 }
 
 func (t TplData) Render(mode tb.ParseMode) (string, error) {
@@ -268,7 +270,6 @@ func validateTPL() {
 }
 
 func initTPL() {
-
 	var tplMsg string
 	if viper.IsSet("message_tpl") {
 		tplMsg = viper.GetString("message_tpl")
@@ -289,7 +290,6 @@ func initTPL() {
 	} else {
 		MessageMode = tb.ModeMarkdown
 	}
-
 }
 
 func getInt(s string) int {
@@ -304,4 +304,13 @@ func (m *MysqlConfig) GetMysqlConnectingString() string {
 	port := m.Port
 	db := m.DB
 	return fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8mb4&parseTime=true", usr, pwd, host, port, db)
+}
+
+func isInTests() bool {
+	for _, arg := range os.Args {
+		if strings.HasPrefix(arg, "-test") {
+			return true
+		}
+	}
+	return false
 }

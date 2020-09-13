@@ -15,8 +15,11 @@ var db *gorm.DB
 
 // ConnectDB connect to db and update table
 func ConnectDB() {
-	var err error
+	if config.RunMode == config.TestMode {
+		return
+	}
 
+	var err error
 	if config.EnableMysql {
 		db, err = gorm.Open("mysql", config.Mysql.GetMysqlConnectingString())
 	} else {

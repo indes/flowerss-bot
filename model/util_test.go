@@ -12,8 +12,8 @@ func Test_genHashID(t *testing.T) {
 		args args
 		want string
 	}{
-		{"1", args{"http://www.ruanyifeng.com/blog/atom.xml", "tag:www.ruanyifeng.com,2019:/blog//1.2054"}, "96b2e254"},
-		{"2", args{"https://rsshub.app/guokr/scientific", "https://www.guokr.com/article/445877/"}, "770fff44"},
+		{"case1", args{"http://www.ruanyifeng.com/blog/atom.xml", "tag:www.ruanyifeng.com,2019:/blog//1.2054"}, "96b2e254"},
+		{"case2", args{"https://rsshub.app/guokr/scientific", "https://www.guokr.com/article/445877/"}, "770fff44"},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

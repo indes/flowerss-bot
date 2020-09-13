@@ -7,11 +7,11 @@ import (
 	"time"
 )
 
-func init() {
-
-}
-
 func Update() {
+	if config.RunMode == config.TestMode {
+		return
+	}
+
 	for {
 		sources := model.GetSubscribedNormalSources()
 		for _, source := range sources {
