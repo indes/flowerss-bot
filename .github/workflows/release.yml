@@ -6,21 +6,55 @@ on:
       - '*'
 
 jobs:
-  goreleaser:
+  linux-releases-matrix:
+    name: Release Matrix
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        goos: [ linux ]
+        goarch: ["386", amd64]
+
     steps:
-      -
-        name: Checkout
-        uses: actions/checkout@v2
-      -
-        name: Validates GoReleaser Config
-        uses: docker://mailchain/goreleaser-xcgo:latest
+      - uses: actions/checkout@v2
+
+      - name: Set APP_VERSION env
+        run: echo ::set-env name=APP_VERSION::$(echo ${GITHUB_REF} | rev | cut -d'/' -f 1 | rev )
+      - name: Set BUILD_TIME env
+        run: echo ::set-env name=BUILD_TIME::$(date)
+      - name: Environment Printer
+        uses: managedkaos/print-env@v1.0
+
+      - uses: wangyoucao577/go-release-action@master
         with:
-          args: check
-      -
-        name: Create release on GitHub
-        uses: docker://mailchain/goreleaser-xcgo:latest
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          goos: ${{ matrix.goos }}
+          goarch: ${{ matrix.goarch }}
+          extra_files: config.yml.sample README.md
+          build_flags: -v
+          ldflags: -X 'github.com/indes/flowerss-bot/config.commit=`git rev-parse --short HEAD`' -X 'github.com/indes/flowerss-bot/config.date=`${{ env.BUILD_TIME }}`' -X 'github.com/indes/flowerss-bot/config.version=`${{ env.APP_VERSION }}`'
+
+  darwin-releases-matrix:
+    name: Release Matrix
+    runs-on: darwin-latest
+    strategy:
+      matrix:
+        goos: [ darwin ]
+        goarch: [ amd64 ]
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set APP_VERSION env
+        run: echo ::set-env name=APP_VERSION::$(echo ${GITHUB_REF} | rev | cut -d'/' -f 1 | rev )
+      - name: Set BUILD_TIME env
+        run: echo ::set-env name=BUILD_TIME::$(date)
+      - name: Environment Printer
+        uses: managedkaos/print-env@v1.0
+
+      - uses: wangyoucao577/go-release-action@master
         with:
-          args: --rm-dist
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          goos: ${{ matrix.goos }}
+          goarch: ${{ matrix.goarch }}
+          extra_files: config.yml.sample README.md
+          build_flags: -v
+          ldflags: -X 'github.com/indes/flowerss-bot/config.commit=`git rev-parse --short HEAD`' -X 'github.com/indes/flowerss-bot/config.date=`${{ env.BUILD_TIME }}`' -X 'github.com/indes/flowerss-bot/config.version=`${{ env.APP_VERSION }}`'
