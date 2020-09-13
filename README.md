@@ -1,7 +1,7 @@
 # flowerss bot
 
 [![Build Status](https://travis-ci.org/indes/flowerss-bot.svg?branch=master)](https://travis-ci.org/indes/flowerss-bot)
-[![Go Report Card](https://goreportcard.com/badge/github.com/indes/rssflow)](https://goreportcard.com/report/github.com/indes/flowerss-bot)
+[![Go Report Card](https://goreportcard.com/badge/github.com/indes/flowerss-bot)](https://goreportcard.com/report/github.com/indes/flowerss-bot)
 ![GitHub](https://img.shields.io/github/license/indes/flowerss-bot.svg)
 
 [安装与使用文档](https://flowerss-bot.now.sh/)  
