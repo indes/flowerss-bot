@@ -14,5 +14,15 @@ jobs:
           go-version: ${{ matrix.go-version }}
       - name: Checkout code
         uses: actions/checkout@v2
-      - name: Test
-        run: go test ./...
+
+      - name: Generate coverage report
+        run: |
+          go test -race -coverprofile=coverage.txt -covermode=atomic ./...
+
+      - name: Upload coverage report
+        uses: codecov/codecov-action@v1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          file: ./coverage.txt
+          flags: unittests
+          name: codecov-umbrella
