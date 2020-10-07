@@ -66,6 +66,9 @@ mysql:
   database: flowerss
 sqlite:
   path: ./data.db
+allowed_users:
+  - 123
+  - 234
 ```
 
 配置说明：
@@ -83,3 +86,4 @@ sqlite:
 | mysql                     | MySQL 数据库配置                           | 可忽略（使用 SQLite ）                     |
 | sqlite                    | SQLite 配置                               | 可忽略（已配置mysql时，该项失效）          |
 | telegram.endpoint         | 自定义telegram bot api url                | 可忽略（使用默认api url）          |
+| allowed_users             | 允许使用bot的用户telegram id，                        | 可忽略，为空时所有用户都能使用bot          |

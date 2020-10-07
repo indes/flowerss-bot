@@ -13,3 +13,7 @@ curl https://api.telegra.ph/createAccount?short_name=flowerss&author_name=flower
 ```
 
 返回的 JSON 中 access_token 字段值即为 Telegraph Token。
+
+
+### 如何获取我的telegram id？
+可以参考这个网页获取：https://botostore.com/c/getmyid_bot/
