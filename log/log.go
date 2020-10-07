@@ -92,7 +92,13 @@ func DebugWithField(msg string, fields ...zapcore.Field) {
 	Logger.WithOptions(zap.AddCallerSkip(1)).Debug(msg, fields...)
 }
 
-// DebugWithField logs a message at DebugLevel. The message includes telegram message info
+// Debugw logs a message with some additional context. The variadic key-value
+// pairs are treated as they are in With.
+func Debugw(msg string, keysAndValues ...interface{}) {
+	Logger.WithOptions(zap.AddCallerSkip(1)).Sugar().Debugw(msg, keysAndValues...)
+}
+
+// DebugWithMessage logs a message at DebugLevel. The message includes telegram message info
 // at the log site, as well as any fields accumulated on the logger.
 func DebugWithMessage(m *tb.Message, v ...interface{}) {
 	Logger.WithOptions(zap.AddCallerSkip(1)).Debug(fmt.Sprint(v...),
