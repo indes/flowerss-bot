@@ -19,3 +19,5 @@ telegram:
 
 sqlite:
   path: ./data.db
+
+allowed_users:

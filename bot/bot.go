@@ -24,6 +24,11 @@ func init() {
 	}
 	poller := &tb.LongPoller{Timeout: 10 * time.Second}
 	spamProtected := tb.NewMiddlewarePoller(poller, func(upd *tb.Update) bool {
+		if !isUserAllowed(upd) {
+			// 检查用户是否可以使用bot
+			return false
+		}
+
 		if !CheckAdmin(upd) {
 			return false
 		}

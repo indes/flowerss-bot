@@ -197,6 +197,36 @@ func CheckAdmin(upd *tb.Update) bool {
 	return false
 }
 
+// IsUserAllowed check user is allowed to use bot
+func isUserAllowed(upd *tb.Update) bool {
+	if upd == nil {
+		return false
+	}
+
+	var userID int64
+
+	if upd.Message != nil {
+		userID = int64(upd.Message.Sender.ID)
+	} else if upd.Callback != nil {
+		userID = int64(upd.Callback.Sender.ID)
+	} else {
+		return false
+	}
+
+	if len(config.AllowUsers) == 0 {
+		return true
+	}
+
+	for _, allowUserID := range config.AllowUsers {
+		if allowUserID == userID {
+			return true
+		}
+	}
+
+	log.Debugw("user not allowed", "userID", userID)
+	return false
+}
+
 func userIsAdminOfGroup(userID int, groupChat *tb.Chat) (isAdmin bool) {
 
 	adminList, err := B.AdminsOf(groupChat)

@@ -10,7 +10,7 @@ require (
 	github.com/grokify/html-strip-tags-go v0.0.0-20200322061010-ea0c1cf2f119
 	github.com/indes/telegraph-go v1.0.1
 	github.com/jinzhu/gorm v1.9.16
-	github.com/magiconair/properties v1.8.2 // indirect
+	github.com/magiconair/properties v1.8.2
 	github.com/mattn/go-sqlite3 v1.14.3 // indirect
 	github.com/mitchellh/mapstructure v1.3.3 // indirect
 	github.com/pelletier/go-toml v1.8.0 // indirect

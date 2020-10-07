@@ -17,74 +17,6 @@ import (
 	"text/template"
 )
 
-type RunType string
-
-var (
-	ProjectName           string = "flowerss"
-	BotToken              string
-	Socks5                string
-	TelegraphToken        []string
-	TelegraphAccountName  string
-	TelegraphAuthorName   string = "flowerss-bot"
-	TelegraphAuthorURL    string
-	EnableTelegraph       bool
-	PreviewText           int = 0
-	DisableWebPagePreview bool
-	Mysql                 MysqlConfig
-	SQLitePath            string
-	EnableMysql           bool
-	UpdateInterval        int  = 10
-	ErrorThreshold        uint = 100
-	MessageTpl            *template.Template
-	MessageMode           tb.ParseMode
-	TelegramEndpoint      string
-	UserAgent             string
-	RunMode               RunType = ReleaseMode
-)
-
-const (
-	logo = `
-   __ _                                
-  / _| | _____      _____ _ __ ___ ___ 
- | |_| |/ _ \ \ /\ / / _ \ '__/ __/ __|
- |  _| | (_) \ V  V /  __/ |  \__ \__ \
- |_| |_|\___/ \_/\_/ \___|_|  |___/___/
-
-`
-	defaultMessageTplMode = "md"
-	defaultMessageTpl     = `** {{.SourceTitle}} **{{ if .PreviewText }}
----------- Preview ----------
-{{.PreviewText}}
------------------------------
-{{- end}}{{if .EnableTelegraph}}
-{{.ContentTitle}} [Telegraph]({{.TelegraphURL}}) | [原文]({{.RawLink}})
-{{- else }}
-[{{.ContentTitle}}]({{.RawLink}})
-{{- end }}
-{{.Tags}}
-`
-	TestMode    RunType = "Test"
-	ReleaseMode RunType = "Release"
-)
-
-type MysqlConfig struct {
-	Host     string
-	Port     int
-	User     string
-	Password string
-	DB       string
-}
-
-type TplData struct {
-	SourceTitle     string
-	ContentTitle    string
-	RawLink         string
-	PreviewText     string
-	TelegraphURL    string
-	Tags            string
-	EnableTelegraph bool
-}
-
 func init() {
 	if isInTests() {
 		// 测试环境
@@ -136,8 +68,6 @@ func init() {
 	if viper.IsSet("telegraph_token") {
 		EnableTelegraph = true
 		TelegraphToken = viper.GetStringSlice("telegraph_token")
-	} else {
-		EnableTelegraph = false
 	}
 
 	if viper.IsSet("telegraph_account") {
@@ -155,28 +85,33 @@ func init() {
 
 	if viper.IsSet("preview_text") {
 		PreviewText = viper.GetInt("preview_text")
-	} else {
-		PreviewText = 0
 	}
 
-	DisableWebPagePreview = viper.GetBool("disable_web_page_preview")
+	if viper.IsSet("allowed_users") {
+		intAllowUsers := viper.GetStringSlice("allowed_users")
+		for _, useIDStr := range intAllowUsers {
+			userID, err := strconv.ParseInt(useIDStr, 10, 64)
+			if err != nil {
+				panic(fmt.Errorf("Fatal error config file: %s", err))
+			}
+			AllowUsers = append(AllowUsers, userID)
+		}
+	}
+
+	if viper.IsSet("disable_web_page_preview") {
+		DisableWebPagePreview = viper.GetBool("disable_web_page_preview")
+	}
 
 	if viper.IsSet("telegram.endpoint") {
 		TelegramEndpoint = viper.GetString("telegram.endpoint")
-	} else {
-		TelegramEndpoint = tb.DefaultApiURL
 	}
 
 	if viper.IsSet("error_threshold") {
 		ErrorThreshold = uint(viper.GetInt("error_threshold"))
-	} else {
-		ErrorThreshold = 100
 	}
 
 	if viper.IsSet("update_interval") {
 		UpdateInterval = viper.GetInt("update_interval")
-	} else {
-		UpdateInterval = 10
 	}
 
 	if viper.IsSet("mysql.host") {
@@ -188,8 +123,6 @@ func init() {
 			Password: viper.GetString("mysql.password"),
 			DB:       viper.GetString("mysql.database"),
 		}
-	} else {
-		EnableMysql = false
 	}
 
 	if !EnableMysql {
