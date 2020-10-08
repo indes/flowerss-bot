@@ -142,6 +142,10 @@ func init() {
 			}
 		}
 	}
+
+	if viper.IsSet("log.db_log") {
+		DBLogMode = viper.GetBool("log.db_log")
+	}
 }
 
 func (t TplData) Render(mode tb.ParseMode) (string, error) {

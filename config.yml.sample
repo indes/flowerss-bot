@@ -19,6 +19,8 @@ telegram:
 
 log:
   level: release
+  db_log: false # 打印数据库日志，false则只会打印数据库错误日志
+
 #  file: ./flowerss.log
 
 sqlite:

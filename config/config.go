@@ -55,6 +55,9 @@ var (
 
 	// AllowUsers 允许使用bot的用户
 	AllowUsers []int64
+
+	// DBLogMode 是否打印数据库日志
+	DBLogMode bool = false
 )
 
 const (
