@@ -110,3 +110,15 @@ func DebugWithMessage(m *tb.Message, v ...interface{}) {
 func Warn(v ...interface{}) {
 	Logger.WithOptions(zap.AddCallerSkip(1)).Warn(fmt.Sprint(v...))
 }
+
+// Errorw logs a message with some additional context. The variadic key-value
+// pairs are treated as they are in With.
+func Errorw(msg string, keysAndValues ...interface{}) {
+	Logger.WithOptions(zap.AddCallerSkip(1)).Sugar().Errorw(msg, keysAndValues...)
+}
+
+// Error logs a message at ErrorLevel. The message includes any fields passed
+// at the log site, as well as any fields accumulated on the logger.
+func Error(v ...interface{}) {
+	Logger.WithOptions(zap.AddCallerSkip(1)).Error(fmt.Sprint(v...))
+}
