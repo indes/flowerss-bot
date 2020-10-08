@@ -149,10 +149,13 @@ func (s *Source) NeedUpdate() bool {
 }
 
 func (s *Source) GetNewContents() ([]Content, error) {
+	log.Debugw("fetch source updates",
+		"source", s,
+	)
 	var newContents []Content
 	feed, err := rss.FetchByFunc(fetchFunc, s.Link)
 	if err != nil {
-		log.Println("Unable to make request: ", err, " ", s.Link)
+		log.Errorw("unable to fetch update", "error", err, "source", s)
 		s.AddErrorCount()
 		return nil, err
 	}

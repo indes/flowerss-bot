@@ -95,16 +95,16 @@ func SendError(c *tb.Chat) {
 	_, _ = B.Send(c, "请输入正确的指令！")
 }
 
-//BroadNews send new contents message to subscriber
-func BroadNews(source *model.Source, subs []model.Subscribe, contents []model.Content) {
+//BroadcastNews send new contents message to subscriber
+func BroadcastNews(source *model.Source, subs []model.Subscribe, contents []model.Content) {
 	log.Infow("broadcast news",
 		"feed id", source.ID,
 		"feed title", source.Title,
 		"subscriber count", len(subs),
 		"new contents", len(contents),
 	)
-	for _, content := range contents {
 
+	for _, content := range contents {
 		previewText := trimDescription(content.Description, config.PreviewText)
 
 		for _, sub := range subs {
@@ -128,13 +128,21 @@ func BroadNews(source *model.Source, subs []model.Subscribe, contents []model.Co
 			}
 			msg, err := tpldata.Render(config.MessageMode)
 			if err != nil {
-				log.Println("BroadNews tpldata.Render err ", err)
+				log.Errorw("broadcast news error, tpldata.Render err",
+					"error", err.Error(),
+				)
 				return
 			}
 			if _, err := B.Send(u, msg, o); err != nil {
-				log.Println(err)
+
 				if strings.Contains(err.Error(), "Forbidden") {
-					log.Printf("Unsubscribe UserID:%d SourceID:%d", sub.UserID, sub.SourceID)
+					log.Errorw("broadcast news error, bot stopped by user",
+						"error", err.Error(),
+						"user id", sub.UserID,
+						"source id", sub.SourceID,
+						"title", source.Title,
+						"link", source.Link,
+					)
 					sub.Unsub()
 				}
 
@@ -144,15 +152,18 @@ func BroadNews(source *model.Source, subs []model.Subscribe, contents []model.Co
 					api error: Bad Request: can't parse entities: Can't find end of the entity starting at byte offset 894
 				*/
 				if strings.Contains(err.Error(), "parse entities") {
-					log.Println("Markdown Err: ", msg)
+					log.Errorw("broadcast news error, markdown error",
+						"markdown msg", msg,
+						"error", err.Error(),
+					)
 				}
 			}
 		}
 	}
 }
 
-// BroadSourceError send feed updata error message to subscribers
-func BroadSourceError(source *model.Source) {
+// BroadcastSourceError send feed updata error message to subscribers
+func BroadcastSourceError(source *model.Source) {
 	subs := model.GetSubscriberBySource(source)
 	var u tb.User
 	for _, sub := range subs {
