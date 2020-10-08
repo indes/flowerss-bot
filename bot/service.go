@@ -223,7 +223,7 @@ func isUserAllowed(upd *tb.Update) bool {
 		}
 	}
 
-	log.Debugw("user not allowed", "userID", userID)
+	log.Infow("user not allowed", "userID", userID)
 	return false
 }
 

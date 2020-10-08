@@ -17,6 +17,10 @@ mysql:
 telegram:
   endpoint:
 
+log:
+  level: release
+#  file: ./flowerss.log
+
 sqlite:
   path: ./data.db
 
