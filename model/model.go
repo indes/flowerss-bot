@@ -4,19 +4,40 @@ import (
 	"github.com/indes/flowerss-bot/config"
 	"github.com/indes/flowerss-bot/log"
 	"github.com/jinzhu/gorm"
-	"go.uber.org/zap"
-
 	_ "github.com/jinzhu/gorm/dialects/mysql" //mysql driver
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
-
+	"go.uber.org/zap"
 	"moul.io/zapgorm"
+
 	"time"
 )
 
 var db *gorm.DB
 
-// ConnectDB connect to db and update table
-func ConnectDB() {
+// InitDB init db object
+func InitDB() {
+	connectDB()
+	configDB()
+	updateTable()
+}
+
+func configDB(){
+	db.DB().SetMaxIdleConns(10)
+	db.DB().SetMaxOpenConns(50)
+	db.LogMode(true)
+	db.SetLogger(zapgorm.New(log.Logger.WithOptions(zap.AddCallerSkip(7))))
+}
+
+func updateTable(){
+	createOrUpdateTable(&Subscribe{})
+	createOrUpdateTable(&User{})
+	createOrUpdateTable(&Source{})
+	createOrUpdateTable(&Option{})
+	createOrUpdateTable(&Content{})
+}
+
+// connectDB connect to db
+func connectDB() {
 	if config.RunMode == config.TestMode {
 		return
 	}
@@ -28,19 +49,8 @@ func ConnectDB() {
 		db, err = gorm.Open("sqlite3", config.SQLitePath)
 	}
 	if err != nil {
-		log.Logger.Fatal(err.Error())
+		log.Fatal(err.Error())
 	}
-
-	db.DB().SetMaxIdleConns(10)
-	db.DB().SetMaxOpenConns(50)
-	db.LogMode(true)
-	db.SetLogger(zapgorm.New(log.Logger.WithOptions(zap.AddCallerSkip(7))))
-
-	createOrUpdateTable(&Subscribe{})
-	createOrUpdateTable(&User{})
-	createOrUpdateTable(&Source{})
-	createOrUpdateTable(&Option{})
-	createOrUpdateTable(&Content{})
 }
 
 // Disconnect disconnects from the database.

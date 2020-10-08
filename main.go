@@ -10,7 +10,7 @@ import (
 )
 
 func main() {
-	model.ConnectDB()
+	model.InitDB()
 	go task.Update()
 	go handleSignal()
 	bot.Start()
