@@ -46,21 +46,23 @@ func init() {
 		viper.SetConfigFile(filepath.Join(workDir, "config.yml"))
 	}
 
+	fmt.Println(logo)
+	err := viper.ReadInConfig() // Find and read the config file
+	if err != nil {             // Handle errors reading the config file
+		panic(fmt.Errorf("Fatal error config file: %s", err))
+	}
+
 	initTPL()
 	if *testTpl {
 		validateTPL()
 		os.Exit(0)
 	}
 
+	// 由于test mode检测机制与-testtpl冲突，所以该代码必须放到validateTPL后面
 	if RunMode == TestMode {
 		return
 	}
 
-	fmt.Println(logo)
-	err := viper.ReadInConfig() // Find and read the config file
-	if err != nil {             // Handle errors reading the config file
-		panic(fmt.Errorf("Fatal error config file: %s", err))
-	}
 	BotToken = viper.GetString("bot_token")
 	Socks5 = viper.GetString("socks5")
 	UserAgent = viper.GetString("user_agent")
