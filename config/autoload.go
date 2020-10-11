@@ -21,6 +21,8 @@ func init() {
 	if isInTests() {
 		// 测试环境
 		RunMode = TestMode
+		initTPL()
+		return
 	}
 
 	workDirFlag := flag.String("d", "./", "work directory of flowerss")
@@ -56,11 +58,6 @@ func init() {
 	if *testTpl {
 		validateTPL()
 		os.Exit(0)
-	}
-
-	// 由于test mode检测机制与-testtpl冲突，所以该代码必须放到validateTPL后面
-	if RunMode == TestMode {
-		return
 	}
 
 	BotToken = viper.GetString("bot_token")
@@ -246,6 +243,9 @@ func (m *MysqlConfig) GetMysqlConnectingString() string {
 func isInTests() bool {
 	for _, arg := range os.Args {
 		if strings.HasPrefix(arg, "-test") {
+			if arg == "-testtpl" {
+				continue
+			}
 			return true
 		}
 	}
