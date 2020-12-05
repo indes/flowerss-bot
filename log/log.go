@@ -122,3 +122,11 @@ func Errorw(msg string, keysAndValues ...interface{}) {
 func Error(v ...interface{}) {
 	Logger.WithOptions(zap.AddCallerSkip(1)).Error(fmt.Sprint(v...))
 }
+
+// ErrorWithMessage logs a message at ErrorLevel. The message includes telegram message info
+// at the log site, as well as any fields accumulated on the logger.
+func ErrorWithMessage(m *tb.Message, v ...interface{}) {
+	Logger.WithOptions(zap.AddCallerSkip(1)).Error(fmt.Sprint(v...),
+		zap.Field{Key: "telegram message", Type: zapcore.ReflectType, Interface: m},
+	)
+}
