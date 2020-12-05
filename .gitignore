@@ -249,6 +249,7 @@ pip-selfcheck.json
 __pycache__/*
 
 config.yml
+flowerss-bot
 
 *.db
 .dockerfile
