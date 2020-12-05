@@ -25,6 +25,6 @@ require (
 	golang.org/x/net v0.0.0-20200904194848-62affa334b73
 	golang.org/x/sys v0.0.0-20200909081042-eff7692f9009 // indirect
 	gopkg.in/ini.v1 v1.61.0 // indirect
-	gopkg.in/tucnak/telebot.v2 v2.3.4
+	gopkg.in/tucnak/telebot.v2 v2.3.5
 	moul.io/zapgorm v1.1.2
 )
