@@ -156,6 +156,10 @@ func (t TplData) Render(mode tb.ParseMode) (string, error) {
 		t.SourceTitle = mkd.ReplaceAllString(t.SourceTitle, "\\$1")
 		t.ContentTitle = mkd.ReplaceAllString(t.ContentTitle, "\\$1")
 		t.PreviewText = mkd.ReplaceAllString(t.PreviewText, "\\$1")
+	} else if mode == tb.ModeHTML {
+		t.SourceTitle = t.replaceHTMLTags(t.SourceTitle)
+		t.ContentTitle = t.replaceHTMLTags(t.ContentTitle)
+		t.PreviewText = t.replaceHTMLTags(t.PreviewText)
 	}
 
 	if err := MessageTpl.Execute(wb, t); err != nil {
@@ -163,6 +167,16 @@ func (t TplData) Render(mode tb.ParseMode) (string, error) {
 	}
 
 	return strings.TrimSpace(string(wb.Bytes())), nil
+}
+
+func (t TplData) replaceHTMLTags(s string) string {
+
+	rStr := strings.ReplaceAll(s,"&", "&amp;")
+	rStr = strings.ReplaceAll(rStr,"\"", "&quot;")
+	rStr = strings.ReplaceAll(rStr,"<", "&lt;")
+	rStr = strings.ReplaceAll(rStr,">", "&gt;")
+
+	return rStr
 }
 
 func validateTPL() {
