@@ -26,17 +26,17 @@ func TestTplData_Render(t1 *testing.T) {
 		want    string
 		wantErr bool
 	}{
-		{
-			"markdown",
-			fields{SourceTitle: "[aaa](qq) *123*"},
-			args{telebot.ModeMarkdown},
-			"** \\[aaa](qq) \\*123\\* **\n[]()",
-			false,
-		},
+		//{
+		//	"markdown",
+		//	fields{SourceTitle: "[aaa](qq) *123*"},
+		//	args{telebot.ModeMarkdown},
+		//	"** \\[aaa](qq) \\*123\\* **\n[]()",
+		//	false,
+		//},
 		{"HTML Mode",
-			fields{SourceTitle: "[aaa] *123*"},
+			fields{SourceTitle: "[aaa] *123*", ContentTitle: "google", RawLink: "https://google.com"},
 			args{telebot.ModeHTML},
-			"** [aaa] *123* **\n[]()",
+			"<b>[aaa] *123*</b>\n<a href=\"https://google.com\">google</a>",
 			false,
 		},
 	}
@@ -53,7 +53,7 @@ func TestTplData_Render(t1 *testing.T) {
 			}
 			got, err := t.Render(tt.args.mode)
 
-			assert.Equal(t1, got, tt.want)
+			assert.Equal(t1, tt.want, got)
 			assert.Equal(t1, err != nil, tt.wantErr)
 		})
 	}
@@ -61,13 +61,12 @@ func TestTplData_Render(t1 *testing.T) {
 
 func TestTplData_replaceHTMLTags(t1 *testing.T) {
 	tests := []struct {
-		name   string
-		arg    string
-		want   string
+		name string
+		arg  string
+		want string
 	}{
-		{"case1","<hello>","&lt;hello&gt;"},
-		{"case2","<\"hello\">","&lt;&quot;hello&quot;&gt;"},
-
+		{"case1", "<hello>", "&lt;hello&gt;"},
+		{"case2", "<\"hello\">", "&lt;&quot;hello&quot;&gt;"},
 	}
 	for _, tt := range tests {
 		t1.Run(tt.name, func(t1 *testing.T) {
