@@ -222,7 +222,7 @@ func initTPL() {
 			MessageMode = tb.ModeDefault
 		}
 	} else {
-		MessageMode = tb.ModeMarkdown
+		MessageMode = defaultMessageTplMode
 	}
 }
 
