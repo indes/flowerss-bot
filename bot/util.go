@@ -1,6 +1,7 @@
 package bot
 
 import (
+	"html"
 	"regexp"
 	"strings"
 
@@ -13,9 +14,10 @@ func trimDescription(desc string, limit int) string {
 	}
 	desc = strings.Trim(
 		strip.StripTags(
-			regexp.MustCompile(`\n+`).ReplaceAllLiteralString(
+			regexp.MustCompile("\n+").ReplaceAllLiteralString(
 				strings.ReplaceAll(
-					regexp.MustCompile(`<br(| /)>`).ReplaceAllString(desc, "<br>"),
+					regexp.MustCompile(`<br(| /)>`).ReplaceAllString(
+						html.UnescapeString(desc), "<br>"),
 					"<br>", "\n"),
 				"\n")),
 		"\n")
