@@ -24,6 +24,9 @@ func init() {
 		zapConfig.EncoderConfig = zap.NewProductionEncoderConfig()
 	}
 
+	//日志时间戳人类可读
+	zapConfig.EncoderConfig.EncodeTime = zapcore.RFC3339TimeEncoder
+
 	logFile := config.GetString("log.file")
 	if logFile != "" {
 		zapConfig.Sampling = &zap.SamplingConfig{
