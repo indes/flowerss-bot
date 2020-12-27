@@ -3,6 +3,7 @@ package bot
 import (
 	"bytes"
 	"fmt"
+	"go.uber.org/zap"
 	"html/template"
 	"strconv"
 	"strings"
@@ -10,7 +11,6 @@ import (
 
 	"github.com/indes/flowerss-bot/bot/fsm"
 	"github.com/indes/flowerss-bot/config"
-	"github.com/indes/flowerss-bot/log"
 	"github.com/indes/flowerss-bot/model"
 
 	tb "gopkg.in/tucnak/telebot.v2"
@@ -106,7 +106,7 @@ func toggleCtrlButtons(c *tb.Callback, action string) {
 
 func startCmdCtr(m *tb.Message) {
 	user, _ := model.FindOrCreateUserByTelegramID(m.Chat.ID)
-	log.Printf("/start user_id: %d telegram_id: %d", user.ID, user.TelegramID)
+	zap.S().Infof("/start user_id: %d telegram_id: %d", user.ID, user.TelegramID)
 	_, _ = B.Send(m.Chat, fmt.Sprintf("你好，欢迎使用flowerss。"))
 }
 
@@ -142,7 +142,7 @@ func exportCmdCtr(m *tb.Message) {
 
 		sourceList, err = model.GetSourcesByUserID(m.Chat.ID)
 		if err != nil {
-			log.Println(err.Error())
+			zap.S().Warnf(err.Error())
 			_, _ = B.Send(m.Chat, fmt.Sprintf("导出失败"))
 			return
 		}
@@ -174,7 +174,7 @@ func exportCmdCtr(m *tb.Message) {
 
 		sourceList, err = model.GetSourcesByUserID(channelChat.ID)
 		if err != nil {
-			log.Println(err.Error())
+			zap.S().Errorf(err.Error())
 			_, _ = B.Send(m.Chat, fmt.Sprintf("导出失败"))
 			return
 		}
@@ -197,7 +197,7 @@ func exportCmdCtr(m *tb.Message) {
 
 	if err != nil {
 		_, _ = B.Send(m.Chat, fmt.Sprintf("导出失败"))
-		log.Println("[export]", err)
+		zap.S().Errorf("send opml file failed, err:%+v", err)
 	}
 
 }
@@ -567,7 +567,7 @@ func unsubCmdCtr(m *tb.Message) {
 							ParseMode:             tb.ModeMarkdown,
 						},
 					)
-					log.Printf("%d unsubscribe [%d]%s %s", m.Chat.ID, source.ID, source.Title, source.Link)
+					zap.S().Infof("%d unsubscribe [%d]%s %s", m.Chat.ID, source.ID, source.Title, source.Link)
 				} else {
 					_, err = B.Send(m.Chat, err.Error())
 				}
@@ -665,7 +665,7 @@ func unsubCmdCtr(m *tb.Message) {
 						ParseMode:             tb.ModeMarkdown,
 					},
 				)
-				log.Printf("%d for [%d]%s unsubscribe %s", m.Chat.ID, source.ID, source.Title, source.Link)
+				zap.S().Infof("%d for [%d]%s unsubscribe %s", m.Chat.ID, source.ID, source.Title, source.Link)
 			} else {
 				_, err = B.Send(m.Chat, err.Error())
 			}
@@ -785,7 +785,10 @@ func unsubAllConfirmBtnCtr(c *tb.Callback) {
 
 func pingCmdCtr(m *tb.Message) {
 	_, _ = B.Send(m.Chat, "pong")
-	log.DebugWithMessage(m, "ping")
+	zap.S().Debugw(
+		"pong",
+		"telegram msg", m,
+	)
 }
 
 func helpCmdCtr(m *tb.Message) {
@@ -1219,7 +1222,7 @@ func docCtr(m *tb.Message) {
 			failImportList = append(failImportList, outline)
 			continue
 		}
-		log.Printf("%d subscribe [%d]%s %s", m.Chat.ID, source.ID, source.Title, source.Link)
+		zap.S().Infof("%d subscribe [%d]%s %s", m.Chat.ID, source.ID, source.Title, source.Link)
 		successImportList = append(successImportList, outline)
 	}
 

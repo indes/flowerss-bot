@@ -49,7 +49,7 @@ func connectDB() {
 		db, err = gorm.Open("sqlite3", config.SQLitePath)
 	}
 	if err != nil {
-		log.Fatal(err.Error())
+		zap.S().Fatal(err.Error())
 	}
 }
 

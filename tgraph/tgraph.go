@@ -1,7 +1,7 @@
 package tgraph
 
 import (
-	"github.com/indes/flowerss-bot/log"
+	"go.uber.org/zap"
 
 	"github.com/indes/flowerss-bot/config"
 	"github.com/indes/telegraph-go"
@@ -24,7 +24,7 @@ var (
 
 func init() {
 	if config.EnableTelegraph {
-		log.Infow("telegraph enabled",
+		zap.S().Infow("telegraph enabled",
 			"token count", len(authToken),
 			"token list", authToken,
 		)
@@ -34,7 +34,7 @@ func init() {
 		for _, t := range authToken {
 			client, err := telegraph.Load(t, socks5Proxy)
 			if err != nil {
-				log.Errorw("telegraph load error",
+				zap.S().Errorw("telegraph load error",
 					"error", err,
 					"token", t,
 				)
@@ -46,7 +46,7 @@ func init() {
 		if len(clientPool) == 0 {
 			if config.TelegraphAccountName == "" {
 				config.EnableTelegraph = false
-				log.Error("telegraph token error, telegraph disabled")
+				zap.S().Error("telegraph token error, telegraph disabled")
 			} else if len(authToken) == 0 {
 				// create account
 				client, err := telegraph.Create(
@@ -58,11 +58,11 @@ func init() {
 
 				if err != nil {
 					config.EnableTelegraph = false
-					log.Errorw("create telegraph account fail, telegraph disabled", "error", err)
+					zap.S().Errorw("create telegraph account fail, telegraph disabled", "error", err)
 				}
 
 				clientPool = append(clientPool, client)
-				log.Infow("create telegraph account success",
+				zap.S().Infow("create telegraph account success",
 					"telegraph token", client.AccessToken)
 
 			}

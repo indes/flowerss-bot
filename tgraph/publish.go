@@ -2,8 +2,8 @@ package tgraph
 
 import (
 	"fmt"
+	"go.uber.org/zap"
 	"html"
-	"github.com/indes/flowerss-bot/log"
 	"math/rand"
 	"time"
 )
@@ -28,10 +28,10 @@ func PublishHtml(sourceTitle string, title string, rawLink string, htmlContent s
 	client := clientPool[rand.Intn(len(clientPool))]
 
 	if page, err := client.CreatePageWithHTML(title+" - "+sourceTitle, sourceTitle, rawLink, htmlContent, true); err == nil {
-		log.Printf("Created telegraph page url: %s", page.URL)
+		zap.S().Infof("Created telegraph page url: %s", page.URL)
 		return page.URL, err
 	} else {
-		log.Printf("Create telegraph page error: %s", err)
+		zap.S().Warnf("Create telegraph page failed, error: %s", err)
 		return "", nil
 	}
 }

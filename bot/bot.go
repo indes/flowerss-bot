@@ -1,11 +1,11 @@
 package bot
 
 import (
+	"go.uber.org/zap"
 	"time"
 
 	"github.com/indes/flowerss-bot/bot/fsm"
 	"github.com/indes/flowerss-bot/config"
-	"github.com/indes/flowerss-bot/log"
 	"github.com/indes/flowerss-bot/util"
 	tb "gopkg.in/tucnak/telebot.v2"
 )
@@ -34,7 +34,7 @@ func init() {
 		}
 		return true
 	})
-	log.Infow("init telegram bot",
+	zap.S().Infow("init telegram bot",
 		"token", config.BotToken,
 		"endpoint", config.TelegramEndpoint,
 	)
@@ -50,7 +50,7 @@ func init() {
 	})
 
 	if err != nil {
-		log.Fatal(err)
+		zap.S().Fatal(err)
 		return
 	}
 }
@@ -58,6 +58,7 @@ func init() {
 //Start bot
 func Start() {
 	if config.RunMode != config.TestMode {
+		zap.S().Infof("bot start %s", config.AppVersionInfo())
 		setCommands()
 		setHandle()
 		B.Start()
@@ -88,8 +89,10 @@ func setCommands() {
 		{"version", "bot版本"},
 	}
 
+	zap.S().Debugf("set bot command %+v", commands)
+
 	if err := B.SetCommands(commands); err != nil {
-		log.Errorw("set bot commands failed", "error", err.Error())
+		zap.S().Errorw("set bot commands failed", "error", err.Error())
 	}
 }
 

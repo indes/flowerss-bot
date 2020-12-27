@@ -2,10 +2,10 @@ package bot
 
 import (
 	"fmt"
+	"go.uber.org/zap"
 	"strings"
 
 	"github.com/indes/flowerss-bot/config"
-	"github.com/indes/flowerss-bot/log"
 	"github.com/indes/flowerss-bot/model"
 
 	tb "gopkg.in/tucnak/telebot.v2"
@@ -46,7 +46,7 @@ func FeedForChannelRegister(m *tb.Message, url string, channelMention string) {
 	}
 
 	err = model.RegistFeed(channelChat.ID, source.ID)
-	log.Printf("%d for %d subscribe [%d]%s %s", m.Chat.ID, channelChat.ID, source.ID, source.Title, source.Link)
+	zap.S().Infof("%d for %d subscribe [%d]%s %s", m.Chat.ID, channelChat.ID, source.ID, source.Title, source.Link)
 
 	if err == nil {
 		newText := fmt.Sprintf(
@@ -77,7 +77,7 @@ func registFeed(chat *tb.Chat, url string) {
 	}
 
 	err = model.RegistFeed(chat.ID, source.ID)
-	log.Printf("%d subscribe [%d]%s %s", chat.ID, source.ID, source.Title, source.Link)
+	zap.S().Infof("%d subscribe [%d]%s %s", chat.ID, source.ID, source.Title, source.Link)
 
 	if err == nil {
 		_, _ = B.Edit(msg, fmt.Sprintf("[%s](%s) 订阅成功", source.Title, source.Link),
@@ -97,7 +97,7 @@ func SendError(c *tb.Chat) {
 
 //BroadcastNews send new contents message to subscriber
 func BroadcastNews(source *model.Source, subs []model.Subscribe, contents []model.Content) {
-	log.Infow("broadcast news",
+	zap.S().Infow("broadcast news",
 		"feed id", source.ID,
 		"feed title", source.Title,
 		"subscriber count", len(subs),
@@ -128,7 +128,7 @@ func BroadcastNews(source *model.Source, subs []model.Subscribe, contents []mode
 			}
 			msg, err := tpldata.Render(config.MessageMode)
 			if err != nil {
-				log.Errorw("broadcast news error, tpldata.Render err",
+				zap.S().Errorw("broadcast news error, tpldata.Render err",
 					"error", err.Error(),
 				)
 				return
@@ -136,7 +136,7 @@ func BroadcastNews(source *model.Source, subs []model.Subscribe, contents []mode
 			if _, err := B.Send(u, msg, o); err != nil {
 
 				if strings.Contains(err.Error(), "Forbidden") {
-					log.Errorw("broadcast news error, bot stopped by user",
+					zap.S().Errorw("broadcast news error, bot stopped by user",
 						"error", err.Error(),
 						"user id", sub.UserID,
 						"source id", sub.SourceID,
@@ -152,7 +152,7 @@ func BroadcastNews(source *model.Source, subs []model.Subscribe, contents []mode
 					api error: Bad Request: can't parse entities: Can't find end of the entity starting at byte offset 894
 				*/
 				if strings.Contains(err.Error(), "parse entities") {
-					log.Errorw("broadcast news error, markdown error",
+					zap.S().Errorw("broadcast news error, markdown error",
 						"markdown msg", msg,
 						"error", err.Error(),
 					)
@@ -234,7 +234,7 @@ func isUserAllowed(upd *tb.Update) bool {
 		}
 	}
 
-	log.Infow("user not allowed", "userID", userID)
+	zap.S().Infow("user not allowed", "userID", userID)
 	return false
 }
 

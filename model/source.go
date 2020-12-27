@@ -3,6 +3,7 @@ package model
 import (
 	"errors"
 	"fmt"
+	"go.uber.org/zap"
 	"io/ioutil"
 	"net/http"
 	"sort"
@@ -11,7 +12,6 @@ import (
 
 	"github.com/SlyMarbo/rss"
 	"github.com/indes/flowerss-bot/config"
-	"github.com/indes/flowerss-bot/log"
 	"github.com/indes/flowerss-bot/util"
 	"github.com/jinzhu/gorm"
 )
@@ -47,7 +47,7 @@ func GetSourceByUrl(url string) (*Source, error) {
 func fetchFunc(url string) (resp *http.Response, err error) {
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
-		log.Fatal(err)
+		zap.S().Fatal(err)
 	}
 
 	if config.UserAgent != "" {
@@ -149,13 +149,13 @@ func (s *Source) NeedUpdate() bool {
 }
 
 func (s *Source) GetNewContents() ([]Content, error) {
-	log.Debugw("fetch source updates",
+	zap.S().Debugw("fetch source updates",
 		"source", s,
 	)
 	var newContents []Content
 	feed, err := rss.FetchByFunc(fetchFunc, s.Link)
 	if err != nil {
-		log.Errorw("unable to fetch update", "error", err, "source", s)
+		zap.S().Errorw("unable to fetch update", "error", err, "source", s)
 		s.AddErrorCount()
 		return nil, err
 	}
