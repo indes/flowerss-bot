@@ -21,14 +21,14 @@ func InitDB() {
 	updateTable()
 }
 
-func configDB(){
+func configDB() {
 	db.DB().SetMaxIdleConns(10)
 	db.DB().SetMaxOpenConns(50)
 	db.LogMode(config.DBLogMode)
 	db.SetLogger(zapgorm.New(log.Logger.WithOptions(zap.AddCallerSkip(7))))
 }
 
-func updateTable(){
+func updateTable() {
 	createOrUpdateTable(&Subscribe{})
 	createOrUpdateTable(&User{})
 	createOrUpdateTable(&Source{})
@@ -49,7 +49,7 @@ func connectDB() {
 		db, err = gorm.Open("sqlite3", config.SQLitePath)
 	}
 	if err != nil {
-		zap.S().Fatal(err.Error())
+		zap.S().Fatalf("connect db failed, err: %+v", err)
 	}
 }
 
