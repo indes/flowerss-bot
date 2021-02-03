@@ -101,9 +101,11 @@ const (
 {{- end }}
 {{.Tags}}
 `
-	defaultMessageListItemTpl         = `[{{.ContentTitle}}]({{.TelegraphURL}})`
-	TestMode                  RunType = "Test"
-	ReleaseMode               RunType = "Release"
+	defaultMessageListItemTpl = `{{if .EnableTelegraph}}
+[{{.ContentTitle}}]({{.TelegraphURL}}) - [原文]({{.RawLink}}){{- else }}
+[{{.ContentTitle}}]({{.RawLink}}){{- end }}`
+	TestMode    RunType = "Test"
+	ReleaseMode RunType = "Release"
 )
 
 // MysqlConfig mysql 配置
