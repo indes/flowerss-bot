@@ -27,3 +27,25 @@ sqlite:
   path: ./data.db
 
 allowed_users:
+
+merge_message:
+  enable: true
+  item_tpl: |
+    {{if .EnableTelegraph}}
+    [{{.ContentTitle}}]({{.TelegraphURL}}) - [原文]({{.RawLink}})
+    {{- else }}
+    [{{.ContentTitle}}]({{.RawLink}})
+    {{- end }}
+
+message_mode: md
+message_tpl: |
+    ** {{.SourceTitle}} **{{ if .PreviewText }}
+    ---------- Preview ----------
+    {{.PreviewText}}
+    -----------------------------
+    {{- end}}{{if .EnableTelegraph}}
+    {{.ContentTitle}} [Telegraph]({{.TelegraphURL}}) | [原文]({{.RawLink}})
+    {{- else }}
+    [{{.ContentTitle}}]({{.RawLink}})
+    {{- end }}
+    {{.Tags}}

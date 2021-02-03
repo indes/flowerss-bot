@@ -58,6 +58,15 @@ var (
 
 	// DBLogMode 是否打印数据库日志
 	DBLogMode bool = false
+
+	// 当 feed 有多个条目更新时，是否合并为一条消息
+	MergeMessage bool = false
+
+	// 使用列表发送消息时的心消息阈值
+	MergeTolerance int = 2
+
+	// 合并消息中单条消息模板，模式与 MessageMode 一致
+	MessageItemTpl *template.Template
 )
 
 const (
@@ -92,8 +101,9 @@ const (
 {{- end }}
 {{.Tags}}
 `
-	TestMode    RunType = "Test"
-	ReleaseMode RunType = "Release"
+	defaultMessageListItemTpl         = `[{{.ContentTitle}}]({{.TelegraphURL}})`
+	TestMode                  RunType = "Test"
+	ReleaseMode               RunType = "Release"
 )
 
 // MysqlConfig mysql 配置
@@ -113,6 +123,7 @@ type TplData struct {
 	TelegraphURL    string
 	Tags            string
 	EnableTelegraph bool
+	IsItem          bool
 }
 
 func AppVersionInfo() (s string) {

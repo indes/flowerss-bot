@@ -145,6 +145,9 @@ func init() {
 	if viper.IsSet("log.db_log") {
 		DBLogMode = viper.GetBool("log.db_log")
 	}
+	if viper.IsSet("merge_message.enable") {
+		MergeMessage = viper.GetBool("merge_message.enable")
+	}
 }
 
 func (t TplData) Render(mode tb.ParseMode) (string, error) {
@@ -162,8 +165,15 @@ func (t TplData) Render(mode tb.ParseMode) (string, error) {
 		t.PreviewText = t.replaceHTMLTags(t.PreviewText)
 	}
 
-	if err := MessageTpl.Execute(wb, t); err != nil {
-		return "", err
+	switch t.IsItem {
+	case true:
+		if err := MessageItemTpl.Execute(wb, t); err != nil {
+			return "", err
+		}
+	default:
+		if err := MessageTpl.Execute(wb, t); err != nil {
+			return "", err
+		}
 	}
 
 	return strings.TrimSpace(string(wb.Bytes())), nil
@@ -171,10 +181,10 @@ func (t TplData) Render(mode tb.ParseMode) (string, error) {
 
 func (t TplData) replaceHTMLTags(s string) string {
 
-	rStr := strings.ReplaceAll(s,"&", "&amp;")
-	rStr = strings.ReplaceAll(rStr,"\"", "&quot;")
-	rStr = strings.ReplaceAll(rStr,"<", "&lt;")
-	rStr = strings.ReplaceAll(rStr,">", "&gt;")
+	rStr := strings.ReplaceAll(s, "&", "&amp;")
+	rStr = strings.ReplaceAll(rStr, "\"", "&quot;")
+	rStr = strings.ReplaceAll(rStr, "<", "&lt;")
+	rStr = strings.ReplaceAll(rStr, ">", "&gt;")
 
 	return rStr
 }
@@ -189,6 +199,7 @@ func validateTPL() {
 			"",
 			"",
 			false,
+			false,
 		},
 		TplData{
 			"RSS源标识 - 有预览无telegraph的消息",
@@ -198,6 +209,7 @@ func validateTPL() {
 			"",
 			"#标签",
 			false,
+			false,
 		},
 		TplData{
 			"RSS源标识 - 有预览有telegraph的消息",
@@ -206,6 +218,7 @@ func validateTPL() {
 			"这里是很长很长很长的消息预览字数补丁紫薯补丁紫薯补丁紫薯补丁紫薯补丁",
 			"https://telegra.ph/markdown-07-07",
 			"#标签1 #标签2",
+			true,
 			true,
 		},
 	}
@@ -218,13 +231,19 @@ func validateTPL() {
 }
 
 func initTPL() {
-	var tplMsg string
+	var tplMsg, tplMsgListItem string
 	if viper.IsSet("message_tpl") {
 		tplMsg = viper.GetString("message_tpl")
 	} else {
 		tplMsg = defaultMessageTpl
 	}
+	if viper.IsSet("message_item.item_tpl") {
+		tplMsgListItem = viper.GetString("message_item.item_tpl")
+	} else {
+		tplMsgListItem = defaultMessageListItemTpl
+	}
 	MessageTpl = template.Must(template.New("message").Parse(tplMsg))
+	MessageItemTpl = template.Must(template.New("message_item").Parse(tplMsgListItem))
 
 	if viper.IsSet("message_mode") {
 		switch strings.ToLower(viper.GetString("message_mode")) {
