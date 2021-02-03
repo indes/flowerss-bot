@@ -23,7 +23,13 @@ func trimDescription(desc string, limit int) string {
 		"\n")
 
 	contentDescRune := []rune(desc)
-	if len(contentDescRune) > limit {
+	descLen := len(contentDescRune)
+	// in latin alphabets, len(str) == len([]rune)
+	if len(desc) == descLen {
+		descLen /= 2
+		limit *= 2
+	}
+	if descLen > limit {
 		desc = string(contentDescRune[:limit])
 	}
 
