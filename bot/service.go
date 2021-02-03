@@ -104,10 +104,10 @@ func BroadcastNews(source *model.Source, subs []model.Subscribe, contents []mode
 		"new contents", len(contents),
 	)
 
-	for _, content := range contents {
-		previewText := trimDescription(content.Description, config.PreviewText)
-
-		for _, sub := range subs {
+	for _, sub := range subs {
+		var allMsg []string
+		for _, content := range contents {
+			previewText := trimDescription(content.Description, config.PreviewText)
 			tpldata := &config.TplData{
 				SourceTitle:     source.Title,
 				ContentTitle:    content.Title,
@@ -117,14 +117,8 @@ func BroadcastNews(source *model.Source, subs []model.Subscribe, contents []mode
 				Tags:            sub.Tag,
 				EnableTelegraph: sub.EnableTelegraph == 1 && content.TelegraphURL != "",
 			}
-
-			u := &tb.User{
-				ID: int(sub.UserID),
-			}
-			o := &tb.SendOptions{
-				DisableWebPagePreview: config.DisableWebPagePreview,
-				ParseMode:             config.MessageMode,
-				DisableNotification:   sub.EnableNotification != 1,
+			if config.MergeMessage && len(contents) > config.MergeTolerance {
+				tpldata.IsItem = true
 			}
 			msg, err := tpldata.Render(config.MessageMode)
 			if err != nil {
@@ -133,31 +127,53 @@ func BroadcastNews(source *model.Source, subs []model.Subscribe, contents []mode
 				)
 				return
 			}
-			if _, err := B.Send(u, msg, o); err != nil {
-
-				if strings.Contains(err.Error(), "Forbidden") {
-					zap.S().Errorw("broadcast news error, bot stopped by user",
-						"error", err.Error(),
-						"user id", sub.UserID,
-						"source id", sub.SourceID,
-						"title", source.Title,
-						"link", source.Link,
-					)
-					sub.Unsub()
+			if tpldata.IsItem {
+				if len(allMsg) == 0 {
+					allMsg = append(allMsg, source.Title)
 				}
-
-				/*
-					Telegram return error if markdown message has incomplete format.
-					Print the msg to warn the user
-					api error: Bad Request: can't parse entities: Can't find end of the entity starting at byte offset 894
-				*/
-				if strings.Contains(err.Error(), "parse entities") {
-					zap.S().Errorw("broadcast news error, markdown error",
-						"markdown msg", msg,
-						"error", err.Error(),
-					)
-				}
+				allMsg = append(allMsg, msg)
+			} else {
+				SendMessage(source, &sub, msg)
 			}
+		}
+		if config.MergeMessage && len(contents) > config.MergeTolerance {
+			SendMessage(source, &sub, strings.Join(allMsg, "\n"))
+		}
+	}
+}
+
+func SendMessage(source *model.Source, sub *model.Subscribe, msg string) {
+	u := &tb.User{
+		ID: int(sub.UserID),
+	}
+	o := &tb.SendOptions{
+		DisableWebPagePreview: config.DisableWebPagePreview,
+		ParseMode:             config.MessageMode,
+		DisableNotification:   sub.EnableNotification != 1,
+	}
+	if _, err := B.Send(u, msg, o); err != nil {
+
+		if strings.Contains(err.Error(), "Forbidden") {
+			zap.S().Errorw("broadcast news error, bot stopped by user",
+				"error", err.Error(),
+				"user id", sub.UserID,
+				"source id", sub.SourceID,
+				"title", source.Title,
+				"link", source.Link,
+			)
+			sub.Unsub()
+		}
+
+		/*
+			Telegram return error if markdown message has incomplete format.
+			Print the msg to warn the user
+			api error: Bad Request: can't parse entities: Can't find end of the entity starting at byte offset 894
+		*/
+		if strings.Contains(err.Error(), "parse entities") {
+			zap.S().Errorw("broadcast news error, markdown error",
+				"markdown msg", msg,
+				"error", err.Error(),
+			)
 		}
 	}
 }
