@@ -4,9 +4,9 @@ import (
 	"go.uber.org/zap"
 	"time"
 
-	"github.com/indes/flowerss-bot/bot/fsm"
-	"github.com/indes/flowerss-bot/config"
-	"github.com/indes/flowerss-bot/util"
+	"github.com/yangon99/flowerss-bot/bot/fsm"
+	"github.com/yangon99/flowerss-bot/config"
+	"github.com/yangon99/flowerss-bot/util"
 	tb "gopkg.in/tucnak/telebot.v2"
 )
 

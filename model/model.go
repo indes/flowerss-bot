@@ -1,11 +1,11 @@
 package model
 
 import (
-	"github.com/indes/flowerss-bot/config"
-	"github.com/indes/flowerss-bot/log"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/mysql" //mysql driver
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
+	"github.com/yangon99/flowerss-bot/config"
+	"github.com/yangon99/flowerss-bot/log"
 	"go.uber.org/zap"
 	"moul.io/zapgorm"
 

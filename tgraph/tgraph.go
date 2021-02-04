@@ -3,8 +3,8 @@ package tgraph
 import (
 	"go.uber.org/zap"
 
-	"github.com/indes/flowerss-bot/config"
 	"github.com/indes/telegraph-go"
+	"github.com/yangon99/flowerss-bot/config"
 )
 
 const (
@@ -15,7 +15,7 @@ const (
 var (
 	authToken   = config.TelegraphToken
 	socks5Proxy = config.Socks5
-	authorUrl   = "https://github.com/indes/flowerss-bot"
+	authorUrl   = "https://github.com/yangon99/flowerss-bot"
 	authorName  = "flowerss"
 	verbose     = false
 	//client     *telegraph.Client

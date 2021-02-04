@@ -2,43 +2,12 @@
 
 ## 二进制部署
 
-从 [Releases](https://github.com/indes/flowerss-bot/releases) 页面下载对应的版本解压运行即可。
-
-## Docker 部署
-
-1.下载配置文件
-在项目目录下新建 `config.yml` 文件
-
-
-```bash
-mkdir ~/flowerss &&\
-wget -O ~/flowerss/config.yml \
-    https://raw.githubusercontent.com/indes/flowerss-bot/master/config.yml.sample
-```
-
-
-2.修改配置文件
-
-```bash
-vim ~/flowerss/config.yml
-```
-
-修改配置文件中sqlite路径（如果使用sqlite作为数据库）：
-```yaml
-sqlite:
-  path: /root/.flowerss/data.db
-```
-
-3.运行
-
-```shell script
-docker run -d -v ~/flowerss:/root/.flowerss indes/flowerss-bot
-```
+从 [Releases](https://github.com/yangon99/flowerss-bot/releases) 页面下载对应的版本解压运行即可。
 
 ## 源码编译部署
 
 ```shell script
-git clone https://github.com/indes/flowerss-bot && cd flowerss-bot
+git clone https://github.com/yangon99/flowerss-bot && cd flowerss-bot
 make build
 ./flowerss-bot
 ```
