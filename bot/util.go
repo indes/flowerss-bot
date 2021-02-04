@@ -27,7 +27,7 @@ func trimDescription(desc string, limit int) string {
 		limit *= 2
 	}
 	if descLen > limit {
-		desc = string(contentDescRune[:limit])
+		desc = string(contentDescRune[:limit]) + "…"
 	}
 
 	return desc
