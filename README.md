@@ -1,11 +1,5 @@
 # flowerss bot
 
-[![Build Status](https://github.com/yangon99/flowerss-bot/workflows/Release/badge.svg)](https://github.com/yangon99/flowerss-bot/actions?query=workflow%3ARelease)
-[![Test Status](https://github.com/yangon99/flowerss-bot/workflows/Test/badge.svg)](https://github.com/yangon99/flowerss-bot/actions?query=workflow%3ATest)
-![Build Docker Image](https://github.com/yangon99/flowerss-bot/workflows/Build%20Docker%20Image/badge.svg)
-[![Go Report Card](https://goreportcard.com/badge/github.com/yangon99/flowerss-bot)](https://goreportcard.com/report/github.com/yangon99/flowerss-bot)
-![GitHub](https://img.shields.io/github/license/yangon99/flowerss-bot.svg)
-
 [安装与使用文档](https://flowerss-bot.now.sh/)  
 
 <img src="https://github.com/rssflow/img/raw/master/images/rssflow_demo.gif" width = "300"/>
