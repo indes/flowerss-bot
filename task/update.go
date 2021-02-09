@@ -1,9 +1,9 @@
 package task
 
 import (
-	"github.com/yangon99/flowerss-bot/bot"
-	"github.com/yangon99/flowerss-bot/config"
-	"github.com/yangon99/flowerss-bot/model"
+	"github.com/indes/flowerss-bot/bot"
+	"github.com/indes/flowerss-bot/config"
+	"github.com/indes/flowerss-bot/model"
 	"time"
 )
 

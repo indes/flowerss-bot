@@ -1,4 +1,4 @@
-module github.com/yangon99/flowerss-bot
+module github.com/indes/flowerss-bot
 
 go 1.12
 

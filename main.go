@@ -1,9 +1,9 @@
 package main
 
 import (
-	"github.com/yangon99/flowerss-bot/bot"
-	"github.com/yangon99/flowerss-bot/model"
-	"github.com/yangon99/flowerss-bot/task"
+	"github.com/indes/flowerss-bot/bot"
+	"github.com/indes/flowerss-bot/model"
+	"github.com/indes/flowerss-bot/task"
 	"os"
 	"os/signal"
 	"syscall"

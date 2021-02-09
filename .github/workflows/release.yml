@@ -30,4 +30,4 @@ jobs:
           goarch: ${{ matrix.goarch }}
           extra_files: config.yml.sample README.md
           build_flags: -v
-          ldflags: -X 'github.com/yangon99/flowerss-bot/config.commit=${{ github.sha }}' -X 'github.com/yangon99/flowerss-bot/config.date=${{ env.BUILD_TIME }}' -X 'github.com/yangon99/flowerss-bot/config.version=${{ env.APP_VERSION }}'
+          ldflags: -X 'github.com/indes/flowerss-bot/config.commit=${{ github.sha }}' -X 'github.com/indes/flowerss-bot/config.date=${{ env.BUILD_TIME }}' -X 'github.com/indes/flowerss-bot/config.version=${{ env.APP_VERSION }}'

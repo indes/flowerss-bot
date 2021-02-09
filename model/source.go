@@ -11,9 +11,9 @@ import (
 	"unicode"
 
 	"github.com/SlyMarbo/rss"
+	"github.com/indes/flowerss-bot/config"
+	"github.com/indes/flowerss-bot/util"
 	"github.com/jinzhu/gorm"
-	"github.com/yangon99/flowerss-bot/config"
-	"github.com/yangon99/flowerss-bot/util"
 )
 
 type Source struct {

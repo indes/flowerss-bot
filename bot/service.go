@@ -5,8 +5,8 @@ import (
 	"go.uber.org/zap"
 	"strings"
 
-	"github.com/yangon99/flowerss-bot/config"
-	"github.com/yangon99/flowerss-bot/model"
+	"github.com/indes/flowerss-bot/config"
+	"github.com/indes/flowerss-bot/model"
 
 	tb "gopkg.in/tucnak/telebot.v2"
 )

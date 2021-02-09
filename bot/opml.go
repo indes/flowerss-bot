@@ -9,8 +9,8 @@ import (
 	"net/url"
 	"time"
 
-	"github.com/yangon99/flowerss-bot/config"
-	"github.com/yangon99/flowerss-bot/model"
+	"github.com/indes/flowerss-bot/config"
+	"github.com/indes/flowerss-bot/model"
 )
 
 // OPML opml struct

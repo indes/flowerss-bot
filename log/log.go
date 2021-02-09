@@ -1,7 +1,7 @@
 package log
 
 import (
-	"github.com/yangon99/flowerss-bot/config"
+	"github.com/indes/flowerss-bot/config"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"strings"

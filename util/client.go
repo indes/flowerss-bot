@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/yangon99/flowerss-bot/config"
+	"github.com/indes/flowerss-bot/config"
 	"golang.org/x/net/proxy"
 )
 
