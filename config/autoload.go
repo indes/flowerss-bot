@@ -157,12 +157,10 @@ func (t TplData) Render(mode tb.ParseMode) (string, error) {
 	if mode == tb.ModeMarkdown {
 		mkd := regexp.MustCompile("(\\[|\\*|\\`|\\_)")
 		t.SourceTitle = mkd.ReplaceAllString(t.SourceTitle, "\\$1")
-		t.Tags = mkd.ReplaceAllString(t.Tags, "\\$1")
 		t.ContentTitle = mkd.ReplaceAllString(t.ContentTitle, "\\$1")
 		t.PreviewText = mkd.ReplaceAllString(t.PreviewText, "\\$1")
 	} else if mode == tb.ModeHTML {
 		t.SourceTitle = t.replaceHTMLTags(t.SourceTitle)
-		t.Tags = t.replaceHTMLTags(t.Tags)
 		t.ContentTitle = t.replaceHTMLTags(t.ContentTitle)
 		t.PreviewText = t.replaceHTMLTags(t.PreviewText)
 	}
