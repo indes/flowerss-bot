@@ -1,9 +1,9 @@
 package main
 
 import (
-	"github.com/indes/flowerss-bot/bot"
-	"github.com/indes/flowerss-bot/model"
-	"github.com/indes/flowerss-bot/task"
+	"github.com/xos/rssbot/bot"
+	"github.com/xos/rssbot/model"
+	"github.com/xos/rssbot/task"
 	"os"
 	"os/signal"
 	"syscall"

@@ -4,7 +4,7 @@ import (
 	"errors"
 	"strings"
 
-	"github.com/indes/flowerss-bot/config"
+	"github.com/xos/rssbot/config"
 )
 
 const (

@@ -1,4 +1,4 @@
-module github.com/indes/flowerss-bot
+module github.com/xos/rssbot
 
 go 1.12
 

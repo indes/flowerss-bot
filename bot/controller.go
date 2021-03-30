@@ -9,9 +9,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/indes/flowerss-bot/bot/fsm"
-	"github.com/indes/flowerss-bot/config"
-	"github.com/indes/flowerss-bot/model"
+	"github.com/xos/rssbot/bot/fsm"
+	"github.com/xos/rssbot/config"
+	"github.com/xos/rssbot/model"
 
 	tb "gopkg.in/tucnak/telebot.v2"
 )
@@ -807,7 +807,7 @@ func helpCmdCtr(m *tb.Message) {
 /import 导入 OPML 文件
 /export 导出 OPML 文件
 /unsuball 取消所有订阅
-详细使用方法请看：https://github.com/indes/flowerss-bot
+详细使用方法请看：https://github.com/xos/rssbot
 `
 
 	_, _ = B.Send(m.Chat, message)

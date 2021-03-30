@@ -12,16 +12,16 @@ var ()
 type RunType string
 
 var (
-	version = "dev"
-	commit  = "none"
-	date    = "unknown"
+	version = "master"
+	commit  = "newest"
+	date    = "today"
 
 	ProjectName          string = "flowerss"
 	BotToken             string
 	Socks5               string
 	TelegraphToken       []string
 	TelegraphAccountName string
-	TelegraphAuthorName  string = "flowerss-bot"
+	TelegraphAuthorName  string = "rssbot"
 	TelegraphAuthorURL   string
 
 	// EnableTelegraph 是否启用telegraph
@@ -62,7 +62,7 @@ var (
 	// 当 feed 有多个条目更新时，是否合并为一条消息
 	MergeMessage bool = false
 
-	// 使用列表发送消息时的心消息阈值
+	// 使用列表发送消息时的新消息阈值
 	MergeTolerance int = 2
 
 	// 合并消息中单条消息模板，模式与 MessageMode 一致
@@ -84,7 +84,7 @@ const (
 {{.PreviewText}}
 -----------------------------
 {{- end}}{{if .EnableTelegraph}}
-{{.ContentTitle}} <a href="{{.TelegraphURL}}">Telegraph</a> | <a href="{{.RawLink}}">原文</a>
+<a href="{{.TelegraphURL}}">【预览】</a><a href="{{.RawLink}}">{{.ContentTitle}}</a>
 {{- else }}
 <a href="{{.RawLink}}">{{.ContentTitle}}</a>
 {{- end }}
@@ -95,15 +95,21 @@ const (
 {{.PreviewText}}
 -----------------------------
 {{- end}}{{if .EnableTelegraph}}
-{{.ContentTitle}} [Telegraph]({{.TelegraphURL}}) | [原文]({{.RawLink}})
+[【预览】]({{.TelegraphURL}})[{{.ContentTitle}}]({{.RawLink}})
 {{- else }}
 [{{.ContentTitle}}]({{.RawLink}})
 {{- end }}
 {{.Tags}}
 `
+	//defaultMessageListItemTpl = `{{if .EnableTelegraph}}
+	//[【预览】]({{.TelegraphURL}})[{{.ContentTitle}}]({{.RawLink}}) {{- else }}
+	//[{{.ContentTitle}}]({{.RawLink}}){{- end }}`
 	defaultMessageListItemTpl = `{{if .EnableTelegraph}}
-[{{.ContentTitle}}]({{.TelegraphURL}}) - [原文]({{.RawLink}}){{- else }}
-[{{.ContentTitle}}]({{.RawLink}}){{- end }}`
+<a href="{{.TelegraphURL}}">【预览】</a><a href="{{.RawLink}}">{{.ContentTitle}}</a>
+{{- else }}
+<a href="{{.RawLink}}">{{.ContentTitle}}</a>
+{{- end }}`
+
 	TestMode    RunType = "Test"
 	ReleaseMode RunType = "Release"
 )

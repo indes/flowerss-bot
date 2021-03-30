@@ -7,8 +7,8 @@ RUN apk add git make gcc libc-dev && \
 # Image starts here
 FROM alpine
 COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
-COPY --from=builder /flowerss/flowerss-bot /bin/
+COPY --from=builder /flowerss/rssbot /bin/
 VOLUME /root/.flowerss
 WORKDIR /root/.flowerss
-ENTRYPOINT ["/bin/flowerss-bot"]
+ENTRYPOINT ["/bin/rssbot"]
 

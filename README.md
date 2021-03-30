@@ -1,12 +1,12 @@
 # flowerss bot
 
-[![Build Status](https://github.com/indes/flowerss-bot/workflows/Release/badge.svg)](https://github.com/indes/flowerss-bot/actions?query=workflow%3ARelease)
-[![Test Status](https://github.com/indes/flowerss-bot/workflows/Test/badge.svg)](https://github.com/indes/flowerss-bot/actions?query=workflow%3ATest)
-![Build Docker Image](https://github.com/indes/flowerss-bot/workflows/Build%20Docker%20Image/badge.svg)
-[![Go Report Card](https://goreportcard.com/badge/github.com/indes/flowerss-bot)](https://goreportcard.com/report/github.com/indes/flowerss-bot)
-![GitHub](https://img.shields.io/github/license/indes/flowerss-bot.svg)
+[![Build Status](https://github.com/xos/rssbot/workflows/Release/badge.svg)](https://github.com/xos/rssbot/actions?query=workflow%3ARelease)
+[![Test Status](https://github.com/xos/rssbot/workflows/Test/badge.svg)](https://github.com/xos/rssbot/actions?query=workflow%3ATest)
+![Build Docker Image](https://github.com/xos/rssbot/workflows/Build%20Docker%20Image/badge.svg)
+[![Go Report Card](https://goreportcard.com/badge/github.com/xos/rssbot)](https://goreportcard.com/report/github.com/xos/rssbot)
+![GitHub](https://img.shields.io/github/license/xos/rssbot.svg)
 
-[安装与使用文档](https://flowerss-bot.now.sh/)  
+[安装与使用文档](https://rssbot.now.sh/)  
 
 <img src="https://github.com/rssflow/img/raw/master/images/rssflow_demo.gif" width = "300"/>
 
@@ -24,7 +24,7 @@
 
 ## 安装与使用
 
-详细安装与使用方法请查阅项目[使用文档](https://flowerss-bot.now.sh/)。  
+详细安装与使用方法请查阅项目[使用文档](https://rssbot.now.sh/)。  
 
 使用命令：
 
@@ -43,4 +43,4 @@
 /unsuball 取消所有订阅
 /help 帮助
 ```
-详细使用方法请查阅项目[使用文档](https://flowerss-bot.now.sh/#/usage)。 
+详细使用方法请查阅项目[使用文档](https://rssbot.now.sh/#/usage)。 

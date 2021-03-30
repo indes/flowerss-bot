@@ -3,16 +3,17 @@ package model
 import (
 	"errors"
 	"fmt"
-	"go.uber.org/zap"
 	"io/ioutil"
 	"net/http"
 	"sort"
 	"strings"
 	"unicode"
 
+	"go.uber.org/zap"
+
 	"github.com/SlyMarbo/rss"
-	"github.com/indes/flowerss-bot/config"
-	"github.com/indes/flowerss-bot/util"
+	"github.com/xos/rssbot/config"
+	"github.com/xos/rssbot/util"
 	"github.com/jinzhu/gorm"
 )
 
@@ -53,7 +54,7 @@ func fetchFunc(url string) (resp *http.Response, err error) {
 	if config.UserAgent != "" {
 		req.Header.Set("User-Agent", config.UserAgent)
 	} else {
-		req.Header.Set("User-Agent", "flowerss/2.0")
+		req.Header.Set("User-Agent", "Nange/2.0")
 	}
 
 	resp, err = util.HttpClient.Do(req)

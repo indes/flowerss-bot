@@ -2,7 +2,7 @@
 
 ## 二进制部署
 
-从 [Releases](https://github.com/indes/flowerss-bot/releases) 页面下载对应的版本解压运行即可。
+从 [Releases](https://github.com/xos/rssbot/releases) 页面下载对应的版本解压运行即可。
 
 ## Docker 部署
 
@@ -13,7 +13,7 @@
 ```bash
 mkdir ~/flowerss &&\
 wget -O ~/flowerss/config.yml \
-    https://raw.githubusercontent.com/indes/flowerss-bot/master/config.yml.sample
+    https://raw.githubusercontent.com/xos/rssbot/master/config.yml.sample
 ```
 
 
@@ -32,15 +32,15 @@ sqlite:
 3.运行
 
 ```shell script
-docker run -d -v ~/flowerss:/root/.flowerss indes/flowerss-bot
+docker run -d -v ~/flowerss:/root/.flowerss xos/rssbot
 ```
 
 ## 源码编译部署
 
 ```shell script
-git clone https://github.com/indes/flowerss-bot && cd flowerss-bot
+git clone https://github.com/xos/rssbot && cd rssbot
 make build
-./flowerss-bot
+./rssbot
 ```
 
 

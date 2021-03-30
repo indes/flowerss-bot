@@ -4,8 +4,8 @@ import (
 	"strings"
 
 	"github.com/SlyMarbo/rss"
-	"github.com/indes/flowerss-bot/config"
-	"github.com/indes/flowerss-bot/tgraph"
+	"github.com/xos/rssbot/config"
+	"github.com/xos/rssbot/tgraph"
 )
 
 // Content feed content

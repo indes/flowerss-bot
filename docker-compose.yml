@@ -1,14 +1,14 @@
 version: '3.4'
 
 services:
-  flowerss-bot:
+  rssbot:
     build:
       network: host
       context: .
       dockerfile: Dockerfile
-    image: flowerss-bot
+    image: rssbot
     volumes:
-      - ./conf:/root/.flowerss-bot
+      - ./conf:/root/.rssbot
     restart: unless-stopped
     deploy:
       replicas: 1

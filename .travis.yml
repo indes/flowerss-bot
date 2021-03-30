@@ -5,7 +5,7 @@ go:
 deploy:
 - provider: script
   skip_cleanup: true
-  script: docker run --rm --privileged -v $PWD:/go/code/indes/flowerss-bot -v /var/run/docker.sock:/var/run/docker.sock -w /go/code/indes/flowerss-bot -e GITHUB_TOKEN=$GITHUB_TOKEN goreleaser/goreleaser:latest-cgo release
+  script: docker run --rm --privileged -v $PWD:/go/code/xos/rssbot -v /var/run/docker.sock:/var/run/docker.sock -w /go/code/xos/rssbot -e GITHUB_TOKEN=$GITHUB_TOKEN goreleaser/goreleaser:latest-cgo release
   on:
     tags: true
     condition: $TRAVIS_OS_NAME = linux
