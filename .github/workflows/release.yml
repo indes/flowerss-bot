@@ -17,7 +17,9 @@ jobs:
       - uses: actions/checkout@v2
 
       - name: Set APP_VERSION env
-        run: echo ::set-env name=APP_VERSION::$(echo ${GITHUB_REF} | rev | cut -d'/' -f 1 | rev )
+        run: |
+        echo "ACTIONS_ALLOW_UNSECURE_COMMANDS=true" >> $GITHUB_ENV
+        echo ::set-env name=APP_VERSION::$(echo ${GITHUB_REF} | rev | cut -d'/' -f 1 | rev )
       - name: Set BUILD_TIME env
         run: echo ::set-env name=BUILD_TIME::$(date)
       - name: Environment Printer

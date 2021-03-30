@@ -6,7 +6,7 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/xos/rssbot)](https://goreportcard.com/report/github.com/xos/rssbot)
 ![GitHub](https://img.shields.io/github/license/xos/rssbot.svg)
 
-[安装与使用文档](https://rssbot.now.sh/)  
+[安装与使用文档](https://flowerss-bot.now.sh/)  
 
 <img src="https://github.com/rssflow/img/raw/master/images/rssflow_demo.gif" width = "300"/>
 
@@ -24,7 +24,7 @@
 
 ## 安装与使用
 
-详细安装与使用方法请查阅项目[使用文档](https://rssbot.now.sh/)。  
+详细安装与使用方法请查阅项目[使用文档](https://flowerss-bot.now.sh/)。  
 
 使用命令：
 
@@ -43,4 +43,4 @@
 /unsuball 取消所有订阅
 /help 帮助
 ```
-详细使用方法请查阅项目[使用文档](https://rssbot.now.sh/#/usage)。 
+详细使用方法请查阅项目[使用文档](https://flowerss-bot.now.sh/#/usage)。 
