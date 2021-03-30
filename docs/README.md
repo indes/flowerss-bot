@@ -1,4 +1,4 @@
-# flowerss bot
+# rssbot bot
 
 > 一个支持应用内即时预览的 Telegram RSS Bot。
 

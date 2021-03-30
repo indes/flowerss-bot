@@ -9,7 +9,7 @@
 
 如果要使用应用内即时预览，必须在配置文件中填写 `telegraph_token` 配置项，Telegraph Token 申请命令如下：  
 ```bash
-curl https://api.telegra.ph/createAccount?short_name=flowerss&author_name=flowerss&author_url=https://github.com/xos/rssbot
+curl https://api.telegra.ph/createAccount?short_name=rssbot&author_name=rssbot&author_url=https://github.com/xos/rssbot
 ```
 
 返回的 JSON 中 access_token 字段值即为 Telegraph Token。

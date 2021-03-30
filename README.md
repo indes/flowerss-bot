@@ -1,4 +1,4 @@
-# flowerss bot
+# rssbot bot
 
 [![Build Status](https://github.com/xos/rssbot/workflows/Release/badge.svg)](https://github.com/xos/rssbot/actions?query=workflow%3ARelease)
 [![Test Status](https://github.com/xos/rssbot/workflows/Test/badge.svg)](https://github.com/xos/rssbot/actions?query=workflow%3ATest)

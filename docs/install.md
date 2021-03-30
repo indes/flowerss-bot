@@ -11,8 +11,8 @@
 
 
 ```bash
-mkdir ~/flowerss &&\
-wget -O ~/flowerss/config.yml \
+mkdir ~/rssbot &&\
+wget -O ~/rssbot/config.yml \
     https://raw.githubusercontent.com/xos/rssbot/master/config.yml.sample
 ```
 
@@ -20,19 +20,19 @@ wget -O ~/flowerss/config.yml \
 2.修改配置文件
 
 ```bash
-vim ~/flowerss/config.yml
+vim ~/rssbot/config.yml
 ```
 
 修改配置文件中sqlite路径（如果使用sqlite作为数据库）：
 ```yaml
 sqlite:
-  path: /root/.flowerss/data.db
+  path: /root/.rssbot/data.db
 ```
 
 3.运行
 
 ```shell script
-docker run -d -v ~/flowerss:/root/.flowerss xos/rssbot
+docker run -d -v ~/rssbot:/root/.rssbot xos/rssbot
 ```
 
 ## 源码编译部署
@@ -69,7 +69,7 @@ mysql:
   port: 3306
   user: user
   password: pwd
-  database: flowerss
+  database: rssbot
 sqlite:
   path: ./data.db
 allowed_users:

@@ -3,11 +3,12 @@ package bot
 import (
 	"bytes"
 	"fmt"
-	"go.uber.org/zap"
 	"html/template"
 	"strconv"
 	"strings"
 	"time"
+
+	"go.uber.org/zap"
 
 	"github.com/xos/rssbot/bot/fsm"
 	"github.com/xos/rssbot/config"
@@ -107,7 +108,7 @@ func toggleCtrlButtons(c *tb.Callback, action string) {
 func startCmdCtr(m *tb.Message) {
 	user, _ := model.FindOrCreateUserByTelegramID(m.Chat.ID)
 	zap.S().Infof("/start user_id: %d telegram_id: %d", user.ID, user.TelegramID)
-	_, _ = B.Send(m.Chat, fmt.Sprintf("你好，欢迎使用flowerss。"))
+	_, _ = B.Send(m.Chat, fmt.Sprintf("你好，欢迎使用rssbot。"))
 }
 
 func subCmdCtr(m *tb.Message) {

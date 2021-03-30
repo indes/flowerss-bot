@@ -16,7 +16,7 @@ var (
 	commit  = "newest"
 	date    = "today"
 
-	ProjectName          string = "flowerss"
+	ProjectName          string = "rssbot"
 	BotToken             string
 	Socks5               string
 	TelegraphToken       []string

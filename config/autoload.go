@@ -25,8 +25,8 @@ func init() {
 		return
 	}
 
-	workDirFlag := flag.String("d", "./", "work directory of flowerss")
-	configFile := flag.String("c", "", "config file of flowerss")
+	workDirFlag := flag.String("d", "./", "work directory of rssbot")
+	configFile := flag.String("c", "", "config file of rssbot")
 	printVersionFlag := flag.Bool("v", false, "prints rssbot version")
 
 	testTpl := flag.Bool("testtpl", false, "test template")

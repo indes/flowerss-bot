@@ -16,7 +16,7 @@ var (
 	authToken   = config.TelegraphToken
 	socks5Proxy = config.Socks5
 	authorUrl   = "https://github.com/xos/rssbot"
-	authorName  = "flowerss"
+	authorName  = "rssbot"
 	verbose     = false
 	//client     *telegraph.Client
 	clientPool []*telegraph.Client

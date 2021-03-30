@@ -136,7 +136,7 @@ func ToOPML(sources []model.Source) (string, error) {
 	O.XMLName.Local = "opml"
 	O.Version = "2.0"
 	O.XMLName.Space = ""
-	O.Head.Title = "subscriptions in flowerss"
+	O.Head.Title = "subscriptions in rssbot"
 	O.Head.DateCreated = time.Now().Format(time.RFC1123)
 	for _, s := range sources {
 		outline := Outline{}
