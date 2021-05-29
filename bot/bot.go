@@ -85,6 +85,8 @@ func setCommands() {
 		{"pauseall", "停止抓取订阅更新"},
 		{"activeall", "开启抓取订阅更新"},
 
+		// {"search", "搜索微信公众号订阅"},
+
 		{"help", "使用帮助"},
 		{"version", "bot版本"},
 	}
@@ -144,6 +146,8 @@ func setHandle() {
 	B.Handle("/pauseall", pauseAllCmdCtr)
 
 	B.Handle("/version", versionCmdCtr)
+
+	// B.Handle("/search", searchCmdCtr)
 
 	B.Handle(tb.OnText, textCtr)
 

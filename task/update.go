@@ -1,10 +1,11 @@
 package task
 
 import (
+	"time"
+
 	"github.com/indes/flowerss-bot/bot"
 	"github.com/indes/flowerss-bot/config"
 	"github.com/indes/flowerss-bot/model"
-	"time"
 )
 
 func Update() {
@@ -28,5 +29,15 @@ func Update() {
 			}
 		}
 		time.Sleep(time.Duration(config.UpdateInterval) * time.Minute)
+	}
+}
+
+func UpdateWechatAccount() {
+	if config.RunMode == config.TestMode {
+		return
+	}
+	for {
+		model.LoadWechatAccounts()
+		time.Sleep(time.Duration(24*60) * time.Minute)
 	}
 }
