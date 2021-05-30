@@ -12,6 +12,7 @@ import (
 func main() {
 	model.InitDB()
 	go task.Update()
+	go task.UpdateWechatAccount()
 	go handleSignal()
 	bot.Start()
 }

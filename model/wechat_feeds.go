@@ -14,10 +14,9 @@ import (
 
 // const sqliteFulltextTable = "CREATE VIRTUAL TABLE feed_fts USING FTS5(name,bizid,description)"
 const (
-	mysqlFulltextIndex  = "CREATE FULLTEXT INDEX fts ON feeds(name, bizid, description)"
 	wechatAccountSource = "https://raw.githubusercontent.com/hellodword/wechat-feeds/main/list.csv"
 	wechatHost          = "mp.weixin.qq.com"
-	wechatSubUrl        = "https://github.com/hellodword/wechat-feeds/raw/feeds/%s.xml"
+	WechatSubUrl        = "https://github.com/hellodword/wechat-feeds/raw/feeds/%s.xml"
 )
 
 type Feed struct {
@@ -36,7 +35,7 @@ func ProcessWechatURL(urlStr string) string {
 			bizs, ok := q["__biz"]
 			if ok {
 				biz := bizs[0]
-				newURL := fmt.Sprintf(wechatSubUrl, biz)
+				newURL := fmt.Sprintf(WechatSubUrl, biz)
 				return newURL
 			}
 		}
@@ -77,7 +76,6 @@ func LoadWechatAccounts() {
 	db.AutoMigrate(&Feed{})
 	db.DropTable(&Feed{})
 	db.CreateTable(&Feed{})
-	db.Exec(mysqlFulltextIndex)
 
 	tx := db.Begin()
 	for _, feed := range feeds {
@@ -86,9 +84,13 @@ func LoadWechatAccounts() {
 	tx.Commit()
 }
 
-func SearchWechatAccounts(keyword string) []Feed {
+func SearchWechatAccounts(keyword string, offset, limit int) ([]Feed, int64) {
 	keyword = "%" + keyword + "%"
-	rows, err := db.Model(&Feed{}).Where("name like ? or bizid like ? or description like ? ", keyword, keyword, keyword).Rows()
+
+	var total int64
+	q := db.Model(&Feed{}).Where("name like ? or bizid like ? or description like ? ", keyword, keyword, keyword)
+	q.Count(&total)
+	rows, err := q.Offset(offset).Limit(limit).Rows()
 	if err != nil {
 		log.Fatal("Unable to search query with keyword: "+keyword+".\t", err)
 	}
@@ -100,5 +102,5 @@ func SearchWechatAccounts(keyword string) []Feed {
 		db.ScanRows(rows, &feed)
 		feeds = append(feeds, feed)
 	}
-	return feeds
+	return feeds, total
 }

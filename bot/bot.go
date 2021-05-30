@@ -1,8 +1,9 @@
 package bot
 
 import (
-	"go.uber.org/zap"
 	"time"
+
+	"go.uber.org/zap"
 
 	"github.com/indes/flowerss-bot/bot/fsm"
 	"github.com/indes/flowerss-bot/config"
@@ -85,7 +86,7 @@ func setCommands() {
 		{"pauseall", "停止抓取订阅更新"},
 		{"activeall", "开启抓取订阅更新"},
 
-		// {"search", "搜索微信公众号订阅"},
+		{"search", "搜索微信公众号订阅"},
 
 		{"help", "使用帮助"},
 		{"version", "bot版本"},
@@ -114,6 +115,10 @@ func setHandle() {
 	B.Handle(&tb.InlineButton{Unique: "unsub_all_cancel_btn"}, unsubAllCancelBtnCtr)
 
 	B.Handle(&tb.InlineButton{Unique: "unsub_feed_item_btn"}, unsubFeedItemBtnCtr)
+
+	B.Handle(&tb.InlineButton{Unique: "sub_wechat_feed_item_btn"}, subWechatFeedItemBtnCtr)
+
+	B.Handle(&tb.InlineButton{Unique: "pagination_btn"}, paginationBtnCtr)
 
 	B.Handle("/start", startCmdCtr)
 
@@ -147,7 +152,7 @@ func setHandle() {
 
 	B.Handle("/version", versionCmdCtr)
 
-	// B.Handle("/search", searchCmdCtr)
+	B.Handle("/search", searchCmdCtr)
 
 	B.Handle(tb.OnText, textCtr)
 
