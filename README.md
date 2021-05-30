@@ -39,3 +39,11 @@
 /help 帮助
 ```
 详细使用方法请查阅项目[使用文档](https://flowerss-bot.now.sh/#/usage)。 
+
+## 订阅微信公众号
+
+- 支持搜索公众号名称，bizid 和描述
+- 可以订阅的公众号，请查看 [wechat-feeds](https://github.com/hellodword/wechat-feeds) 
+
+
+<img src="./docs/_media/wechat-feeds-bot.gif" width = "300"/>
