@@ -108,14 +108,13 @@ func FindOrNewSourceByUrl(url string) (*Source, error) {
 	return &source, nil
 }
 
-func GetSources() []Source {
-	var sources []Source
+func GetSources() (sources []*Source) {
 	db.Find(&sources)
 	return sources
 }
 
-func GetSubscribedNormalSources() []Source {
-	var subscribedSources []Source
+func GetSubscribedNormalSources() []*Source {
+	var subscribedSources []*Source
 	sources := GetSources()
 	for _, source := range sources {
 		if source.IsSubscribed() && source.ErrorCount < config.ErrorThreshold {
@@ -148,11 +147,13 @@ func (s *Source) NeedUpdate() bool {
 	}
 }
 
-func (s *Source) GetNewContents() ([]Content, error) {
+// GetNewContents 获取rss新内容
+func (s *Source) GetNewContents() ([]*Content, error) {
 	zap.S().Debugw("fetch source updates",
 		"source", s,
 	)
-	var newContents []Content
+
+	var newContents []*Content
 	feed, err := rss.FetchByFunc(fetchFunc, s.Link)
 	if err != nil {
 		zap.S().Errorw("unable to fetch update", "error", err, "source", s)
@@ -163,13 +164,13 @@ func (s *Source) GetNewContents() ([]Content, error) {
 	s.EraseErrorCount()
 
 	items := feed.Items
-
 	for _, item := range items {
 		c, isBroad, _ := GenContentAndCheckByFeedItem(s, item)
 		if !isBroad {
-			newContents = append(newContents, *c)
+			newContents = append(newContents, c)
 		}
 	}
+
 	return newContents, nil
 }
 

@@ -96,7 +96,7 @@ func SendError(c *tb.Chat) {
 }
 
 //BroadcastNews send new contents message to subscriber
-func BroadcastNews(source *model.Source, subs []model.Subscribe, contents []model.Content) {
+func BroadcastNews(source *model.Source, subs []*model.Subscribe, contents []*model.Content) {
 	zap.S().Infow("broadcast news",
 		"feed id", source.ID,
 		"feed title", source.Title,

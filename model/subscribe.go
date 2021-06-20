@@ -65,12 +65,12 @@ func GetSubscribeByUserIDAndURL(userID int, url string) (*Subscribe, error) {
 	return &sub, nil
 }
 
-func GetSubscriberBySource(s *Source) []Subscribe {
+func GetSubscriberBySource(s *Source) []*Subscribe {
 	if s == nil {
-		return []Subscribe{}
+		return []*Subscribe{}
 	}
 
-	var subs []Subscribe
+	var subs []*Subscribe
 
 	db.Where("source_id=?", s.ID).Find(&subs)
 	return subs

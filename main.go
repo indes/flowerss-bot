@@ -2,8 +2,8 @@ package main
 
 import (
 	"github.com/indes/flowerss-bot/bot"
+	"github.com/indes/flowerss-bot/internal/task"
 	"github.com/indes/flowerss-bot/model"
-	"github.com/indes/flowerss-bot/task"
 	"os"
 	"os/signal"
 	"syscall"
@@ -11,7 +11,7 @@ import (
 
 func main() {
 	model.InitDB()
-	go task.Update()
+	task.StartTasks()
 	go handleSignal()
 	bot.Start()
 }
@@ -22,6 +22,7 @@ func handleSignal() {
 
 	<-c
 
+	task.StopTasks()
 	model.Disconnect()
 	os.Exit(0)
 }
