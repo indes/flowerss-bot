@@ -2,8 +2,10 @@ package bot
 
 import (
 	"fmt"
-	"go.uber.org/zap"
+	"regexp"
 	"strings"
+
+	"go.uber.org/zap"
 
 	"github.com/indes/flowerss-bot/config"
 	"github.com/indes/flowerss-bot/model"
@@ -307,6 +309,8 @@ func GetMentionFromMessage(m *tb.Message) (mention string) {
 	return
 }
 
+var relaxUrlMatcher = regexp.MustCompile(`^(https?://.*?)($| )`)
+
 // GetURLAndMentionFromMessage get URL and mention from message
 func GetURLAndMentionFromMessage(m *tb.Message) (url string, mention string) {
 	for _, entity := range m.Entities {
@@ -322,6 +326,11 @@ func GetURLAndMentionFromMessage(m *tb.Message) (url string, mention string) {
 				url = m.Text[entity.Offset : entity.Offset+entity.Length]
 			}
 		}
+	}
+
+	var payloadMatching = relaxUrlMatcher.FindStringSubmatch(m.Payload)
+	if url == "" && len(payloadMatching) > 0 && payloadMatching[0] != "" {
+		url = payloadMatching[0]
 	}
 
 	return
