@@ -30,19 +30,23 @@ func NewRssTask() *RssUpdateTask {
 	}
 }
 
+// RssUpdateTask rss更新任务
 type RssUpdateTask struct {
 	observerList []RssUpdateObserver
 	isStop       atomic.Bool
 }
 
+// Name 任务名称
 func (t *RssUpdateTask) Name() string {
 	return "RssUpdateTask"
 }
 
+// Register 注册rss更新订阅者
 func (t *RssUpdateTask) Register(observer RssUpdateObserver) {
 	t.observerList = append(t.observerList, observer)
 }
 
+// Register 注销rss更新订阅者
 func (t *RssUpdateTask) Deregister(removeObserver RssUpdateObserver) {
 	for i, observer := range t.observerList {
 		if observer.id() == removeObserver.id() {
