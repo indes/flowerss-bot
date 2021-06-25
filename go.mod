@@ -13,7 +13,7 @@ require (
 	github.com/magiconair/properties v1.8.5
 	github.com/mattn/go-sqlite3 v1.14.5 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
-	github.com/spf13/viper v1.8.0
+	github.com/spf13/viper v1.8.1
 	github.com/stretchr/testify v1.7.0
 	go.uber.org/atomic v1.8.0
 	go.uber.org/zap v1.17.0
