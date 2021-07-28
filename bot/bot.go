@@ -1,12 +1,12 @@
 package bot
 
 import (
-	"go.uber.org/zap"
 	"time"
 
 	"github.com/indes/flowerss-bot/bot/fsm"
 	"github.com/indes/flowerss-bot/config"
 	"github.com/indes/flowerss-bot/util"
+	"go.uber.org/zap"
 	tb "gopkg.in/tucnak/telebot.v2"
 )
 
@@ -68,25 +68,25 @@ func Start() {
 func setCommands() {
 	// 设置bot命令提示信息
 	commands := []tb.Command{
-		{"start", "开始使用"},
-		{"sub", "订阅rss源"},
-		{"list", "当前订阅的rss源"},
-		{"unsub", "退订rss源"},
-		{"unsuball", "退订所有rss源"},
+		{Text: "start", Description: "开始使用"},
+		{Text: "sub", Description: "订阅rss源"},
+		{Text: "list", Description: "当前订阅的rss源"},
+		{Text: "unsub", Description: "退订rss源"},
+		{Text: "unsuball", Description: "退订所有rss源"},
 
-		{"set", "设置rss订阅"},
-		{"setfeedtag", "设置rss订阅标签"},
-		{"setinterval", "设置rss订阅抓取间隔"},
+		{Text: "set", Description: "设置rss订阅"},
+		{Text: "setfeedtag", Description: "设置rss订阅标签"},
+		{Text: "setinterval", Description: "设置rss订阅抓取间隔"},
 
-		{"export", "导出订阅为opml文件"},
-		{"import", "从opml文件导入订阅"},
+		{Text: "export", Description: "导出订阅为opml文件"},
+		{Text: "import", Description: "从opml文件导入订阅"},
 
-		{"check", "检查我的rss订阅状态"},
-		{"pauseall", "停止抓取订阅更新"},
-		{"activeall", "开启抓取订阅更新"},
+		{Text: "check", Description: "检查我的rss订阅状态"},
+		{Text: "pauseall", Description: "停止抓取订阅更新"},
+		{Text: "activeall", Description: "开启抓取订阅更新"},
 
-		{"help", "使用帮助"},
-		{"version", "bot版本"},
+		{Text: "help", Description: "使用帮助"},
+		{Text: "version", Description: "bot版本"},
 	}
 
 	zap.S().Debugf("set bot command %+v", commands)
