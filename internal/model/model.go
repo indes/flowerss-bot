@@ -1,8 +1,8 @@
 package model
 
 import (
-	"github.com/indes/flowerss-bot/config"
-	"github.com/indes/flowerss-bot/log"
+	"github.com/indes/flowerss-bot/internal/config"
+	"github.com/indes/flowerss-bot/internal/log"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/mysql" //mysql driver
 	_ "github.com/jinzhu/gorm/dialects/sqlite"

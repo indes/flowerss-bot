@@ -3,6 +3,8 @@ package model
 import (
 	"errors"
 	"fmt"
+	"github.com/indes/flowerss-bot/internal/config"
+	"github.com/indes/flowerss-bot/internal/util"
 	"go.uber.org/zap"
 	"io/ioutil"
 	"net/http"
@@ -11,8 +13,6 @@ import (
 	"unicode"
 
 	"github.com/SlyMarbo/rss"
-	"github.com/indes/flowerss-bot/config"
-	"github.com/indes/flowerss-bot/util"
 	"github.com/jinzhu/gorm"
 )
 

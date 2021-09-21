@@ -31,7 +31,7 @@ func FindOrCreateUserByTelegramID(telegramID int64) (*User, error) {
 	return &user, nil
 }
 
-// GetSubSourceMap get user subscribe and feed source
+// GetSubSourceMap get user subscribe and fetcher source
 func (user *User) GetSubSourceMap() (map[Subscribe]Source, error) {
 	m := make(map[Subscribe]Source)
 

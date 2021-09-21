@@ -7,7 +7,7 @@ import (
 const wechatHost = "mp.weixin.qq.com"
 const wechatSubUrl = "https://github.com/hellodword/wechat-feeds/raw/feeds/%s.xml"
 
-// ProcessWechatURL return wechat-feed sub URL. if it's valid wehchat url, else return origin str
+// ProcessWechatURL return wechat-fetcher sub URL. if it's valid wehchat url, else return origin str
 func ProcessWechatURL(urlStr string) string {
 	u, err := url.Parse(urlStr)
 	if err == nil {

@@ -5,15 +5,13 @@ import (
 	"regexp"
 	"strings"
 
+	"github.com/indes/flowerss-bot/internal/config"
+	"github.com/indes/flowerss-bot/internal/model"
 	"go.uber.org/zap"
-
-	"github.com/indes/flowerss-bot/config"
-	"github.com/indes/flowerss-bot/model"
-
 	tb "gopkg.in/tucnak/telebot.v2"
 )
 
-// FeedForChannelRegister register feed for channel
+// FeedForChannelRegister register fetcher for channel
 func FeedForChannelRegister(m *tb.Message, url string, channelMention string) {
 	msg, err := B.Send(m.Chat, "处理中...")
 	channelChat, err := B.ChatByID(channelMention)
@@ -100,8 +98,8 @@ func SendError(c *tb.Chat) {
 //BroadcastNews send new contents message to subscriber
 func BroadcastNews(source *model.Source, subs []*model.Subscribe, contents []*model.Content) {
 	zap.S().Infow("broadcast news",
-		"feed id", source.ID,
-		"feed title", source.Title,
+		"fetcher id", source.ID,
+		"fetcher title", source.Title,
 		"subscriber count", len(subs),
 		"new contents", len(contents),
 	)
@@ -164,7 +162,7 @@ func BroadcastNews(source *model.Source, subs []*model.Subscribe, contents []*mo
 	}
 }
 
-// BroadcastSourceError send feed updata error message to subscribers
+// BroadcastSourceError send fetcher updata error message to subscribers
 func BroadcastSourceError(source *model.Source) {
 	subs := model.GetSubscriberBySource(source)
 	var u tb.User

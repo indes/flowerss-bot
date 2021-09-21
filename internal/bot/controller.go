@@ -3,15 +3,15 @@ package bot
 import (
 	"bytes"
 	"fmt"
+	"github.com/indes/flowerss-bot/internal/bot/fsm"
+	"github.com/indes/flowerss-bot/internal/config"
 	"go.uber.org/zap"
 	"html/template"
 	"strconv"
 	"strings"
 	"time"
 
-	"github.com/indes/flowerss-bot/bot/fsm"
-	"github.com/indes/flowerss-bot/config"
-	"github.com/indes/flowerss-bot/model"
+	"github.com/indes/flowerss-bot/internal/model"
 
 	tb "gopkg.in/tucnak/telebot.v2"
 )
@@ -207,7 +207,7 @@ func listCmdCtr(m *tb.Message) {
 
 	var rspMessage string
 	if mention != "" {
-		// channel feed list
+		// channel fetcher list
 		channelChat, err := B.ChatByID(mention)
 		if err != nil {
 			_, _ = B.Send(m.Chat, "error")
