@@ -1,9 +1,10 @@
 package config
 
 import (
+	"testing"
+
 	"github.com/stretchr/testify/assert"
 	"gopkg.in/tucnak/telebot.v2"
-	"testing"
 )
 
 func TestTplData_Render(t1 *testing.T) {

@@ -3,16 +3,16 @@ package bot
 import (
 	"bytes"
 	"fmt"
-	"github.com/indes/flowerss-bot/internal/bot/fsm"
-	"github.com/indes/flowerss-bot/internal/config"
-	"go.uber.org/zap"
 	"html/template"
 	"strconv"
 	"strings"
 	"time"
 
+	"github.com/indes/flowerss-bot/internal/bot/fsm"
+	"github.com/indes/flowerss-bot/internal/config"
 	"github.com/indes/flowerss-bot/internal/model"
 
+	"go.uber.org/zap"
 	tb "gopkg.in/tucnak/telebot.v2"
 )
 

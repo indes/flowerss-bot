@@ -1,15 +1,14 @@
 package model
 
 import (
+	"time"
+
 	"github.com/indes/flowerss-bot/internal/config"
 	"github.com/indes/flowerss-bot/internal/log"
+
 	"github.com/jinzhu/gorm"
-	_ "github.com/jinzhu/gorm/dialects/mysql" //mysql driver
-	_ "github.com/jinzhu/gorm/dialects/sqlite"
 	"go.uber.org/zap"
 	"moul.io/zapgorm"
-
-	"time"
 )
 
 var db *gorm.DB

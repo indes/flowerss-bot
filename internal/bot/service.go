@@ -7,6 +7,7 @@ import (
 
 	"github.com/indes/flowerss-bot/internal/config"
 	"github.com/indes/flowerss-bot/internal/model"
+
 	"go.uber.org/zap"
 	tb "gopkg.in/tucnak/telebot.v2"
 )

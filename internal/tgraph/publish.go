@@ -2,10 +2,11 @@ package tgraph
 
 import (
 	"fmt"
-	"go.uber.org/zap"
 	"html"
 	"math/rand"
 	"time"
+
+	"go.uber.org/zap"
 )
 
 func PublishHtml(sourceTitle string, title string, rawLink string, htmlContent string) (string, error) {

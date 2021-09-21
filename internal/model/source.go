@@ -3,17 +3,18 @@ package model
 import (
 	"errors"
 	"fmt"
-	"github.com/indes/flowerss-bot/internal/config"
-	"github.com/indes/flowerss-bot/internal/util"
-	"go.uber.org/zap"
 	"io/ioutil"
 	"net/http"
 	"sort"
 	"strings"
 	"unicode"
 
+	"github.com/indes/flowerss-bot/internal/config"
+	"github.com/indes/flowerss-bot/internal/util"
+
 	"github.com/SlyMarbo/rss"
 	"github.com/jinzhu/gorm"
+	"go.uber.org/zap"
 )
 
 type Source struct {

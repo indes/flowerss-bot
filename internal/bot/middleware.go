@@ -2,9 +2,10 @@ package bot
 
 import (
 	"fmt"
-	tb "gopkg.in/tucnak/telebot.v2"
 	"strconv"
 	"strings"
+
+	tb "gopkg.in/tucnak/telebot.v2"
 )
 
 //feedSetAuth 验证订阅设置按钮点击者权限

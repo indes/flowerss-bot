@@ -2,12 +2,12 @@ package config
 
 import (
 	"fmt"
+	"text/template"
+
 	"github.com/spf13/viper"
 	tb "gopkg.in/tucnak/telebot.v2"
-	"text/template"
 )
 
-var ()
 
 type RunType string
 

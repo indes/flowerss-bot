@@ -4,8 +4,6 @@ import (
 	"bytes"
 	"flag"
 	"fmt"
-	"github.com/spf13/viper"
-	tb "gopkg.in/tucnak/telebot.v2"
 	"log"
 	"os"
 	"path"
@@ -15,6 +13,9 @@ import (
 	"strings"
 	"testing"
 	"text/template"
+
+	"github.com/spf13/viper"
+	tb "gopkg.in/tucnak/telebot.v2"
 )
 
 func init() {
@@ -171,10 +172,10 @@ func (t TplData) Render(mode tb.ParseMode) (string, error) {
 
 func (t TplData) replaceHTMLTags(s string) string {
 
-	rStr := strings.ReplaceAll(s,"&", "&amp;")
-	rStr = strings.ReplaceAll(rStr,"\"", "&quot;")
-	rStr = strings.ReplaceAll(rStr,"<", "&lt;")
-	rStr = strings.ReplaceAll(rStr,">", "&gt;")
+	rStr := strings.ReplaceAll(s, "&", "&amp;")
+	rStr = strings.ReplaceAll(rStr, "\"", "&quot;")
+	rStr = strings.ReplaceAll(rStr, "<", "&lt;")
+	rStr = strings.ReplaceAll(rStr, ">", "&gt;")
 
 	return rStr
 }

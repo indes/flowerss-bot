@@ -1,13 +1,15 @@
 package task
 
 import (
+	"sync"
+	"time"
+
 	"github.com/indes/flowerss-bot/internal/bot"
 	"github.com/indes/flowerss-bot/internal/config"
 	"github.com/indes/flowerss-bot/internal/model"
+	
 	"go.uber.org/atomic"
 	"go.uber.org/zap"
-	"sync"
-	"time"
 )
 
 func init() {
