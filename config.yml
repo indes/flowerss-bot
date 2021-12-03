@@ -1,0 +1,13 @@
+
+bot_token: 1921211013:AAGwDXKxO7XUTwdPixERGPD5yXZax5P8pWg
+preview_text: 0
+update_interval: 5
+error_threshold: 100
+mysql:
+  host: us-cdbr-east-04.cleardb.com
+  port: 3306
+  user: b73a22be616d22
+  password: a7defc348e2373f
+  database: heroku_543fe8b341294a8
+allowed_users:
+ - 894575091
