@@ -3,3 +3,4 @@ build:
     web: Dockerfile
 run:
   worker: bash start.sh
+  image: https://github.com/makubex2010/flowerss-bot.git
