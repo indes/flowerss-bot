@@ -1,0 +1,14 @@
+bot_token:
+telegraph_token:
+socks5:
+update_interval: 10
+
+mysql:
+  host:
+  port:
+  user:
+  password:
+  database:
+
+sqlite:
+  path: ./data.db
