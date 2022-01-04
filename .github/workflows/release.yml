@@ -15,13 +15,11 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-
-      - name: Set ACTIONS_ALLOW_UNSECURE_COMMANDS env
-        run: echo "ACTIONS_ALLOW_UNSECURE_COMMANDS=true" >> $GITHUB_ENV
+      
       - name: Set APP_VERSION env
-        run: echo ::set-env name=APP_VERSION::$(echo ${GITHUB_REF} | rev | cut -d'/' -f 1 | rev )
+        run: echo ::`echo -n name=APP_VERSION`::$(echo ${GITHUB_REF} | rev | cut -d'/' -f 1 | rev )
       - name: Set BUILD_TIME env
-        run: echo ::set-env name=BUILD_TIME::$(date)
+        run: echo ::`echo -n name=BUILD_TIME`::$(date)
       - name: Environment Printer
         uses: managedkaos/print-env@v1.0
 
