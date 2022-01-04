@@ -1,4 +1,4 @@
-# flowerss bot
+# 無料案內所RSS-BOT
 
 [![Build Status](https://github.com/indes/flowerss-bot/workflows/Release/badge.svg)](https://github.com/indes/flowerss-bot/actions?query=workflow%3ARelease)
 [![Test Status](https://github.com/indes/flowerss-bot/workflows/Test/badge.svg)](https://github.com/indes/flowerss-bot/actions?query=workflow%3ATest)
@@ -6,36 +6,36 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/indes/flowerss-bot)](https://goreportcard.com/report/github.com/indes/flowerss-bot)
 ![GitHub](https://img.shields.io/github/license/indes/flowerss-bot.svg)
 
-[安装与使用文档](https://flowerss-bot.now.sh/)  
+[安裝與使用文檔](https://github.com/makubex2010/RSS-BOT)  
 
 <img src="https://github.com/rssflow/img/raw/master/images/rssflow_demo.gif" width = "300"/>
 
-## Features
+## 功能
 
-- 常见的 RSS Bot 该有的功能
-- 支持 Telegram 应用内 instant view
-- 支持为 Group 和 Channel 订阅 RSS 消息
-- 丰富的订阅设置
+- 常見的 RSS Bot 該有的功能
+- 支持 Telegram 應用內 instant view
+- 支持為 Group 和 Channel 訂閱 RSS 消息
+- 豐富的訂閱設置
 
-## 安装与使用
+## 安裝與使用
 
-详细安装与使用方法请查阅项目[使用文档](https://flowerss-bot.now.sh/)。  
+詳細安裝與使用方法請查閱項目[使用文檔](https://github.com/makubex2010/RSS-BOT)。
 
 使用命令：
 
 ```
-/sub [url] 订阅（url 为可选）
-/unsub [url] 取消订阅（url 为可选）
-/list 查看当前订阅
-/set 设置订阅
-/check 检查当前订阅
-/setfeedtag [sub id] [tag1] [tag2] 设置订阅标签（最多设置三个Tag，以空格分割）
-/setinterval [interval] [sub id] 设置订阅刷新频率（可设置多个sub id，以空格分割）
-/activeall 开启所有订阅
-/pauseall 暂停所有订阅
-/import 导入 OPML 文件
-/export 导出 OPML 文件
-/unsuball 取消所有订阅
-/help 帮助
+/sub [url] 訂閱（url 為可選）
+/unsub [url] 取消訂閱（url 為可選）
+/list 查看當前訂閱
+/set 設置訂閱
+/check 檢查當前訂閱
+/setfeedtag [sub id] [tag1] [tag2] 設置訂閱標籤（最多設置三個Tag，以空格分割）
+/setinterval [interval] [sub id] 設置訂閱刷新頻率（可設置多個sub id，以空格分割）
+/activeall 開啟所有訂閱
+/pauseall 暫停所有訂閱
+/import 導入 OPML 文件
+/export 導出 OPML 文件
+/unsuball 取消所有訂閱
+/help 幫助
 ```
-详细使用方法请查阅项目[使用文档](https://flowerss-bot.now.sh/#/usage)。 
+詳細使用方法請查閱項目[使用文檔](https://github.com/makubex2010/RSS-BOT)。
