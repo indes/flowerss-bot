@@ -1,9 +1,9 @@
 package tgraph
 
 import (
-	"github.com/makubex2010/flowerss-bot/internal/config"
+	"github.com/indes/flowerss-bot/internal/config"
 
-	"github.com/makubex2010/telegraph-go"
+	"github.com/indes/telegraph-go"
 	"go.uber.org/zap"
 )
 
@@ -15,7 +15,7 @@ const (
 var (
 	authToken   = config.TelegraphToken
 	socks5Proxy = config.Socks5
-	authorUrl   = "https://github.com/makubex2010/flowerss-bot"
+	authorUrl   = "https://github.com/indes/flowerss-bot"
 	authorName  = "flowerss"
 	verbose     = false
 	//client     *telegraph.Client
