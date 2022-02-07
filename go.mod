@@ -16,7 +16,7 @@ require (
 	github.com/spf13/viper v1.9.0
 	github.com/stretchr/testify v1.7.0
 	go.uber.org/atomic v1.9.0
-	go.uber.org/zap v1.19.1
+	go.uber.org/zap v1.21.0
 	golang.org/x/net v0.0.0-20210503060351-7fd8e65b6420
 	gopkg.in/tucnak/telebot.v2 v2.4.1
 	moul.io/zapgorm v1.1.3
