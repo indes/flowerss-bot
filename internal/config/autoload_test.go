@@ -4,7 +4,6 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"gopkg.in/tucnak/telebot.v2"
 )
 
 func TestTplData_Render(t1 *testing.T) {

@@ -4,10 +4,9 @@ import (
 	"sync"
 	"time"
 
-	"github.com/indes/flowerss-bot/internal/bot"
 	"github.com/indes/flowerss-bot/internal/config"
 	"github.com/indes/flowerss-bot/internal/model"
-	
+
 	"go.uber.org/atomic"
 	"go.uber.org/zap"
 )
@@ -137,12 +136,12 @@ type telegramBotRssUpdateObserver struct {
 func (o *telegramBotRssUpdateObserver) update(
 	source *model.Source, newContents []*model.Content, subscribes []*model.Subscribe) {
 	zap.S().Debugf("%v receiving [%d]%v update", o.id(), source.ID, source.Title)
-	bot.BroadcastNews(source, subscribes, newContents)
+	//bot.BroadcastNews(source, subscribes, newContents)
 }
 
 func (o *telegramBotRssUpdateObserver) errorUpdate(source *model.Source) {
 	zap.S().Debugf("%v receiving [%d]%v error update", o.id(), source.ID, source.Title)
-	bot.BroadcastSourceError(source)
+	//bot.BroadcastSourceError(source)
 }
 
 func (o *telegramBotRssUpdateObserver) id() string {
