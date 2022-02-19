@@ -98,77 +98,7 @@ var (
 //
 //}
 //
-//func listCmdCtr(m *tb.Message) {
-//	mention := GetMentionFromMessage(m)
-//
-//	var rspMessage string
-//	if mention != "" {
-//		// channel fetcher list
-//		channelChat, err := B.ChatByID(mention)
-//		if err != nil {
-//			_, _ = B.Send(m.Chat, "error")
-//			return
-//		}
-//
-//		if !checkPermitOfChat(int64(m.Sender.ID), channelChat) {
-//			B.Send(m.Chat, fmt.Sprintf("非频道管理员无法执行此操作"))
-//			return
-//		}
-//
-//		user, err := model.FindOrCreateUserByTelegramID(channelChat.ID)
-//		if err != nil {
-//			B.Send(m.Chat, fmt.Sprintf("内部错误 list@1"))
-//			return
-//		}
-//
-//		subSourceMap, err := user.GetSubSourceMap()
-//		if err != nil {
-//			B.Send(m.Chat, fmt.Sprintf("内部错误 list@2"))
-//			return
-//		}
-//
-//		sources, _ := model.GetSourcesByUserID(channelChat.ID)
-//		rspMessage = fmt.Sprintf("频道 [%s](https://t.me/%s) 订阅列表：\n", channelChat.Title, channelChat.Username)
-//		if len(sources) == 0 {
-//			rspMessage = fmt.Sprintf("频道 [%s](https://t.me/%s) 订阅列表为空", channelChat.Title, channelChat.Username)
-//		} else {
-//			for sub, source := range subSourceMap {
-//				rspMessage = rspMessage + fmt.Sprintf("[[%d]] [%s](%s)\n", sub.ID, source.Title, source.Link)
-//			}
-//		}
-//	} else {
-//		// private chat or group
-//		if m.Chat.Type != tb.ChatPrivate && !checkPermitOfChat(int64(m.Sender.ID), m.Chat) {
-//			// 无权限
-//			return
-//		}
-//
-//		user, err := model.FindOrCreateUserByTelegramID(m.Chat.ID)
-//		if err != nil {
-//			B.Send(m.Chat, fmt.Sprintf("内部错误 list@1"))
-//			return
-//		}
-//
-//		subSourceMap, err := user.GetSubSourceMap()
-//		if err != nil {
-//			B.Send(m.Chat, fmt.Sprintf("内部错误 list@2"))
-//			return
-//		}
-//
-//		rspMessage = "当前订阅列表：\n"
-//		if len(subSourceMap) == 0 {
-//			rspMessage = "订阅列表为空"
-//		} else {
-//			for sub, source := range subSourceMap {
-//				rspMessage = rspMessage + fmt.Sprintf("[[%d]] [%s](%s)\n", sub.ID, source.Title, source.Link)
-//			}
-//		}
-//	}
-//	_, _ = B.Send(m.Chat, rspMessage, &tb.SendOptions{
-//		DisableWebPagePreview: true,
-//		ParseMode:             tb.ModeMarkdown,
-//	})
-//}
+
 //
 //func checkCmdCtr(m *tb.Message) {
 //	mention := GetMentionFromMessage(m)
