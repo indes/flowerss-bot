@@ -110,6 +110,7 @@ var (
 		&handler.Version{},
 		&handler.Ping{},
 		&handler.Help{},
+		&handler.Export{},
 	}
 )
 
