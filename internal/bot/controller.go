@@ -92,28 +92,7 @@ var (
 //
 //}
 //
-//func subCmdCtr(m *tb.Message) {
-//
-//	url, mention := GetURLAndMentionFromMessage(m)
-//
-//	if mention == "" {
-//		if url != "" {
-//			registFeed(m.Chat, url)
-//		} else {
-//			_, err := B.Send(m.Chat, "请回复RSS URL", &tb.ReplyMarkup{ForceReply: true})
-//			if err == nil {
-//				UserState[m.Chat.ID] = fsm.Sub
-//			}
-//		}
-//	} else {
-//		if url != "" {
-//			FeedForChannelRegister(m, url, mention)
-//		} else {
-//			_, _ = B.Send(m.Chat, "频道订阅请使用' /sub @ChannelID URL ' 命令")
-//		}
-//	}
-//
-//}
+
 //
 //func exportCmdCtr(m *tb.Message) {
 //

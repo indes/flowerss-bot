@@ -111,6 +111,7 @@ var (
 		&handler.Ping{},
 		&handler.Help{},
 		&handler.Export{},
+		&handler.AddSubscription{},
 	}
 )
 
@@ -133,10 +134,8 @@ func setHandle() {
 	//B.Handle(&tb.InlineButton{Unique: "unsub_all_cancel_btn"}, unsubAllCancelBtnCtr)
 	//
 	//B.Handle(&tb.InlineButton{Unique: "unsub_feed_item_btn"}, unsubFeedItemBtnCtr)
-	//
 
 	//B.Handle("/sub", subCmdCtr)
-	//
 	//B.Handle("/list", listCmdCtr)
 	//
 	//B.Handle("/set", setCmdCtr)

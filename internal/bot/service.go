@@ -1,93 +1,10 @@
 package bot
 
 import (
-	"fmt"
 	"github.com/indes/flowerss-bot/internal/config"
-	"github.com/indes/flowerss-bot/internal/model"
-	"regexp"
-
 	"go.uber.org/zap"
 	tb "gopkg.in/telebot.v3"
 )
-
-//// FeedForChannelRegister register fetcher for channel
-//func FeedForChannelRegister(m *tb.Message, url string, channelMention string) {
-//	msg, err := B.Send(m.Chat, "处理中...")
-//	channelChat, err := B.ChatByID(channelMention)
-//	adminList, err := B.AdminsOf(channelChat)
-//
-//	senderIsAdmin := false
-//	botIsAdmin := false
-//	for _, admin := range adminList {
-//		if m.Sender.ID == admin.User.ID {
-//			senderIsAdmin = true
-//		}
-//		if B.Me.ID == admin.User.ID {
-//			botIsAdmin = true
-//		}
-//	}
-//
-//	if !botIsAdmin {
-//		msg, _ = B.Edit(msg, fmt.Sprintf("请先将bot添加为频道管理员"))
-//		return
-//	}
-//
-//	if !senderIsAdmin {
-//		msg, _ = B.Edit(msg, fmt.Sprintf("非频道管理员无法执行此操作"))
-//		return
-//	}
-//
-//	source, err := model.FindOrNewSourceByUrl(url)
-//
-//	if err != nil {
-//		msg, _ = B.Edit(msg, fmt.Sprintf("%s，订阅失败", err))
-//		return
-//	}
-//
-//	err = model.RegistFeed(channelChat.ID, source.ID)
-//	zap.S().Infof("%d for %d subscribe [%d]%s %s", m.Chat.ID, channelChat.ID, source.ID, source.Title, source.Link)
-//
-//	if err == nil {
-//		newText := fmt.Sprintf(
-//			"频道 [%s](https://t.me/%s) 订阅 [%s](%s) 成功",
-//			channelChat.Title,
-//			channelChat.Username,
-//			source.Title,
-//			source.Link,
-//		)
-//		_, err = B.Edit(msg, newText,
-//			&tb.SendOptions{
-//				DisableWebPagePreview: true,
-//				ParseMode:             tb.ModeMarkdown,
-//			})
-//	} else {
-//		_, _ = B.Edit(msg, "订阅失败")
-//	}
-//}
-
-func registFeed(chat *tb.Chat, url string) {
-	msg, err := B.Send(chat, "处理中...")
-	url = model.ProcessWechatURL(url)
-	source, err := model.FindOrNewSourceByUrl(url)
-
-	if err != nil {
-		msg, _ = B.Edit(msg, fmt.Sprintf("%s，订阅失败", err))
-		return
-	}
-
-	err = model.RegistFeed(chat.ID, source.ID)
-	zap.S().Infof("%d subscribe [%d]%s %s", chat.ID, source.ID, source.Title, source.Link)
-
-	if err == nil {
-		_, _ = B.Edit(msg, fmt.Sprintf("[%s](%s) 订阅成功", source.Title, source.Link),
-			&tb.SendOptions{
-				DisableWebPagePreview: true,
-				ParseMode:             tb.ModeMarkdown,
-			})
-	} else {
-		_, _ = B.Edit(msg, "订阅失败")
-	}
-}
 
 //SendError send error user
 func SendError(c *tb.Chat) {
@@ -304,32 +221,5 @@ func GetMentionFromMessage(m *tb.Message) (mention string) {
 			}
 		}
 	}
-	return
-}
-
-var relaxUrlMatcher = regexp.MustCompile(`^(https?://.*?)($| )`)
-
-// GetURLAndMentionFromMessage get URL and mention from message
-func GetURLAndMentionFromMessage(m *tb.Message) (url string, mention string) {
-	for _, entity := range m.Entities {
-		if entity.Type == tb.EntityMention {
-			if mention == "" {
-				mention = m.Text[entity.Offset : entity.Offset+entity.Length]
-
-			}
-		}
-
-		if entity.Type == tb.EntityURL {
-			if url == "" {
-				url = m.Text[entity.Offset : entity.Offset+entity.Length]
-			}
-		}
-	}
-
-	var payloadMatching = relaxUrlMatcher.FindStringSubmatch(m.Payload)
-	if url == "" && len(payloadMatching) > 0 && payloadMatching[0] != "" {
-		url = payloadMatching[0]
-	}
-
 	return
 }
