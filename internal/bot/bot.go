@@ -45,12 +45,12 @@ func init() {
 	var err error
 
 	B, err = tb.NewBot(tb.Settings{
-		URL:    config.TelegramEndpoint,
-		Token:  config.BotToken,
-		Poller: spamProtected,
-		Client: util.HttpClient,
+		URL:     config.TelegramEndpoint,
+		Token:   config.BotToken,
+		Poller:  spamProtected,
+		Client:  util.HttpClient,
+		Verbose: true,
 	})
-
 	if err != nil {
 		zap.S().Fatal(err)
 		return
@@ -93,6 +93,9 @@ func setCommands() {
 
 	var commands []tb.Command
 	for _, h := range commandHandlers {
+		if h.Description() == "" {
+			continue
+		}
 		commands = append(commands, tb.Command{Text: h.Command(), Description: h.Description()})
 	}
 	zap.S().Debugf("set bot command %+v", commands)
@@ -105,6 +108,8 @@ var (
 	commandHandlers = []handler.CommandHandler{
 		&handler.Start{},
 		&handler.Version{},
+		&handler.Ping{},
+		&handler.Help{},
 	}
 )
 
@@ -128,10 +133,7 @@ func setHandle() {
 	//
 	//B.Handle(&tb.InlineButton{Unique: "unsub_feed_item_btn"}, unsubFeedItemBtnCtr)
 	//
-	//startHandler := &handler.Start{}
-	//B.Handle("/start", startHandler.Handle)
-	//B.Handle("/export", exportCmdCtr)
-	//
+
 	//B.Handle("/sub", subCmdCtr)
 	//
 	//B.Handle("/list", listCmdCtr)
@@ -141,11 +143,7 @@ func setHandle() {
 	//B.Handle("/unsub", unsubCmdCtr)
 	//
 	//B.Handle("/unsuball", unsubAllCmdCtr)
-	//
-	//B.Handle("/ping", pingCmdCtr)
-	//
-	//B.Handle("/help", helpCmdCtr)
-	//
+
 	//B.Handle("/import", importCmdCtr)
 	//
 	//B.Handle("/setfeedtag", setFeedTagCmdCtr)
