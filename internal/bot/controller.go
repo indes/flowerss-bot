@@ -699,36 +699,6 @@ var (
 //	_, _ = B.Edit(c.Message, msg)
 //}
 //
-//func pingCmdCtr(m *tb.Message) {
-//	_, _ = B.Send(m.Chat, "pong")
-//	zap.S().Debugw(
-//		"pong",
-//		"telegram msg", m,
-//	)
-//}
-//
-//func helpCmdCtr(m *tb.Message) {
-//	message := `
-//命令：
-///sub 订阅源
-///unsub  取消订阅
-///list 查看当前订阅源
-///set 设置订阅
-///check 检查当前订阅
-///setfeedtag 设置订阅标签
-///setinterval 设置订阅刷新频率
-///activeall 开启所有订阅
-///pauseall 暂停所有订阅
-///help 帮助
-///import 导入 OPML 文件
-///export 导出 OPML 文件
-///unsuball 取消所有订阅
-//详细使用方法请看：https://github.com/indes/flowerss-bot
-//`
-//
-//	_, _ = B.Send(m.Chat, message)
-//}
-//
 
 //
 //func importCmdCtr(m *tb.Message) {
