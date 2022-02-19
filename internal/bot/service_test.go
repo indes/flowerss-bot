@@ -3,7 +3,7 @@ package bot
 import (
 	"github.com/indes/flowerss-bot/internal/config"
 	"github.com/magiconair/properties/assert"
-	tb "gopkg.in/tucnak/telebot.v2"
+	tb "gopkg.in/telebot.v3"
 	"testing"
 )
 

@@ -1,4 +1,4 @@
-package bot
+package opml
 
 import (
 	"crypto/tls"
@@ -130,7 +130,7 @@ func (o OPML) XML() (string, error) {
 	return xml.Header + string(b), err
 }
 
-// ToOPML dump OPML to opml file
+// ToOPML dump sources to opml file
 func ToOPML(sources []model.Source) (string, error) {
 	O := OPML{}
 	O.XMLName.Local = "opml"

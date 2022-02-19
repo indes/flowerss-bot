@@ -5,9 +5,8 @@ import (
 	"text/template"
 
 	"github.com/spf13/viper"
-	tb "gopkg.in/tucnak/telebot.v2"
+	tb "gopkg.in/telebot.v3"
 )
-
 
 type RunType string
 
