@@ -42,11 +42,3 @@ package bot
 //	return checkPermitOfChat(userID, chat)
 //}
 //
-//func checkPermitOfChat(userID int64, chat *tb.Chat) bool {
-//	if (chat.Type == tb.ChatGroup || chat.Type == tb.ChatSuperGroup) &&
-//		!userIsAdminOfGroup(int(userID), chat) {
-//		// check admin
-//		return false
-//	}
-//	return true
-//}
