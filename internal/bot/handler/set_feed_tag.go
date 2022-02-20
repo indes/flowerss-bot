@@ -7,7 +7,7 @@ import (
 	"github.com/indes/flowerss-bot/internal/bot/message"
 	"github.com/indes/flowerss-bot/internal/bot/session"
 	"github.com/indes/flowerss-bot/internal/model"
-	
+
 	tb "gopkg.in/telebot.v3"
 )
 

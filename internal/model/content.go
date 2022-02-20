@@ -5,7 +5,7 @@ import (
 
 	"github.com/indes/flowerss-bot/internal/config"
 	"github.com/indes/flowerss-bot/internal/tgraph"
-	
+
 	"github.com/SlyMarbo/rss"
 )
 

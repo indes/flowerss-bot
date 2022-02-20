@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/url"
 )
+
 const wechatHost = "mp.weixin.qq.com"
 const wechatSubUrl = "https://github.com/hellodword/wechat-feeds/raw/feeds/%s.xml"
 
@@ -11,7 +12,7 @@ const wechatSubUrl = "https://github.com/hellodword/wechat-feeds/raw/feeds/%s.xm
 func ProcessWechatURL(urlStr string) string {
 	u, err := url.Parse(urlStr)
 	if err == nil {
-		if (u.Host == "mp.weixin.qq.com") {
+		if u.Host == "mp.weixin.qq.com" {
 			q := u.Query()
 			bizs, ok := q["__biz"]
 			if ok {
