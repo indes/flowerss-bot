@@ -19,5 +19,5 @@ require (
 	go.uber.org/zap v1.21.0
 	golang.org/x/net v0.0.0-20210813160813-60bc85c4be6d
 	gopkg.in/telebot.v3 v3.0.0
-	moul.io/zapgorm v1.1.3
+	moul.io/zapgorm v1.1.5
 )
