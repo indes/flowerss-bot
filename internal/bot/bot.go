@@ -145,9 +145,7 @@ func setHandle() {
 	//B.Handle("/setfeedtag", setFeedTagCmdCtr)
 	//
 	//B.Handle("/setinterval", setIntervalCmdCtr)
-	//
-	//B.Handle("/check", checkCmdCtr)
-	//
+
 	//B.Handle("/activeall", activeAllCmdCtr)
 	//
 	//B.Handle("/pauseall", pauseAllCmdCtr)
