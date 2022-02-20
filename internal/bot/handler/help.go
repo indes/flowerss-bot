@@ -35,3 +35,7 @@ func (h *Help) Handle(ctx tb.Context) error {
 	`
 	return ctx.Send(message)
 }
+
+func (h *Help) Middlewares() []tb.MiddlewareFunc {
+	return nil
+}

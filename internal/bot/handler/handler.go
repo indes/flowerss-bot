@@ -9,4 +9,6 @@ type CommandHandler interface {
 	Description() string
 	// Handle function
 	Handle(ctx tb.Context) error
+
+	Middlewares() []tb.MiddlewareFunc
 }

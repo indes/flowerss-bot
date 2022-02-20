@@ -136,3 +136,7 @@ func (r *RemoveSubscription) Handle(ctx tb.Context) error {
 	}
 	return r.removeForChat(ctx)
 }
+
+func (l *RemoveSubscription) Middlewares() []tb.MiddlewareFunc {
+	return nil
+}

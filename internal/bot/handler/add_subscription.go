@@ -125,3 +125,7 @@ func (a *AddSubscription) Handle(ctx tb.Context) error {
 	}
 	return a.addSubscriptionForChat(ctx)
 }
+
+func (a *AddSubscription) Middlewares() []tb.MiddlewareFunc {
+	return nil
+}

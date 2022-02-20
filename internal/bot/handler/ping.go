@@ -24,3 +24,7 @@ func (p *Ping) Description() string {
 func (p *Ping) Handle(ctx tb.Context) error {
 	return ctx.Send("pong")
 }
+
+func (p *Ping) Middlewares() []tb.MiddlewareFunc {
+	return nil
+}

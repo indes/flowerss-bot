@@ -19,3 +19,7 @@ func (c *Version) Description() string {
 func (c *Version) Handle(ctx tb.Context) error {
 	return ctx.Send(config.AppVersionInfo())
 }
+
+func (c *Version) Middlewares() []tb.MiddlewareFunc {
+	return nil
+}
