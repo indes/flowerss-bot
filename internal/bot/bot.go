@@ -53,7 +53,7 @@ func init() {
 			Token:   config.BotToken,
 			Poller:  spamProtected,
 			Client:  util.HttpClient,
-			Verbose: true,
+			Verbose: false,
 		},
 	)
 	B.Use(middleware.PreLoadMentionChat(), middleware.IsChatAdmin())

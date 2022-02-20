@@ -30,20 +30,3 @@ func feedSetAuth(c *tb.Callback) bool {
 	}
 	return true
 }
-
-//func checkPermit(userID int64, chatID int64) bool {
-//	// 个人用户
-//	if userID == chatID {
-//		return true
-//	}
-//
-//	// 群组或频道
-//	chat, err := B.ChatByID(fmt.Sprintf("%d", chatID))
-//
-//	if err != nil {
-//		return false
-//	}
-//
-//	return checkPermitOfChat(userID, chat)
-//}
-//

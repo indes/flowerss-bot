@@ -165,23 +165,6 @@ func isUserAllowed(upd *tb.Update) bool {
 	return false
 }
 
-//// UserIsAdminChannel check if the user is the administrator of channel
-//func UserIsAdminChannel(userID int64, channelChat *tb.Chat) (isAdmin bool) {
-//	adminList, err := B.AdminsOf(channelChat)
-//	isAdmin = false
-//
-//	if err != nil {
-//		return
-//	}
-//
-//	for _, admin := range adminList {
-//		if userID == admin.User.ID {
-//			isAdmin = true
-//		}
-//	}
-//	return
-//}
-
 // HasAdminType check if the message is sent in the group/channel environment
 func HasAdminType(t tb.ChatType) bool {
 	hasAdmin := []tb.ChatType{tb.ChatGroup, tb.ChatSuperGroup, tb.ChatChannel, tb.ChatChannelPrivate}
