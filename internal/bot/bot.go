@@ -86,6 +86,7 @@ func setCommands() {
 		handler.NewActiveAll(),
 		handler.NewSetFeedTag(),
 		handler.NewSetUpdateInterval(),
+		handler.NewSet(B),
 	}
 
 	for _, h := range commandHandlers {
@@ -145,6 +146,5 @@ func setHandle() {
 	//B.Handle(&tb.InlineButton{Unique: "unsub_all_cancel_btn"}, unsubAllCancelBtnCtr)
 	//B.Handle(&tb.InlineButton{Unique: "unsub_feed_item_btn"}, unsubFeedItemBtnCtr)
 
-	//B.Handle("/set", setCmdCtr)
 	//B.Handle(tb.OnText, textCtr)
 }
