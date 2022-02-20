@@ -76,9 +76,11 @@ func setCommands() {
 		handler.NewRemoveSubscription(B),
 		&handler.Help{},
 		&handler.Export{},
+		&handler.Import{},
 		&handler.AddSubscription{},
 		&handler.ListSubscription{},
 		&handler.RemoveAllSubscription{},
+		handler.NewOnDocument(B),
 	}
 
 	for _, h := range commandHandlers {
@@ -131,23 +133,16 @@ func setCommands() {
 
 func setHandle() {
 	//B.Handle(&tb.InlineButton{Unique: "set_feed_item_btn"}, setFeedItemBtnCtr)
-	//
 	//B.Handle(&tb.InlineButton{Unique: "set_toggle_notice_btn"}, setToggleNoticeBtnCtr)
-	//
 	//B.Handle(&tb.InlineButton{Unique: "set_toggle_telegraph_btn"}, setToggleTelegraphBtnCtr)
 	//B.Handle(&tb.InlineButton{Unique: "set_toggle_update_btn"}, setToggleUpdateBtnCtr)
-	//
 	//B.Handle(&tb.InlineButton{Unique: "set_set_sub_tag_btn"}, setSubTagBtnCtr)
-	//
-
 	//B.Handle(&tb.InlineButton{Unique: "unsub_all_cancel_btn"}, unsubAllCancelBtnCtr)
 	//
 	//B.Handle(&tb.InlineButton{Unique: "unsub_feed_item_btn"}, unsubFeedItemBtnCtr)
 
 	//B.Handle("/set", setCmdCtr)
 
-	//B.Handle("/import", importCmdCtr)
-	//
 	//B.Handle("/setfeedtag", setFeedTagCmdCtr)
 	//
 	//B.Handle("/setinterval", setIntervalCmdCtr)
@@ -157,6 +152,4 @@ func setHandle() {
 	//B.Handle("/pauseall", pauseAllCmdCtr)
 
 	//B.Handle(tb.OnText, textCtr)
-	//
-	//B.Handle(tb.OnDocument, docCtr)
 }
