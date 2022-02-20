@@ -18,7 +18,7 @@ func MentionFromMessage(m *tb.Message) string {
 	}
 
 	for _, entity := range m.CaptionEntities {
-		if entity.Type == tb.EntityMention {
+		if entity.Type != tb.EntityMention {
 			continue
 		}
 		return m.Caption[entity.Offset : entity.Offset+entity.Length]

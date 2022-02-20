@@ -4,6 +4,7 @@ import (
 	"crypto/tls"
 	"encoding/xml"
 	"errors"
+	"io"
 	"io/ioutil"
 	"net/http"
 	"net/url"
@@ -70,6 +71,19 @@ func NewOPML(b []byte) (*OPML, error) {
 	}
 
 	return &root, nil
+}
+
+func ReadOPML(r io.Reader) (*OPML, error) {
+	body, err := io.ReadAll(r)
+	if err != nil {
+		return nil, err
+	}
+
+	o, err := NewOPML(body)
+	if err != nil {
+		return nil, errors.New("parse opml file error")
+	}
+	return o, nil
 }
 
 // GetOPMLByURL get OPML form url
