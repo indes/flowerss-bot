@@ -141,9 +141,7 @@ func GetSubByUserIDAndURL(userID int64, url string) (*Subscribe, error) {
 
 func GetSubsByUserID(userID int64) ([]Subscribe, error) {
 	var subs []Subscribe
-
 	db.Where("user_id=?", userID).Find(&subs)
-
 	return subs, nil
 }
 

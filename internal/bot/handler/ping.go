@@ -1,8 +1,16 @@
 package handler
 
-import tb "gopkg.in/telebot.v3"
+import (
+	tb "gopkg.in/telebot.v3"
+)
 
 type Ping struct {
+	bot *tb.Bot
+}
+
+// NewPing new ping cmd handler
+func NewPing(bot *tb.Bot) *Ping {
+	return &Ping{bot: bot}
 }
 
 func (p *Ping) Command() string {
