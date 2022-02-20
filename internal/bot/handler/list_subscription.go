@@ -89,3 +89,7 @@ func (l *ListSubscription) Handle(ctx tb.Context) error {
 	}
 	return l.listChatSubscription(ctx)
 }
+
+func (l *ListSubscription) Middlewares() []tb.MiddlewareFunc {
+	return nil
+}

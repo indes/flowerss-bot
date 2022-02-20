@@ -99,3 +99,7 @@ func (e *Export) Handle(ctx tb.Context) error {
 	}
 	return nil
 }
+
+func (e *Export) Middlewares() []tb.MiddlewareFunc {
+	return nil
+}

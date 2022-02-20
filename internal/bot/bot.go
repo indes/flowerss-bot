@@ -1,10 +1,11 @@
 package bot
 
 import (
-	"github.com/indes/flowerss-bot/internal/bot/handler"
 	"time"
 
 	"github.com/indes/flowerss-bot/internal/bot/fsm"
+	"github.com/indes/flowerss-bot/internal/bot/handler"
+	"github.com/indes/flowerss-bot/internal/bot/middleware"
 	"github.com/indes/flowerss-bot/internal/config"
 	"github.com/indes/flowerss-bot/internal/util"
 
@@ -51,6 +52,7 @@ func init() {
 		Client:  util.HttpClient,
 		Verbose: true,
 	})
+	B.Use(middleware.PreLoadMentionChat())
 	if err != nil {
 		zap.S().Fatal(err)
 		return
@@ -82,7 +84,6 @@ func setCommands() {
 	for _, h := range commandHandlers {
 		B.Handle(h.Command(), h.Handle)
 	}
-
 	// 设置bot命令提示信息
 	//commands := []tb.Command{
 	//	{Text: "start", Description: "开始使用"},

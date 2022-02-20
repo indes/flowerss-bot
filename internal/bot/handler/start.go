@@ -24,3 +24,7 @@ func (s *Start) Handle(ctx tb.Context) error {
 	zap.S().Infof("/start user_id: %d telegram_id: %d", user.ID, user.TelegramID)
 	return ctx.Send(fmt.Sprintf("你好，欢迎使用flowerss。"))
 }
+
+func (s *Start) Middlewares() []tb.MiddlewareFunc {
+	return nil
+}
