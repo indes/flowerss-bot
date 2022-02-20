@@ -146,6 +146,5 @@ func setHandle() {
 	//B.Handle("/set", setCmdCtr)
 	//B.Handle("/setfeedtag", setFeedTagCmdCtr)
 	//B.Handle("/setinterval", setIntervalCmdCtr)
-	//B.Handle("/activeall", activeAllCmdCtr)
 	//B.Handle(tb.OnText, textCtr)
 }
