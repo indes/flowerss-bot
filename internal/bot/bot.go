@@ -83,6 +83,7 @@ func setCommands() {
 		&handler.RemoveAllSubscription{},
 		handler.NewOnDocument(B),
 		handler.NewPauseAll(),
+		handler.NewActiveAll(),
 	}
 
 	for _, h := range commandHandlers {
