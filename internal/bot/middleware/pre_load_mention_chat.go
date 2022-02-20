@@ -18,7 +18,7 @@ func PreLoadMentionChat() tb.MiddlewareFunc {
 					zap.S().Errorf("pre load mention %s chat failed, %v", mention, err)
 					return next(c)
 				}
-				c.Set(session.MentionChat.String(), chat)
+				c.Set(session.StoreKeyMentionChat.String(), chat)
 			}
 			return next(c)
 		}
