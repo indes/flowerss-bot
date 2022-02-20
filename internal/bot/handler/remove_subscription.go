@@ -2,11 +2,13 @@ package handler
 
 import (
 	"fmt"
+
+	"go.uber.org/zap"
+	tb "gopkg.in/telebot.v3"
+
 	"github.com/indes/flowerss-bot/internal/bot/chat"
 	"github.com/indes/flowerss-bot/internal/bot/message"
 	"github.com/indes/flowerss-bot/internal/model"
-	"go.uber.org/zap"
-	tb "gopkg.in/telebot.v3"
 )
 
 type RemoveSubscription struct {
@@ -63,8 +65,10 @@ func (r *RemoveSubscription) removeForChannel(ctx tb.Context, channelName string
 		return ctx.Reply("退订失败")
 	}
 	return ctx.Send(
-		fmt.Sprintf("频道 [%s](https://t.me/%s) 退订 [%s](%s) 成功",
-			channelChat.Title, channelChat.Username, source.Title, source.Link),
+		fmt.Sprintf(
+			"频道 [%s](https://t.me/%s) 退订 [%s](%s) 成功",
+			channelChat.Title, channelChat.Username, source.Title, source.Link,
+		),
 		&tb.SendOptions{DisableWebPagePreview: true, ParseMode: tb.ModeMarkdown},
 	)
 }
@@ -72,7 +76,32 @@ func (r *RemoveSubscription) removeForChannel(ctx tb.Context, channelName string
 func (r *RemoveSubscription) removeForChat(ctx tb.Context) error {
 	sourceURL := message.URLFromMessage(ctx.Message())
 	if sourceURL == "" {
-		return ctx.Reply("退订请使用' /unsub URL' 命令")
+		subs, err := model.GetSubsByUserID(ctx.Chat().ID)
+		if err != nil {
+			return ctx.Reply("获取订阅列表失败")
+		}
+
+		if len(subs) == 0 {
+			return ctx.Reply("没有订阅")
+		}
+
+		unsubFeedItemBtns := [][]tb.InlineButton{}
+		for _, sub := range subs {
+			source, err := model.GetSourceById(sub.SourceID)
+			if err != nil {
+				return ctx.Reply("获取订阅列表失败")
+			}
+			unsubFeedItemBtns = append(
+				unsubFeedItemBtns, []tb.InlineButton{
+					tb.InlineButton{
+						Unique: "unsub_feed_item_btn",
+						Text:   fmt.Sprintf("[%d] %s", sub.SourceID, source.Title),
+						Data:   fmt.Sprintf("%d:%d:%d", sub.UserID, sub.ID, source.ID),
+					},
+				},
+			)
+		}
+		return ctx.Reply("请选择你要退订的源", &tb.ReplyMarkup{InlineKeyboard: unsubFeedItemBtns})
 	}
 
 	if !chat.IsChatAdmin(r.bot, ctx.Chat(), ctx.Sender().ID) {
@@ -96,37 +125,6 @@ func (r *RemoveSubscription) removeForChat(ctx tb.Context) error {
 		fmt.Sprintf("[%s](%s) 退订成功！", source.Title, source.Link),
 		&tb.SendOptions{DisableWebPagePreview: true, ParseMode: tb.ModeMarkdown},
 	)
-	//Unsub by button
-	//subs, err := model.GetSubsByUserID(m.Chat.ID)
-	//if err != nil {
-	//	return
-	//}
-	//
-	//if len(subs) > 0 {
-	//	unsubFeedItemBtns := [][]tb.InlineButton{}
-	//
-	//	for _, sub := range subs {
-	//
-	//		source, err := model.GetSourceById(sub.SourceID)
-	//		if err != nil {
-	//			return
-	//		}
-	//
-	//		unsubFeedItemBtns = append(unsubFeedItemBtns, []tb.InlineButton{
-	//			tb.InlineButton{
-	//				Unique: "unsub_feed_item_btn",
-	//				Text:   fmt.Sprintf("[%d] %s", sub.SourceID, source.Title),
-	//				Data:   fmt.Sprintf("%d:%d:%d", sub.UserID, sub.ID, source.ID),
-	//			},
-	//		})
-	//	}
-	//
-	//	_, _ = B.Send(m.Chat, "请选择你要退订的源", &tb.ReplyMarkup{
-	//		InlineKeyboard: unsubFeedItemBtns,
-	//	})
-	//} else {
-	//	_, _ = B.Send(m.Chat, "当前没有订阅源")
-	//}
 }
 
 func (r *RemoveSubscription) Handle(ctx tb.Context) error {
