@@ -433,53 +433,6 @@ var (
 //
 //	return
 //}
-//
-//func activeAllCmdCtr(m *tb.Message) {
-//	mention := GetMentionFromMessage(m)
-//	if mention != "" {
-//		channelChat, err := B.ChatByID(mention)
-//		if err != nil {
-//			_, _ = B.Send(m.Chat, "error")
-//			return
-//		}
-//		adminList, err := B.AdminsOf(channelChat)
-//		if err != nil {
-//			_, _ = B.Send(m.Chat, "error")
-//			return
-//		}
-//
-//		senderIsAdmin := false
-//		for _, admin := range adminList {
-//			if m.Sender.ID == admin.User.ID {
-//				senderIsAdmin = true
-//			}
-//		}
-//
-//		if !senderIsAdmin {
-//			_, _ = B.Send(m.Chat, fmt.Sprintf("非频道管理员无法执行此操作"))
-//			return
-//		}
-//
-//		_ = model.ActiveSourcesByUserID(channelChat.ID)
-//		message := fmt.Sprintf("频道 [%s](https://t.me/%s) 订阅已全部开启", channelChat.Title, channelChat.Username)
-//
-//		_, _ = B.Send(m.Chat, message, &tb.SendOptions{
-//			DisableWebPagePreview: true,
-//			ParseMode:             tb.ModeMarkdown,
-//		})
-//
-//	} else {
-//		_ = model.ActiveSourcesByUserID(m.Chat.ID)
-//		message := "订阅已全部开启"
-//
-//		_, _ = B.Send(m.Chat, message, &tb.SendOptions{
-//			DisableWebPagePreview: true,
-//			ParseMode:             tb.ModeMarkdown,
-//		})
-//	}
-//
-//}
-//
 
 //func textCtr(m *tb.Message) {
 //	switch UserState[m.Chat.ID] {
