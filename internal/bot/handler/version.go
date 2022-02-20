@@ -1,11 +1,16 @@
 package handler
 
 import (
-	"github.com/indes/flowerss-bot/internal/config"
 	tb "gopkg.in/telebot.v3"
+
+	"github.com/indes/flowerss-bot/internal/config"
 )
 
 type Version struct {
+}
+
+func NewVersion() *Version {
+	return &Version{}
 }
 
 func (c *Version) Command() string {

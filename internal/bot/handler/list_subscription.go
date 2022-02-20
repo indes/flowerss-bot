@@ -2,13 +2,19 @@ package handler
 
 import (
 	"fmt"
+
+	tb "gopkg.in/telebot.v3"
+
 	"github.com/indes/flowerss-bot/internal/bot/chat"
 	"github.com/indes/flowerss-bot/internal/bot/message"
 	"github.com/indes/flowerss-bot/internal/model"
-	tb "gopkg.in/telebot.v3"
 )
 
 type ListSubscription struct {
+}
+
+func NewListSubscription() *ListSubscription {
+	return &ListSubscription{}
 }
 
 func (l *ListSubscription) Command() string {
