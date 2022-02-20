@@ -68,6 +68,21 @@ func Start() {
 }
 
 func setCommands() {
+	commandHandlers := []handler.CommandHandler{
+		&handler.Start{},
+		&handler.Version{},
+		handler.NewPing(B),
+		handler.NewRemoveSubscription(B),
+		&handler.Help{},
+		&handler.Export{},
+		&handler.AddSubscription{},
+		&handler.ListSubscription{},
+	}
+
+	for _, h := range commandHandlers {
+		B.Handle(h.Command(), h.Handle)
+	}
+
 	// 设置bot命令提示信息
 	//commands := []tb.Command{
 	//	{Text: "start", Description: "开始使用"},
@@ -104,22 +119,7 @@ func setCommands() {
 	}
 }
 
-var (
-	commandHandlers = []handler.CommandHandler{
-		&handler.Start{},
-		&handler.Version{},
-		&handler.Ping{},
-		&handler.Help{},
-		&handler.Export{},
-		&handler.AddSubscription{},
-		&handler.ListSubscription{},
-	}
-)
-
 func setHandle() {
-	for _, h := range commandHandlers {
-		B.Handle(h.Command(), h.Handle)
-	}
 	//B.Handle(&tb.InlineButton{Unique: "set_feed_item_btn"}, setFeedItemBtnCtr)
 	//
 	//B.Handle(&tb.InlineButton{Unique: "set_toggle_notice_btn"}, setToggleNoticeBtnCtr)
