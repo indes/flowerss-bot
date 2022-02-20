@@ -61,7 +61,7 @@ func (s Set) Handle(ctx tb.Context) error {
 		setFeedItemBtns = append(
 			setFeedItemBtns, []tb.InlineButton{
 				tb.InlineButton{
-					Unique: "set_feed_item_btn",
+					Unique: SetFeedItemButtonUnique,
 					Text:   fmt.Sprintf("[%d] %s", source.ID, source.Title),
 					Data:   fmt.Sprintf("%d:%d", ownerID, source.ID),
 				},
