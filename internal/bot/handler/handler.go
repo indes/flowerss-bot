@@ -9,6 +9,16 @@ type CommandHandler interface {
 	Description() string
 	// Handle function
 	Handle(ctx tb.Context) error
+	// Middlewares Handler middlewares
+	Middlewares() []tb.MiddlewareFunc
+}
 
+type ButtonHandler interface {
+	tb.CallbackEndpoint
+	// Description of Command
+	Description() string
+	// Handle function
+	Handle(ctx tb.Context) error
+	// Middlewares Handler middlewares
 	Middlewares() []tb.MiddlewareFunc
 }
