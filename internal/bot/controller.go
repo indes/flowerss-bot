@@ -335,50 +335,6 @@ var (
 //}
 //
 
-//
-//func setIntervalCmdCtr(m *tb.Message) {
-//
-//	args := strings.Split(m.Payload, " ")
-//
-//	if len(args) < 1 {
-//		_, _ = B.Send(m.Chat, "/setinterval [interval] [sub id] 设置订阅刷新频率（可设置多个sub id，以空格分割）")
-//		return
-//	}
-//
-//	interval, err := strconv.Atoi(args[0])
-//	if interval <= 0 || err != nil {
-//		_, _ = B.Send(m.Chat, "请输入正确的抓取频率")
-//		return
-//	}
-//
-//	for _, id := range args[1:] {
-//
-//		subID, err := strconv.Atoi(id)
-//		if err != nil {
-//			_, _ = B.Send(m.Chat, "请输入正确的订阅id!")
-//			return
-//		}
-//
-//		sub, err := model.GetSubscribeByID(subID)
-//
-//		if err != nil || sub == nil {
-//			_, _ = B.Send(m.Chat, "请输入正确的订阅id!")
-//			return
-//		}
-//
-//		if !checkPermit(int64(m.Sender.ID), sub.UserID) {
-//			_, _ = B.Send(m.Chat, "没有权限!")
-//			return
-//		}
-//
-//		_ = sub.SetInterval(interval)
-//
-//	}
-//	_, _ = B.Send(m.Chat, "抓取频率设置成功!")
-//
-//	return
-//}
-
 //func textCtr(m *tb.Message) {
 //	switch UserState[m.Chat.ID] {
 //	case fsm.UnSub:
