@@ -104,12 +104,12 @@ func (a *AddSubscription) addSubscriptionForChannel(ctx tb.Context, channelName 
 	}
 
 	zap.S().Infof("%d subscribe [%d]%s %s", channelChat.ID, source.ID, source.Title, source.Link)
-	if err := model.RegistFeed(ctx.Chat().ID, source.ID); err != nil {
+	if err := model.RegistFeed(channelChat.ID, source.ID); err != nil {
 		return ctx.Reply(fmt.Sprintf("%s，订阅失败", err))
 	}
 
 	return ctx.Reply(
-		fmt.Sprintf("[[%d]][%s](%s) 订阅成功", source.ID, source.Title, source.Link),
+		fmt.Sprintf("[[%d]] [%s](%s) 订阅成功", source.ID, source.Title, source.Link),
 		&tb.SendOptions{
 			DisableWebPagePreview: true,
 			ParseMode:             tb.ModeMarkdown,
