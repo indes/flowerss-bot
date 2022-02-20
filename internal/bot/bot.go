@@ -44,7 +44,6 @@ func init() {
 
 	// create bot
 	var err error
-
 	B, err = tb.NewBot(tb.Settings{
 		URL:     config.TelegramEndpoint,
 		Token:   config.BotToken,
@@ -79,10 +78,20 @@ func setCommands() {
 		&handler.Export{},
 		&handler.AddSubscription{},
 		&handler.ListSubscription{},
+		&handler.RemoveAllSubscription{},
 	}
 
 	for _, h := range commandHandlers {
-		B.Handle(h.Command(), h.Handle)
+		B.Handle(h.Command(), h.Handle, h.Middlewares()...)
+	}
+
+	ButtonHandlers := []handler.ButtonHandler{
+		&handler.RemoveAllSubscriptionButton{},
+		&handler.CancelRemoveAllSubscriptionButton{},
+	}
+
+	for _, h := range ButtonHandlers {
+		B.Handle(h, h.Handle, h.Middlewares()...)
 	}
 	// 设置bot命令提示信息
 	//commands := []tb.Command{
@@ -126,20 +135,16 @@ func setHandle() {
 	//B.Handle(&tb.InlineButton{Unique: "set_toggle_notice_btn"}, setToggleNoticeBtnCtr)
 	//
 	//B.Handle(&tb.InlineButton{Unique: "set_toggle_telegraph_btn"}, setToggleTelegraphBtnCtr)
-	//
 	//B.Handle(&tb.InlineButton{Unique: "set_toggle_update_btn"}, setToggleUpdateBtnCtr)
 	//
 	//B.Handle(&tb.InlineButton{Unique: "set_set_sub_tag_btn"}, setSubTagBtnCtr)
 	//
-	//B.Handle(&tb.InlineButton{Unique: "unsub_all_confirm_btn"}, unsubAllConfirmBtnCtr)
-	//
+
 	//B.Handle(&tb.InlineButton{Unique: "unsub_all_cancel_btn"}, unsubAllCancelBtnCtr)
 	//
 	//B.Handle(&tb.InlineButton{Unique: "unsub_feed_item_btn"}, unsubFeedItemBtnCtr)
 
 	//B.Handle("/set", setCmdCtr)
-
-	//B.Handle("/unsuball", unsubAllCmdCtr)
 
 	//B.Handle("/import", importCmdCtr)
 	//
