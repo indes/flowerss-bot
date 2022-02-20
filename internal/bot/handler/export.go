@@ -6,14 +6,19 @@ import (
 	"strings"
 	"time"
 
+	"go.uber.org/zap"
+	tb "gopkg.in/telebot.v3"
+
 	"github.com/indes/flowerss-bot/internal/bot/message"
 	"github.com/indes/flowerss-bot/internal/model"
 	"github.com/indes/flowerss-bot/internal/opml"
-	"go.uber.org/zap"
-	tb "gopkg.in/telebot.v3"
 )
 
 type Export struct {
+}
+
+func NewExport() *Export {
+	return &Export{}
 }
 
 func (e *Export) Description() string {

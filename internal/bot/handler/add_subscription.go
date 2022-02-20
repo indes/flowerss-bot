@@ -4,13 +4,18 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/indes/flowerss-bot/internal/bot/message"
-	"github.com/indes/flowerss-bot/internal/model"
 	"go.uber.org/zap"
 	tb "gopkg.in/telebot.v3"
+
+	"github.com/indes/flowerss-bot/internal/bot/message"
+	"github.com/indes/flowerss-bot/internal/model"
 )
 
 type AddSubscription struct {
+}
+
+func NewAddSubscription() *AddSubscription {
+	return &AddSubscription{}
 }
 
 func (a *AddSubscription) Command() string {
@@ -53,7 +58,9 @@ func (a *AddSubscription) addSubscriptionForChat(ctx tb.Context) error {
 	)
 }
 
-func (a *AddSubscription) hasChannelPrivilege(bot *tb.Bot, channelChat *tb.Chat, opUserID int64, botID int64) (bool, error) {
+func (a *AddSubscription) hasChannelPrivilege(bot *tb.Bot, channelChat *tb.Chat, opUserID int64, botID int64) (
+	bool, error,
+) {
 	adminList, err := bot.AdminsOf(channelChat)
 	if err != nil {
 		zap.S().Error(err)

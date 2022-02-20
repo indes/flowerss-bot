@@ -3,11 +3,16 @@ package handler
 import (
 	"fmt"
 
-	"github.com/indes/flowerss-bot/internal/model"
 	tb "gopkg.in/telebot.v3"
+
+	"github.com/indes/flowerss-bot/internal/model"
 )
 
 type RemoveAllSubscription struct {
+}
+
+func NewRemoveAllSubscription() *RemoveAllSubscription {
+	return &RemoveAllSubscription{}
 }
 
 func (r RemoveAllSubscription) Command() string {
@@ -21,16 +26,18 @@ func (r RemoveAllSubscription) Description() string {
 func (r RemoveAllSubscription) Handle(ctx tb.Context) error {
 	reply := "是否退订当前用户的所有订阅？"
 	confirmKeys := [][]tb.InlineButton{}
-	confirmKeys = append(confirmKeys, []tb.InlineButton{
-		tb.InlineButton{
-			Unique: UnSubAllButtonUnique,
-			Text:   "确认",
+	confirmKeys = append(
+		confirmKeys, []tb.InlineButton{
+			tb.InlineButton{
+				Unique: UnSubAllButtonUnique,
+				Text:   "确认",
+			},
+			tb.InlineButton{
+				Unique: CancelUnSubAllButtonUnique,
+				Text:   "取消",
+			},
 		},
-		tb.InlineButton{
-			Unique: CancelUnSubAllButtonUnique,
-			Text:   "取消",
-		},
-	})
+	)
 	return ctx.Reply(reply, &tb.ReplyMarkup{InlineKeyboard: confirmKeys})
 }
 

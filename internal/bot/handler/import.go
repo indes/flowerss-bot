@@ -5,6 +5,10 @@ import tb "gopkg.in/telebot.v3"
 type Import struct {
 }
 
+func NewImport() *Import {
+	return &Import{}
+}
+
 func (i *Import) Command() string {
 	return "/import"
 }

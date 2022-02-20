@@ -3,12 +3,17 @@ package handler
 import (
 	"fmt"
 
-	"github.com/indes/flowerss-bot/internal/model"
 	"go.uber.org/zap"
 	tb "gopkg.in/telebot.v3"
+
+	"github.com/indes/flowerss-bot/internal/model"
 )
 
 type Start struct {
+}
+
+func NewStart() *Start {
+	return &Start{}
 }
 
 func (s *Start) Command() string {
