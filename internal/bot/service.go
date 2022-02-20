@@ -4,10 +4,11 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/indes/flowerss-bot/internal/config"
-	"github.com/indes/flowerss-bot/internal/model"
 	"go.uber.org/zap"
 	tb "gopkg.in/telebot.v3"
+
+	"github.com/indes/flowerss-bot/internal/config"
+	"github.com/indes/flowerss-bot/internal/model"
 )
 
 //SendError send error user
@@ -17,7 +18,8 @@ func SendError(c *tb.Chat) {
 
 //BroadcastNews send new contents message to subscriber
 func BroadcastNews(source *model.Source, subs []*model.Subscribe, contents []*model.Content) {
-	zap.S().Infow("broadcast news",
+	zap.S().Infow(
+		"broadcast news",
 		"fetcher id", source.ID,
 		"fetcher title", source.Title,
 		"subscriber count", len(subs),
@@ -48,7 +50,8 @@ func BroadcastNews(source *model.Source, subs []*model.Subscribe, contents []*mo
 			}
 			msg, err := tpldata.Render(config.MessageMode)
 			if err != nil {
-				zap.S().Errorw("broadcast news error, tpldata.Render err",
+				zap.S().Errorw(
+					"broadcast news error, tpldata.Render err",
 					"error", err.Error(),
 				)
 				return
@@ -56,7 +59,8 @@ func BroadcastNews(source *model.Source, subs []*model.Subscribe, contents []*mo
 			if _, err := B.Send(u, msg, o); err != nil {
 
 				if strings.Contains(err.Error(), "Forbidden") {
-					zap.S().Errorw("broadcast news error, bot stopped by user",
+					zap.S().Errorw(
+						"broadcast news error, bot stopped by user",
 						"error", err.Error(),
 						"user id", sub.UserID,
 						"source id", sub.SourceID,
@@ -72,7 +76,8 @@ func BroadcastNews(source *model.Source, subs []*model.Subscribe, contents []*mo
 					api error: Bad Request: can't parse entities: Can't find end of the entity starting at byte offset 894
 				*/
 				if strings.Contains(err.Error(), "parse entities") {
-					zap.S().Errorw("broadcast news error, markdown error",
+					zap.S().Errorw(
+						"broadcast news error, markdown error",
 						"markdown msg", msg,
 						"error", err.Error(),
 					)
@@ -89,9 +94,11 @@ func BroadcastSourceError(source *model.Source) {
 	for _, sub := range subs {
 		message := fmt.Sprintf("[%s](%s) 已经累计连续%d次更新失败，暂时停止更新", source.Title, source.Link, config.ErrorThreshold)
 		u.ID = sub.UserID
-		_, _ = B.Send(&u, message, &tb.SendOptions{
-			ParseMode: tb.ModeMarkdown,
-		})
+		_, _ = B.Send(
+			&u, message, &tb.SendOptions{
+				ParseMode: tb.ModeMarkdown,
+			},
+		)
 	}
 }
 
@@ -158,9 +165,8 @@ func isUserAllowed(upd *tb.Update) bool {
 	return false
 }
 
-//
 //// UserIsAdminChannel check if the user is the administrator of channel
-//func UserIsAdminChannel(userID int, channelChat *tb.Chat) (isAdmin bool) {
+//func UserIsAdminChannel(userID int64, channelChat *tb.Chat) (isAdmin bool) {
 //	adminList, err := B.AdminsOf(channelChat)
 //	isAdmin = false
 //
