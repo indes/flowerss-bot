@@ -4,7 +4,7 @@ package session
 type BotContextStoreKey string
 
 const (
-	MentionChat BotContextStoreKey = "mention_chat"
+	StoreKeyMentionChat BotContextStoreKey = "mention_chat"
 )
 
 func (k BotContextStoreKey) String() string {

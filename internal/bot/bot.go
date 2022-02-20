@@ -52,7 +52,7 @@ func init() {
 		Client:  util.HttpClient,
 		Verbose: true,
 	})
-	B.Use(middleware.PreLoadMentionChat())
+	B.Use(middleware.PreLoadMentionChat(), middleware.IsChatAdmin())
 	if err != nil {
 		zap.S().Fatal(err)
 		return
