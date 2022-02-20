@@ -26,31 +26,36 @@ func init() {
 		return
 	}
 	poller := &tb.LongPoller{Timeout: 10 * time.Second}
-	spamProtected := tb.NewMiddlewarePoller(poller, func(upd *tb.Update) bool {
-		if !isUserAllowed(upd) {
-			// 检查用户是否可以使用bot
-			return false
-		}
+	spamProtected := tb.NewMiddlewarePoller(
+		poller, func(upd *tb.Update) bool {
+			if !isUserAllowed(upd) {
+				// 检查用户是否可以使用bot
+				return false
+			}
 
-		if !CheckAdmin(upd) {
-			return false
-		}
-		return true
-	})
-	zap.S().Infow("init telegram bot",
+			if !CheckAdmin(upd) {
+				return false
+			}
+			return true
+		},
+	)
+	zap.S().Infow(
+		"init telegram bot",
 		"token", config.BotToken,
 		"endpoint", config.TelegramEndpoint,
 	)
 
 	// create bot
 	var err error
-	B, err = tb.NewBot(tb.Settings{
-		URL:     config.TelegramEndpoint,
-		Token:   config.BotToken,
-		Poller:  spamProtected,
-		Client:  util.HttpClient,
-		Verbose: true,
-	})
+	B, err = tb.NewBot(
+		tb.Settings{
+			URL:     config.TelegramEndpoint,
+			Token:   config.BotToken,
+			Poller:  spamProtected,
+			Client:  util.HttpClient,
+			Verbose: true,
+		},
+	)
 	B.Use(middleware.PreLoadMentionChat(), middleware.IsChatAdmin())
 	if err != nil {
 		zap.S().Fatal(err)
@@ -96,6 +101,7 @@ func setCommands() {
 	ButtonHandlers := []handler.ButtonHandler{
 		&handler.RemoveAllSubscriptionButton{},
 		&handler.CancelRemoveAllSubscriptionButton{},
+		handler.NewSetFeedItemButton(B),
 	}
 
 	for _, h := range ButtonHandlers {
