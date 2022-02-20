@@ -71,6 +71,7 @@ func (l *ListSubscription) listChannelSubscription(ctx tb.Context, channelName s
 	if len(subSourceMap) == 0 {
 		return ctx.Send(
 			fmt.Sprintf("频道 [%s](https://t.me/%s) 订阅列表为空", channelChat.Title, channelChat.Username),
+			&tb.SendOptions{DisableWebPagePreview: true, ParseMode: tb.ModeMarkdown},
 		)
 	}
 
@@ -78,7 +79,7 @@ func (l *ListSubscription) listChannelSubscription(ctx tb.Context, channelName s
 	for sub, source := range subSourceMap {
 		rspMessage = rspMessage + fmt.Sprintf("[[%d]] [%s](%s)\n", sub.ID, source.Title, source.Link)
 	}
-	return ctx.Send(rspMessage)
+	return ctx.Send(rspMessage, &tb.SendOptions{DisableWebPagePreview: true, ParseMode: tb.ModeMarkdown})
 }
 
 func (l *ListSubscription) Handle(ctx tb.Context) error {
