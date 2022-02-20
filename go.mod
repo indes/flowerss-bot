@@ -11,8 +11,7 @@ require (
 	github.com/indes/telegraph-go v1.0.1
 	github.com/jinzhu/gorm v1.9.16
 	github.com/magiconair/properties v1.8.5
-	github.com/mattn/go-sqlite3 v1.14.5 // indirect
-	github.com/nicksnyder/go-i18n/v2 v2.1.2
+	github.com/mattn/go-sqlite3 v1.14.11 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/spf13/viper v1.10.1
 	github.com/stretchr/testify v1.7.0

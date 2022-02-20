@@ -60,12 +60,13 @@ func init() {
 
 //Start bot
 func Start() {
-	if config.RunMode != config.TestMode {
-		zap.S().Infof("bot start %s", config.AppVersionInfo())
-		setCommands()
-		setHandle()
-		B.Start()
+	if config.RunMode == config.TestMode {
+		return
 	}
+
+	zap.S().Infof("bot start %s", config.AppVersionInfo())
+	setCommands()
+	B.Start()
 }
 
 func setCommands() {
@@ -81,6 +82,7 @@ func setCommands() {
 		&handler.ListSubscription{},
 		&handler.RemoveAllSubscription{},
 		handler.NewOnDocument(B),
+		handler.NewPauseAll(),
 	}
 
 	for _, h := range commandHandlers {
@@ -138,18 +140,11 @@ func setHandle() {
 	//B.Handle(&tb.InlineButton{Unique: "set_toggle_update_btn"}, setToggleUpdateBtnCtr)
 	//B.Handle(&tb.InlineButton{Unique: "set_set_sub_tag_btn"}, setSubTagBtnCtr)
 	//B.Handle(&tb.InlineButton{Unique: "unsub_all_cancel_btn"}, unsubAllCancelBtnCtr)
-	//
 	//B.Handle(&tb.InlineButton{Unique: "unsub_feed_item_btn"}, unsubFeedItemBtnCtr)
 
 	//B.Handle("/set", setCmdCtr)
-
 	//B.Handle("/setfeedtag", setFeedTagCmdCtr)
-	//
 	//B.Handle("/setinterval", setIntervalCmdCtr)
-
 	//B.Handle("/activeall", activeAllCmdCtr)
-	//
-	//B.Handle("/pauseall", pauseAllCmdCtr)
-
 	//B.Handle(tb.OnText, textCtr)
 }
