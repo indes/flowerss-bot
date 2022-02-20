@@ -17,7 +17,7 @@ var (
 	// UserState 用户状态，用于标示当前用户操作所在状态
 	UserState map[int64]fsm.UserStatus = make(map[int64]fsm.UserStatus)
 
-	// B telebot
+	// B bot
 	B *tb.Bot
 )
 
