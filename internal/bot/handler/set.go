@@ -170,7 +170,7 @@ func genFeedSetBtn(
 	}
 
 	toggleTelegraphKey := tb.InlineButton{
-		Unique: "set_toggle_telegraph_btn",
+		Unique: TelegraphSwitchButtonUnique,
 		Text:   "开启 Telegraph 转码",
 		Data:   c.Data,
 	}

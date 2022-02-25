@@ -132,10 +132,6 @@ func genFeedSetBtn(
 	return feedSettingKeys
 }
 
-func setToggleTelegraphBtnCtr(ctx tb.Context) error {
-	return toggleCtrlButtons(ctx, "toggleTelegraph")
-}
-
 func setToggleUpdateBtnCtr(ctx tb.Context) error {
 	return toggleCtrlButtons(ctx, "toggleUpdate")
 }
