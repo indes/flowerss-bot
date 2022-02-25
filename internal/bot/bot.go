@@ -106,6 +106,7 @@ func setCommands() {
 		handler.NewNotificationSwitchButton(B),
 		handler.NewSetSubscriptionTagButton(B),
 		handler.NewTelegraphSwitchButton(B),
+		handler.NewSubscriptionSwitchButton(B),
 	}
 
 	for _, h := range ButtonHandlers {
@@ -124,5 +125,4 @@ func setCommands() {
 		zap.S().Errorw("set bot commands failed", "error", err.Error())
 	}
 
-	B.Handle(&tb.InlineButton{Unique: "set_toggle_update_btn"}, setToggleUpdateBtnCtr)
 }

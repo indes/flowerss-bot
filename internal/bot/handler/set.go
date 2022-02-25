@@ -179,7 +179,7 @@ func genFeedSetBtn(
 	}
 
 	toggleEnabledKey := tb.InlineButton{
-		Unique: "set_toggle_update_btn",
+		Unique: SubscriptionSwitchButtonUnique,
 		Text:   "暂停更新",
 		Data:   c.Data,
 	}
