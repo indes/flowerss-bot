@@ -6,7 +6,6 @@ require (
 	github.com/PuerkitoBio/goquery v1.6.0 // indirect
 	github.com/SlyMarbo/rss v1.0.3
 	github.com/andybalholm/cascadia v1.2.0 // indirect
-	github.com/asaskevich/govalidator v0.0.0-20200907205600-7a23bdc65eef
 	github.com/grokify/html-strip-tags-go v0.0.0-20200923094847-079d207a09f1
 	github.com/indes/telegraph-go v1.0.1
 	github.com/jinzhu/gorm v1.9.16
