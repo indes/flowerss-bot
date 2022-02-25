@@ -53,7 +53,7 @@ func init() {
 			Token:   config.BotToken,
 			Poller:  spamProtected,
 			Client:  util.HttpClient,
-			Verbose: false,
+			Verbose: true,
 		},
 	)
 	B.Use(middleware.PreLoadMentionChat(), middleware.IsChatAdmin())
@@ -103,6 +103,7 @@ func setCommands() {
 		handler.NewCancelRemoveAllSubscriptionButton(),
 		handler.NewSetFeedItemButton(B),
 		handler.NewRemoveSubscriptionItemButton(),
+		handler.NewNotificationSwitchButton(B),
 	}
 
 	for _, h := range ButtonHandlers {
@@ -121,7 +122,6 @@ func setCommands() {
 		zap.S().Errorw("set bot commands failed", "error", err.Error())
 	}
 
-	B.Handle(&tb.InlineButton{Unique: "set_toggle_notice_btn"}, setToggleNoticeBtnCtr)
 	B.Handle(&tb.InlineButton{Unique: "set_toggle_telegraph_btn"}, setToggleTelegraphBtnCtr)
 	B.Handle(&tb.InlineButton{Unique: "set_toggle_update_btn"}, setToggleUpdateBtnCtr)
 	B.Handle(&tb.InlineButton{Unique: "set_set_sub_tag_btn"}, setSubTagBtnCtr)

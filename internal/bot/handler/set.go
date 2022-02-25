@@ -23,15 +23,15 @@ func NewSet(bot *tb.Bot) *Set {
 	return &Set{bot: bot}
 }
 
-func (s Set) Command() string {
+func (s *Set) Command() string {
 	return "/set"
 }
 
-func (s Set) Description() string {
+func (s *Set) Description() string {
 	return "设置订阅"
 }
 
-func (s Set) Handle(ctx tb.Context) error {
+func (s *Set) Handle(ctx tb.Context) error {
 	mentionChat, _ := session.GetMentionChatFromCtxStore(ctx)
 	ownerID := ctx.Message().Chat.ID
 	if mentionChat != nil {
@@ -76,7 +76,7 @@ func (s Set) Handle(ctx tb.Context) error {
 	)
 }
 
-func (s Set) Middlewares() []tb.MiddlewareFunc {
+func (s *Set) Middlewares() []tb.MiddlewareFunc {
 	return nil
 }
 
@@ -147,11 +147,11 @@ func (r *SetFeedItemButton) Handle(ctx tb.Context) error {
 	return ctx.Edit(
 		text.String(),
 		&tb.SendOptions{ParseMode: tb.ModeHTML},
-		&tb.ReplyMarkup{InlineKeyboard: r.genFeedSetBtn(ctx.Callback(), sub, source)},
+		&tb.ReplyMarkup{InlineKeyboard: genFeedSetBtn(ctx.Callback(), sub, source)},
 	)
 }
 
-func (r *SetFeedItemButton) genFeedSetBtn(
+func genFeedSetBtn(
 	c *tb.Callback, sub *model.Subscribe, source *model.Source,
 ) [][]tb.InlineButton {
 	setSubTagKey := tb.InlineButton{

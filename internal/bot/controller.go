@@ -157,10 +157,6 @@ func setSubTagBtnCtr(ctx tb.Context) error {
 	return ctx.Send(msg, &tb.SendOptions{ParseMode: tb.ModeMarkdown})
 }
 
-func setToggleNoticeBtnCtr(ctx tb.Context) error {
-	return toggleCtrlButtons(ctx, "toggleNotice")
-}
-
 func setToggleTelegraphBtnCtr(ctx tb.Context) error {
 	return toggleCtrlButtons(ctx, "toggleTelegraph")
 }
