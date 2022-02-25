@@ -25,7 +25,7 @@ func (r RemoveAllSubscription) Description() string {
 
 func (r RemoveAllSubscription) Handle(ctx tb.Context) error {
 	reply := "是否退订当前用户的所有订阅？"
-	confirmKeys := [][]tb.InlineButton{}
+	var confirmKeys [][]tb.InlineButton
 	confirmKeys = append(
 		confirmKeys, []tb.InlineButton{
 			tb.InlineButton{
@@ -53,6 +53,10 @@ const (
 type RemoveAllSubscriptionButton struct {
 }
 
+func NewRemoveAllSubscriptionButton() *RemoveAllSubscriptionButton {
+	return &RemoveAllSubscriptionButton{}
+}
+
 func (r *RemoveAllSubscriptionButton) CallbackUnique() string {
 	return "\f" + UnSubAllButtonUnique
 }
@@ -74,6 +78,10 @@ func (r *RemoveAllSubscriptionButton) Middlewares() []tb.MiddlewareFunc {
 }
 
 type CancelRemoveAllSubscriptionButton struct {
+}
+
+func NewCancelRemoveAllSubscriptionButton() *CancelRemoveAllSubscriptionButton {
+	return &CancelRemoveAllSubscriptionButton{}
 }
 
 func (r *CancelRemoveAllSubscriptionButton) CallbackUnique() string {
