@@ -2,6 +2,8 @@ package handler
 
 import (
 	"fmt"
+	"strconv"
+	"strings"
 
 	"go.uber.org/zap"
 	tb "gopkg.in/telebot.v3"
@@ -19,26 +21,26 @@ func NewRemoveSubscription(bot *tb.Bot) *RemoveSubscription {
 	return &RemoveSubscription{bot: bot}
 }
 
-func (r *RemoveSubscription) Command() string {
+func (s *RemoveSubscription) Command() string {
 	return "/unsub"
 }
 
-func (r *RemoveSubscription) Description() string {
+func (s *RemoveSubscription) Description() string {
 	return "退订RSS源"
 }
 
-func (r *RemoveSubscription) removeForChannel(ctx tb.Context, channelName string) error {
+func (s *RemoveSubscription) removeForChannel(ctx tb.Context, channelName string) error {
 	sourceURL := message.URLFromMessage(ctx.Message())
 	if sourceURL == "" {
 		return ctx.Send("频道退订请使用' /unsub @ChannelID URL ' 命令")
 	}
 
-	channelChat, err := r.bot.ChatByUsername(channelName)
+	channelChat, err := s.bot.ChatByUsername(channelName)
 	if err != nil {
 		return ctx.Reply("获取频道信息错误")
 	}
 
-	if !chat.IsChatAdmin(r.bot, channelChat, ctx.Sender().ID) {
+	if !chat.IsChatAdmin(s.bot, channelChat, ctx.Sender().ID) {
 		return ctx.Reply("非频道管理员无法执行此操作")
 	}
 
@@ -73,7 +75,7 @@ func (r *RemoveSubscription) removeForChannel(ctx tb.Context, channelName string
 	)
 }
 
-func (r *RemoveSubscription) removeForChat(ctx tb.Context) error {
+func (s *RemoveSubscription) removeForChat(ctx tb.Context) error {
 	sourceURL := message.URLFromMessage(ctx.Message())
 	if sourceURL == "" {
 		subs, err := model.GetSubsByUserID(ctx.Chat().ID)
@@ -85,15 +87,15 @@ func (r *RemoveSubscription) removeForChat(ctx tb.Context) error {
 			return ctx.Reply("没有订阅")
 		}
 
-		unsubFeedItemBtns := [][]tb.InlineButton{}
+		var unsubFeedItemButtons [][]tb.InlineButton
 		for _, sub := range subs {
 			source, err := model.GetSourceById(sub.SourceID)
 			if err != nil {
 				return ctx.Reply("获取订阅列表失败")
 			}
-			unsubFeedItemBtns = append(
-				unsubFeedItemBtns, []tb.InlineButton{
-					tb.InlineButton{
+			unsubFeedItemButtons = append(
+				unsubFeedItemButtons, []tb.InlineButton{
+					{
 						Unique: "unsub_feed_item_btn",
 						Text:   fmt.Sprintf("[%d] %s", sub.SourceID, source.Title),
 						Data:   fmt.Sprintf("%d:%d:%d", sub.UserID, sub.ID, source.ID),
@@ -101,10 +103,10 @@ func (r *RemoveSubscription) removeForChat(ctx tb.Context) error {
 				},
 			)
 		}
-		return ctx.Reply("请选择你要退订的源", &tb.ReplyMarkup{InlineKeyboard: unsubFeedItemBtns})
+		return ctx.Reply("请选择你要退订的源", &tb.ReplyMarkup{InlineKeyboard: unsubFeedItemButtons})
 	}
 
-	if !chat.IsChatAdmin(r.bot, ctx.Chat(), ctx.Sender().ID) {
+	if !chat.IsChatAdmin(s.bot, ctx.Chat(), ctx.Sender().ID) {
 		return ctx.Reply("非管理员无法执行此操作")
 	}
 
@@ -127,14 +129,63 @@ func (r *RemoveSubscription) removeForChat(ctx tb.Context) error {
 	)
 }
 
-func (r *RemoveSubscription) Handle(ctx tb.Context) error {
+func (s *RemoveSubscription) Handle(ctx tb.Context) error {
 	mention := message.MentionFromMessage(ctx.Message())
 	if mention != "" {
-		return r.removeForChannel(ctx, mention)
+		return s.removeForChannel(ctx, mention)
 	}
-	return r.removeForChat(ctx)
+	return s.removeForChat(ctx)
 }
 
-func (l *RemoveSubscription) Middlewares() []tb.MiddlewareFunc {
+func (s *RemoveSubscription) Middlewares() []tb.MiddlewareFunc {
+	return nil
+}
+
+const (
+	RemoveSubscriptionItemButtonUnique = "unsub_feed_item_btn"
+)
+
+type RemoveSubscriptionItemButton struct {
+}
+
+func NewRemoveSubscriptionItemButton() *RemoveSubscriptionItemButton {
+	return &RemoveSubscriptionItemButton{}
+}
+
+func (r *RemoveSubscriptionItemButton) CallbackUnique() string {
+	return "\f" + RemoveSubscriptionItemButtonUnique
+}
+
+func (r *RemoveSubscriptionItemButton) Description() string {
+	return ""
+}
+
+func (r *RemoveSubscriptionItemButton) Handle(ctx tb.Context) error {
+	if ctx.Callback() == nil {
+		return ctx.Edit("内部错误！")
+	}
+
+	data := strings.Split(ctx.Callback().Data, ":")
+	if len(data) != 3 {
+		return ctx.Edit("退订错误！")
+	}
+
+	userID, _ := strconv.Atoi(data[0])
+	subID, _ := strconv.Atoi(data[1])
+	sourceID, _ := strconv.Atoi(data[2])
+	source, err := model.GetSourceById(uint(sourceID))
+	if err != nil {
+		return ctx.Edit("退订错误！")
+	}
+
+	if err := model.UnsubByUserIDAndSubID(int64(userID), uint(subID)); err != nil {
+		return ctx.Edit("退订错误！")
+	}
+
+	rtnMsg := fmt.Sprintf("[%d] <a href=\"%s\">%s</a> 退订成功", sourceID, source.Link, source.Title)
+	return ctx.Edit(rtnMsg, &tb.SendOptions{ParseMode: tb.ModeHTML})
+}
+
+func (r *RemoveSubscriptionItemButton) Middlewares() []tb.MiddlewareFunc {
 	return nil
 }

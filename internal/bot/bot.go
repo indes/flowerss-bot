@@ -102,6 +102,7 @@ func setCommands() {
 		handler.NewRemoveAllSubscriptionButton(),
 		handler.NewCancelRemoveAllSubscriptionButton(),
 		handler.NewSetFeedItemButton(B),
+		handler.NewRemoveSubscriptionItemButton(),
 	}
 
 	for _, h := range ButtonHandlers {
@@ -124,5 +125,4 @@ func setCommands() {
 	B.Handle(&tb.InlineButton{Unique: "set_toggle_telegraph_btn"}, setToggleTelegraphBtnCtr)
 	B.Handle(&tb.InlineButton{Unique: "set_toggle_update_btn"}, setToggleUpdateBtnCtr)
 	B.Handle(&tb.InlineButton{Unique: "set_set_sub_tag_btn"}, setSubTagBtnCtr)
-	B.Handle(&tb.InlineButton{Unique: "unsub_feed_item_btn"}, unsubFeedItemBtnCtr)
 }

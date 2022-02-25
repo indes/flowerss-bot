@@ -168,27 +168,3 @@ func setToggleTelegraphBtnCtr(ctx tb.Context) error {
 func setToggleUpdateBtnCtr(ctx tb.Context) error {
 	return toggleCtrlButtons(ctx, "toggleUpdate")
 }
-
-func unsubFeedItemBtnCtr(ctx tb.Context) error {
-	c := ctx.Callback()
-	if !chat.IsChatAdmin(B, c.Message.Chat, c.Sender.ID) {
-		return nil
-	}
-
-	data := strings.Split(c.Data, ":")
-	if len(data) != 3 {
-		return ctx.Edit("退订错误！")
-	}
-
-	userID, _ := strconv.Atoi(data[0])
-	subID, _ := strconv.Atoi(data[1])
-	sourceID, _ := strconv.Atoi(data[2])
-	source, _ := model.GetSourceById(uint(sourceID))
-
-	rtnMsg := fmt.Sprintf("[%d] <a href=\"%s\">%s</a> 退订成功", sourceID, source.Link, source.Title)
-	err := model.UnsubByUserIDAndSubID(int64(userID), uint(subID))
-	if err != nil {
-		return ctx.Edit("退订错误！")
-	}
-	return ctx.Edit(rtnMsg, &tb.SendOptions{ParseMode: tb.ModeHTML})
-}
