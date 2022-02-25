@@ -2,7 +2,6 @@ package bot
 
 import (
 	"bytes"
-	"fmt"
 	"strconv"
 	"strings"
 	"text/template"
@@ -131,30 +130,6 @@ func genFeedSetBtn(
 		},
 	}
 	return feedSettingKeys
-}
-
-func setSubTagBtnCtr(ctx tb.Context) error {
-	c := ctx.Callback()
-	// 权限验证
-	if !feedSetAuth(c) {
-		return ctx.Send("无权限")
-	}
-	data := strings.Split(c.Data, ":")
-	ownID, _ := strconv.Atoi(data[0])
-	sourceID, _ := strconv.Atoi(data[1])
-
-	sub, err := model.GetSubscribeByUserIDAndSourceID(int64(ownID), uint(sourceID))
-	if err != nil {
-		return ctx.Send("系统错误，代码04")
-	}
-	msg := fmt.Sprintf(
-		"请使用`/setfeedtag %d tags`命令为该订阅设置标签，tags为需要设置的标签，以空格分隔。（最多设置三个标签） \n"+
-			"例如：`/setfeedtag %d 科技 苹果`",
-		sub.ID, sub.ID,
-	)
-
-	_ = B.Delete(c.Message)
-	return ctx.Send(msg, &tb.SendOptions{ParseMode: tb.ModeMarkdown})
 }
 
 func setToggleTelegraphBtnCtr(ctx tb.Context) error {
