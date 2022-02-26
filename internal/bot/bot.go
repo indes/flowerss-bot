@@ -62,21 +62,21 @@ func Start() {
 func setCommands() {
 	commandHandlers := []handler.CommandHandler{
 		handler.NewStart(),
-		handler.NewVersion(),
 		handler.NewPing(B),
-		handler.NewRemoveSubscription(B),
-		handler.NewHelp(),
-		handler.NewExport(),
-		handler.NewImport(),
 		handler.NewAddSubscription(),
+		handler.NewRemoveSubscription(B),
 		handler.NewListSubscription(),
 		handler.NewRemoveAllSubscription(),
 		handler.NewOnDocument(B),
-		handler.NewPauseAll(),
-		handler.NewActiveAll(),
+		handler.NewSet(B),
 		handler.NewSetFeedTag(),
 		handler.NewSetUpdateInterval(),
-		handler.NewSet(B),
+		handler.NewExport(),
+		handler.NewImport(),
+		handler.NewPauseAll(),
+		handler.NewActiveAll(),
+		handler.NewHelp(),
+		handler.NewVersion(),
 	}
 
 	for _, h := range commandHandlers {
