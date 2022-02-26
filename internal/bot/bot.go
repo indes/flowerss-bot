@@ -3,7 +3,6 @@ package bot
 import (
 	"time"
 
-	"github.com/indes/flowerss-bot/internal/bot/fsm"
 	"github.com/indes/flowerss-bot/internal/bot/handler"
 	"github.com/indes/flowerss-bot/internal/bot/middleware"
 	"github.com/indes/flowerss-bot/internal/config"
@@ -14,9 +13,6 @@ import (
 )
 
 var (
-	// UserState 用户状态，用于标示当前用户操作所在状态
-	UserState map[int64]fsm.UserStatus = make(map[int64]fsm.UserStatus)
-
 	// B bot
 	B *tb.Bot
 )
@@ -25,38 +21,27 @@ func init() {
 	if config.RunMode == config.TestMode {
 		return
 	}
-	poller := &tb.LongPoller{Timeout: 10 * time.Second}
-	spamProtected := tb.NewMiddlewarePoller(
-		poller, func(upd *tb.Update) bool {
-			if !isUserAllowed(upd) {
-				// 检查用户是否可以使用bot
-				return false
-			}
-
-			if !CheckAdmin(upd) {
-				return false
-			}
-			return true
-		},
-	)
 	zap.S().Infow(
 		"init telegram bot",
 		"token", config.BotToken,
 		"endpoint", config.TelegramEndpoint,
 	)
-
 	// create bot
 	var err error
 	B, err = tb.NewBot(
 		tb.Settings{
 			URL:     config.TelegramEndpoint,
 			Token:   config.BotToken,
-			Poller:  spamProtected,
+			Poller:  &tb.LongPoller{Timeout: 10 * time.Second},
 			Client:  util.HttpClient,
 			Verbose: true,
 		},
 	)
-	B.Use(middleware.PreLoadMentionChat(), middleware.IsChatAdmin())
+	B.Use(
+		middleware.UserFilter(),
+		middleware.PreLoadMentionChat(),
+		middleware.IsChatAdmin(),
+	)
 	if err != nil {
 		zap.S().Fatal(err)
 		return
@@ -124,5 +109,4 @@ func setCommands() {
 	if err := B.SetCommands(commands); err != nil {
 		zap.S().Errorw("set bot commands failed", "error", err.Error())
 	}
-
 }
