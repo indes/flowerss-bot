@@ -11,12 +11,11 @@ require (
 	github.com/jinzhu/gorm v1.9.16
 	github.com/magiconair/properties v1.8.6
 	github.com/mattn/go-sqlite3 v1.14.11 // indirect
-	github.com/pkg/errors v0.9.1 // indirect
-	github.com/spf13/viper v1.10.1
-	github.com/stretchr/testify v1.7.0
+	github.com/spf13/viper v1.11.0
+	github.com/stretchr/testify v1.7.1
 	go.uber.org/atomic v1.9.0
 	go.uber.org/zap v1.21.0
-	golang.org/x/net v0.0.0-20210813160813-60bc85c4be6d
+	golang.org/x/net v0.0.0-20220412020605-290c469a71a5
 	gopkg.in/telebot.v3 v3.0.0
 	moul.io/zapgorm v1.1.5
 )
