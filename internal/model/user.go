@@ -50,3 +50,32 @@ func (user *User) GetSubSourceMap() (map[Subscribe]Source, error) {
 
 	return m, nil
 }
+
+// GetSubSourceList get user subscribe and fetcher source
+func (user *User) GetSubSourceList() ([]*SubWithSource, error) {
+	m := make(map[Subscribe]struct{})
+
+	subs, err := GetSubsByUserID(user.TelegramID)
+	if err != nil {
+		return nil, errors.New("get subs error")
+	}
+
+	subsWithSources := make([]*SubWithSource, 0, len(subs))
+	for _, sub := range subs {
+		sub := sub
+		if _, ok := m[sub]; ok {
+			continue
+		}
+		m[sub] = struct{}{}
+		source, err := GetSourceById(sub.SourceID)
+		if err != nil {
+			continue
+		}
+		subsWithSources = append(subsWithSources, &SubWithSource{
+			Sub: &sub,
+			Src: source,
+		})
+	}
+
+	return subsWithSources, nil
+}
