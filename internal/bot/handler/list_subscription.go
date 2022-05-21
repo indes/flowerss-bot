@@ -10,6 +10,10 @@ import (
 	"github.com/indes/flowerss-bot/internal/model"
 )
 
+const (
+	MaxSubsSizePerPage = 50
+)
+
 type ListSubscription struct {
 }
 
@@ -70,20 +74,29 @@ func (l *ListSubscription) listChannelSubscription(ctx tb.Context, channelName s
 		return ctx.Send("获取频道订阅错误")
 	}
 
-	subSourceMap, err := user.GetSubSourceMap()
+	subSourceList, err := user.GetSubSourceList()
 	if err != nil {
 		return ctx.Send("获取频道订阅错误")
 	}
-	if len(subSourceMap) == 0 {
+	if len(subSourceList) == 0 {
 		return ctx.Send(
 			fmt.Sprintf("频道 [%s](https://t.me/%s) 订阅列表为空", channelChat.Title, channelChat.Username),
 			&tb.SendOptions{DisableWebPagePreview: true, ParseMode: tb.ModeMarkdown},
 		)
 	}
 
-	rspMessage := fmt.Sprintf("频道 [%s](https://t.me/%s) 订阅列表：\n", channelChat.Title, channelChat.Username)
-	for sub, source := range subSourceMap {
-		rspMessage = rspMessage + fmt.Sprintf("[[%d]] [%s](%s)\n", sub.ID, source.Title, source.Link)
+	rspMessage := ""
+	if len(subSourceList) > MaxSubsSizePerPage {
+		rspMessage = fmt.Sprintf("频道 [%s](https://t.me/%s) 订阅列表[1-%d]：\n", channelChat.Title, channelChat.Username, MaxSubsSizePerPage)
+	} else {
+		rspMessage = fmt.Sprintf("频道 [%s](https://t.me/%s) 订阅列表：\n", channelChat.Title, channelChat.Username)
+	}
+	for i, ss := range subSourceList {
+		if i != 0 && i%MaxSubsSizePerPage == 0 {
+			err = ctx.Send(rspMessage, &tb.SendOptions{DisableWebPagePreview: true, ParseMode: tb.ModeMarkdown})
+			rspMessage = fmt.Sprintf("频道 [%s](https://t.me/%s) 订阅列表[%d-%d]：\n", channelChat.Title, channelChat.Username, i+1, i+MaxSubsSizePerPage)
+		}
+		rspMessage = rspMessage + fmt.Sprintf("[[%d]] [%s](%s)\n", ss.Sub.ID, ss.Src.Title, ss.Src.Link)
 	}
 	return ctx.Send(rspMessage, &tb.SendOptions{DisableWebPagePreview: true, ParseMode: tb.ModeMarkdown})
 }

@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"strings"
+	"sync"
 
 	"github.com/indes/flowerss-bot/internal/bot/session"
 	"github.com/indes/flowerss-bot/internal/model"
@@ -61,20 +62,29 @@ func (o *OnDocument) Handle(ctx tb.Context) error {
 	outlines, _ := opmlFile.GetFlattenOutlines()
 	var failImportList []opml.Outline
 	var successImportList []opml.Outline
+	wg := &sync.WaitGroup{}
 	for _, outline := range outlines {
-		source, err := model.FindOrNewSourceByUrl(outline.XMLURL)
-		if err != nil {
-			failImportList = append(failImportList, outline)
-			continue
-		}
-		err = model.RegistFeed(userID, source.ID)
-		if err != nil {
-			failImportList = append(failImportList, outline)
-			continue
-		}
-		zap.S().Infof("%d subscribe [%d]%s %s", ctx.Chat().ID, source.ID, source.Title, source.Link)
-		successImportList = append(successImportList, outline)
+		outline := outline
+		wg.Add(1)
+		go func() {
+			source, err := model.FindOrNewSourceByUrl(outline.XMLURL)
+			if err != nil {
+				failImportList = append(failImportList, outline)
+				wg.Done()
+				return
+			}
+			err = model.RegistFeed(userID, source.ID)
+			if err != nil {
+				failImportList = append(failImportList, outline)
+				wg.Done()
+				return
+			}
+			zap.S().Infof("%d subscribe [%d]%s %s", ctx.Chat().ID, source.ID, source.Title, source.Link)
+			successImportList = append(successImportList, outline)
+			wg.Done()
+		}()
 	}
+	wg.Wait()
 
 	importReport := fmt.Sprintf("<b>导入成功：%d，导入失败：%d</b>", len(successImportList), len(failImportList))
 	if len(successImportList) != 0 {

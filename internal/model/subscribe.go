@@ -23,6 +23,11 @@ type Subscribe struct {
 	EditTime
 }
 
+type SubWithSource struct {
+	Sub *Subscribe
+	Src *Source
+}
+
 func RegistFeed(userID int64, sourceID uint) error {
 	var subscribe Subscribe
 
@@ -141,7 +146,7 @@ func GetSubByUserIDAndURL(userID int64, url string) (*Subscribe, error) {
 
 func GetSubsByUserID(userID int64) ([]Subscribe, error) {
 	var subs []Subscribe
-	db.Where("user_id=?", userID).Find(&subs)
+	db.Where("user_id=?", userID).Order("id").Find(&subs)
 	return subs, nil
 }
 
