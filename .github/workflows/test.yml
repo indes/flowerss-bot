@@ -17,7 +17,7 @@ jobs:
 
       - name: Generate coverage report
         run: |
-          go test -race -coverprofile=coverage.txt -covermode=atomic ./...
+          go test -v -race -coverprofile=coverage.txt -covermode=atomic ./...
 
       - name: Upload coverage report
         uses: codecov/codecov-action@v1
