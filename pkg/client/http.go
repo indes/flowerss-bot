@@ -37,9 +37,6 @@ func WithProxyURL(url string) HttpClientOption {
 	}
 }
 
-type Http interface {
-}
-
 type HttpClient struct {
 	client    *http.Client
 	userAgent string
