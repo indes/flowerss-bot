@@ -2,6 +2,7 @@ package bot
 
 import (
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/indes/flowerss-bot/internal/bot/handler"
@@ -36,25 +37,25 @@ func init() {
 	}
 	httpClient := client.NewHttpClient(clientOpts...)
 
+	settings := tb.Settings{
+		URL:    config.TelegramEndpoint,
+		Token:  config.BotToken,
+		Poller: &tb.LongPoller{Timeout: 10 * time.Second},
+		Client: httpClient.Client(),
+	}
+
+	logLevel := config.GetString("log.level")
+	if strings.ToLower(logLevel) == "debug" {
+		settings.Verbose = true
+	}
+
 	var err error
-	B, err = tb.NewBot(
-		tb.Settings{
-			URL:     config.TelegramEndpoint,
-			Token:   config.BotToken,
-			Poller:  &tb.LongPoller{Timeout: 10 * time.Second},
-			Client:  httpClient.Client(),
-			Verbose: true,
-		},
-	)
-	B.Use(
-		middleware.UserFilter(),
-		middleware.PreLoadMentionChat(),
-		middleware.IsChatAdmin(),
-	)
+	B, err = tb.NewBot(settings)
 	if err != nil {
 		zap.S().Fatal(err)
 		return
 	}
+	B.Use(middleware.UserFilter(), middleware.PreLoadMentionChat(), middleware.IsChatAdmin())
 }
 
 // Start bot
