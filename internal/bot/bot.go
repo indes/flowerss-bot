@@ -8,6 +8,7 @@ import (
 	"github.com/indes/flowerss-bot/internal/bot/middleware"
 	"github.com/indes/flowerss-bot/internal/config"
 	"github.com/indes/flowerss-bot/pkg/client"
+
 	"go.uber.org/zap"
 	tb "gopkg.in/telebot.v3"
 )
@@ -28,13 +29,13 @@ func init() {
 	)
 
 	clientOpts := []client.HttpClientOption{
-		client.WithTimeout(5 * time.Second),
+		client.WithTimeout(10 * time.Second),
 	}
 	if config.Socks5 != "" {
 		clientOpts = append(clientOpts, client.WithProxyURL(fmt.Sprintf("socks5://%s", config.Socks5)))
 	}
 	httpClient := client.NewHttpClient(clientOpts...)
-	
+
 	var err error
 	B, err = tb.NewBot(
 		tb.Settings{

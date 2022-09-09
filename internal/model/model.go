@@ -1,10 +1,12 @@
 package model
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/indes/flowerss-bot/internal/config"
 	"github.com/indes/flowerss-bot/internal/log"
+	"github.com/indes/flowerss-bot/pkg/client"
 
 	"github.com/jinzhu/gorm"
 	"go.uber.org/zap"
@@ -12,12 +14,28 @@ import (
 )
 
 var db *gorm.DB
+var httpClient *client.HttpClient // TODO: 将网络拉取逻辑从 model 包移除
 
 // InitDB init db object
 func InitDB() {
 	connectDB()
 	configDB()
 	updateTable()
+	initHttpClient()
+}
+
+func initHttpClient() {
+	clientOpts := []client.HttpClientOption{
+		client.WithTimeout(10 * time.Second),
+	}
+	if config.Socks5 != "" {
+		clientOpts = append(clientOpts, client.WithProxyURL(fmt.Sprintf("socks5://%s", config.Socks5)))
+	}
+
+	if config.UserAgent != "" {
+		clientOpts = append(clientOpts, client.WithUserAgent(config.UserAgent))
+	}
+	httpClient = client.NewHttpClient(clientOpts...)
 }
 
 func configDB() {
@@ -66,7 +84,7 @@ func createOrUpdateTable(model interface{}) {
 	}
 }
 
-//EditTime timestamp
+// EditTime timestamp
 type EditTime struct {
 	CreatedAt time.Time
 	UpdatedAt time.Time
