@@ -49,7 +49,8 @@ func init() {
 		viper.SetConfigFile(filepath.Join(workDir, "config.yml"))
 	}
 
-	fmt.Println(logo)
+	fmt.Printf(logo)
+	fmt.Printf("\n")
 	err := viper.ReadInConfig() // Find and read the config file
 	if err != nil {             // Handle errors reading the config file
 		panic(fmt.Errorf("Fatal error config file: %s", err))
