@@ -256,6 +256,9 @@ func (m *MysqlConfig) GetMysqlConnectingString() string {
 }
 
 func isInTests() bool {
+	if flag.Lookup("test.v") != nil {
+		return true
+	}
 	for _, arg := range os.Args {
 		if strings.HasPrefix(arg, "-test") {
 			if arg == "-testtpl" {
