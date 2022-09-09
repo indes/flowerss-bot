@@ -10,7 +10,6 @@ import (
 	"unicode"
 
 	"github.com/indes/flowerss-bot/internal/config"
-	"github.com/indes/flowerss-bot/internal/util"
 
 	"github.com/SlyMarbo/rss"
 	"github.com/jinzhu/gorm"
@@ -46,19 +45,7 @@ func GetSourceByUrl(url string) (*Source, error) {
 }
 
 func fetchFunc(url string) (resp *http.Response, err error) {
-	req, err := http.NewRequest("GET", url, nil)
-	if err != nil {
-		zap.S().Fatal(err)
-	}
-
-	if config.UserAgent != "" {
-		req.Header.Set("User-Agent", config.UserAgent)
-	} else {
-		req.Header.Set("User-Agent", "flowerss/2.0")
-	}
-
-	resp, err = util.HttpClient.Do(req)
-
+	resp, err = httpClient.Get(url)
 	if err != nil {
 		return nil, err
 	}
@@ -66,7 +53,6 @@ func fetchFunc(url string) (resp *http.Response, err error) {
 
 	var data []byte
 	if data, err = ioutil.ReadAll(resp.Body); err != nil {
-
 		return nil, err
 	}
 
