@@ -3,10 +3,11 @@ package model
 import (
 	"strings"
 
-	"github.com/indes/flowerss-bot/internal/config"
-	"github.com/indes/flowerss-bot/internal/tgraph"
-
 	"github.com/SlyMarbo/rss"
+
+	"github.com/indes/flowerss-bot/internal/config"
+	"github.com/indes/flowerss-bot/internal/id"
+	"github.com/indes/flowerss-bot/internal/tgraph"
 )
 
 // Content fetcher content
@@ -41,7 +42,7 @@ func getContentByFeedItem(source *Source, item *rss.Item) (Content, error) {
 		Description:  html, //replace all kinds of <br> tag
 		SourceID:     source.ID,
 		RawID:        item.ID,
-		HashID:       genHashID(source.Link, item.ID),
+		HashID:       id.GenHashID(source.Link, item.ID),
 		TelegraphURL: TelegraphURL,
 		RawLink:      item.Link,
 	}
@@ -56,7 +57,7 @@ func GenContentAndCheckByFeedItem(s *Source, item *rss.Item) (*Content, bool, er
 		isBroaded bool
 	)
 
-	hashID := genHashID(s.Link, item.ID)
+	hashID := id.GenHashID(s.Link, item.ID)
 	db.Where("hash_id=?", hashID).First(&content)
 	if content.HashID == "" {
 		isBroaded = false

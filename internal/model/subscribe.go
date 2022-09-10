@@ -4,6 +4,8 @@ import (
 	"errors"
 	"strings"
 
+	"github.com/jinzhu/gorm"
+
 	"github.com/indes/flowerss-bot/internal/config"
 )
 
@@ -28,22 +30,32 @@ type SubWithSource struct {
 	Src *Source
 }
 
-func RegistFeed(userID int64, sourceID uint) error {
+func AddSubscription(userID int64, sourceID uint) error {
 	var subscribe Subscribe
+	errs := db.Where("user_id=? and source_id=?", userID, sourceID).Find(&subscribe).GetErrors()
+	if len(errs) == 0 {
+		return nil
+	}
 
-	if err := db.Where("user_id=? and source_id=?", userID, sourceID).Find(&subscribe).Error; err != nil {
-		if err.Error() == "record not found" {
-			subscribe.UserID = userID
-			subscribe.SourceID = sourceID
-			subscribe.EnableNotification = 1
-			subscribe.EnableTelegraph = 1
-			subscribe.Interval = config.UpdateInterval
-			subscribe.WaitTime = config.UpdateInterval
-			if db.Create(&subscribe).Error == nil {
-				return nil
-			}
+	var recordNotFound bool = false
+	for _, err := range errs {
+		if err == gorm.ErrRecordNotFound {
+			recordNotFound = true
+		} else {
+			return err
 		}
-		return err
+	}
+
+	if recordNotFound {
+		subscribe.UserID = userID
+		subscribe.SourceID = sourceID
+		subscribe.EnableNotification = 1
+		subscribe.EnableTelegraph = 1
+		subscribe.Interval = config.UpdateInterval
+		subscribe.WaitTime = config.UpdateInterval
+		if errs := db.Create(&subscribe).GetErrors(); len(errs) != 0 {
+			return errs[0]
+		}
 	}
 	return nil
 }
@@ -51,19 +63,6 @@ func RegistFeed(userID int64, sourceID uint) error {
 func GetSubscribeByUserIDAndSourceID(userID int64, sourceID uint) (*Subscribe, error) {
 	var sub Subscribe
 	db.Where("user_id=? and source_id=?", userID, sourceID).First(&sub)
-	if sub.UserID != int64(userID) {
-		return nil, errors.New("未订阅该RSS源")
-	}
-	return &sub, nil
-}
-
-func GetSubscribeByUserIDAndURL(userID int, url string) (*Subscribe, error) {
-	var sub Subscribe
-	source, err := GetSourceByUrl(url)
-	if err != nil {
-		return nil, err
-	}
-	db.Where("user_id=? and source_id=?", userID, source.ID).First(&sub)
 	if sub.UserID != int64(userID) {
 		return nil, errors.New("未订阅该RSS源")
 	}
@@ -148,15 +147,6 @@ func GetSubsByUserID(userID int64) ([]Subscribe, error) {
 	var subs []Subscribe
 	db.Where("user_id=?", userID).Order("id").Find(&subs)
 	return subs, nil
-}
-
-func UnsubByUserIDAndSourceURL(userID int64, url string) error {
-	source, err := GetSourceByUrl(url)
-	if err != nil {
-		return err
-	}
-	err = UnsubByUserIDAndSource(userID, source)
-	return err
 }
 
 func GetSubscribeByID(id int) (*Subscribe, error) {

@@ -45,7 +45,7 @@ func (a *AddSubscription) addSubscriptionForChat(ctx tb.Context) error {
 	}
 
 	zap.S().Infof("%d subscribe [%d]%s %s", ctx.Chat().ID, source.ID, source.Title, source.Link)
-	if err := model.RegistFeed(ctx.Chat().ID, source.ID); err != nil {
+	if err := model.AddSubscription(ctx.Chat().ID, source.ID); err != nil {
 		return ctx.Reply(fmt.Sprintf("%s，订阅失败", err))
 	}
 
@@ -111,7 +111,7 @@ func (a *AddSubscription) addSubscriptionForChannel(ctx tb.Context, channelName 
 	}
 
 	zap.S().Infof("%d subscribe [%d]%s %s", channelChat.ID, source.ID, source.Title, source.Link)
-	if err := model.RegistFeed(channelChat.ID, source.ID); err != nil {
+	if err := model.AddSubscription(channelChat.ID, source.ID); err != nil {
 		return ctx.Reply(fmt.Sprintf("%s，订阅失败", err))
 	}
 

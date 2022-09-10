@@ -1,15 +1,19 @@
 package task
 
 import (
+	"fmt"
 	"sync"
 	"time"
 
-	"github.com/indes/flowerss-bot/internal/bot"
-	"github.com/indes/flowerss-bot/internal/config"
-	"github.com/indes/flowerss-bot/internal/model"
-
+	"github.com/SlyMarbo/rss"
 	"go.uber.org/atomic"
 	"go.uber.org/zap"
+
+	"github.com/indes/flowerss-bot/internal/bot"
+	"github.com/indes/flowerss-bot/internal/config"
+	"github.com/indes/flowerss-bot/internal/fetch"
+	"github.com/indes/flowerss-bot/internal/model"
+	"github.com/indes/flowerss-bot/pkg/client"
 )
 
 func init() {
@@ -27,8 +31,21 @@ type RssUpdateObserver interface {
 
 // NewRssTask new RssUpdateTask
 func NewRssTask() *RssUpdateTask {
+	clientOpts := []client.HttpClientOption{
+		client.WithTimeout(10 * time.Second),
+	}
+	if config.Socks5 != "" {
+		clientOpts = append(clientOpts, client.WithProxyURL(fmt.Sprintf("socks5://%s", config.Socks5)))
+	}
+
+	if config.UserAgent != "" {
+		clientOpts = append(clientOpts, client.WithUserAgent(config.UserAgent))
+	}
+	httpClient := client.NewHttpClient(clientOpts...)
+
 	return &RssUpdateTask{
 		observerList: []RssUpdateObserver{},
+		httpClient:   httpClient,
 	}
 }
 
@@ -36,6 +53,7 @@ func NewRssTask() *RssUpdateTask {
 type RssUpdateTask struct {
 	observerList []RssUpdateObserver
 	isStop       atomic.Bool
+	httpClient   *client.HttpClient
 }
 
 // Name 任务名称
@@ -58,7 +76,7 @@ func (t *RssUpdateTask) Deregister(removeObserver RssUpdateObserver) {
 	}
 }
 
-// Stop stop task
+// Stop task
 func (t *RssUpdateTask) Stop() {
 	t.isStop.Store(true)
 }
@@ -84,7 +102,7 @@ func (t *RssUpdateTask) Start() {
 					continue
 				}
 
-				newContents, err := source.GetNewContents()
+				newContents, err := t.getSourceNewContents(source)
 				if err != nil {
 					if source.ErrorCount >= config.ErrorThreshold {
 						t.notifyAllObserverErrorUpdate(source)
@@ -101,6 +119,29 @@ func (t *RssUpdateTask) Start() {
 			time.Sleep(time.Duration(config.UpdateInterval) * time.Minute)
 		}
 	}()
+}
+
+// getSourceNewContents 获取rss新内容
+func (t *RssUpdateTask) getSourceNewContents(source *model.Source) ([]*model.Content, error) {
+	zap.S().Debugw("fetch source updates", "source", source)
+
+	var newContents []*model.Content
+	feed, err := rss.FetchByFunc(fetch.FetchFunc(t.httpClient), source.Link)
+	if err != nil {
+		zap.S().Errorw("unable to fetch update", "error", err, "source", source)
+		source.AddErrorCount()
+		return nil, err
+	}
+
+	source.EraseErrorCount()
+	items := feed.Items
+	for _, item := range items {
+		c, isBroad, _ := model.GenContentAndCheckByFeedItem(source, item)
+		if !isBroad {
+			newContents = append(newContents, c)
+		}
+	}
+	return newContents, nil
 }
 
 // notifyAllObserverUpdate notify all rss update observer

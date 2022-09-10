@@ -3,17 +3,13 @@ package model
 import (
 	"errors"
 	"fmt"
-	"io/ioutil"
-	"net/http"
 	"sort"
-	"strings"
-	"unicode"
-
-	"github.com/indes/flowerss-bot/internal/config"
 
 	"github.com/SlyMarbo/rss"
 	"github.com/jinzhu/gorm"
-	"go.uber.org/zap"
+
+	"github.com/indes/flowerss-bot/internal/config"
+	"github.com/indes/flowerss-bot/internal/fetch"
 )
 
 type Source struct {
@@ -44,27 +40,6 @@ func GetSourceByUrl(url string) (*Source, error) {
 	return &source, nil
 }
 
-func fetchFunc(url string) (resp *http.Response, err error) {
-	resp, err = httpClient.Get(url)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
-
-	var data []byte
-	if data, err = ioutil.ReadAll(resp.Body); err != nil {
-		return nil, err
-	}
-
-	resp.Body = ioutil.NopCloser(strings.NewReader(strings.Map(func(r rune) rune {
-		if unicode.IsPrint(r) {
-			return r
-		}
-		return -1
-	}, string(data))))
-	return
-}
-
 func FindOrNewSourceByUrl(url string) (*Source, error) {
 	var source Source
 
@@ -73,7 +48,7 @@ func FindOrNewSourceByUrl(url string) (*Source, error) {
 			source.Link = url
 
 			// parsing task
-			feed, err := rss.FetchByFunc(fetchFunc, url)
+			feed, err := rss.FetchByFunc(fetch.FetchFunc(httpClient), url)
 
 			if err != nil {
 				return nil, fmt.Errorf("Feed 抓取错误 %v", err)
@@ -132,33 +107,6 @@ func (s *Source) NeedUpdate() bool {
 		db.Save(&sub)
 		return false
 	}
-}
-
-// GetNewContents 获取rss新内容
-func (s *Source) GetNewContents() ([]*Content, error) {
-	zap.S().Debugw("fetch source updates",
-		"source", s,
-	)
-
-	var newContents []*Content
-	feed, err := rss.FetchByFunc(fetchFunc, s.Link)
-	if err != nil {
-		zap.S().Errorw("unable to fetch update", "error", err, "source", s)
-		s.AddErrorCount()
-		return nil, err
-	}
-
-	s.EraseErrorCount()
-
-	items := feed.Items
-	for _, item := range items {
-		c, isBroad, _ := GenContentAndCheckByFeedItem(s, item)
-		if !isBroad {
-			newContents = append(newContents, c)
-		}
-	}
-
-	return newContents, nil
 }
 
 func GetSourcesByUserID(userID int64) ([]Source, error) {

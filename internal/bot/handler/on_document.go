@@ -73,7 +73,7 @@ func (o *OnDocument) Handle(ctx tb.Context) error {
 				wg.Done()
 				return
 			}
-			err = model.RegistFeed(userID, source.ID)
+			err = model.AddSubscription(userID, source.ID)
 			if err != nil {
 				failImportList = append(failImportList, outline)
 				wg.Done()

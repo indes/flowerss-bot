@@ -4,13 +4,13 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/indes/flowerss-bot/internal/config"
-	"github.com/indes/flowerss-bot/internal/log"
-	"github.com/indes/flowerss-bot/pkg/client"
-
 	"github.com/jinzhu/gorm"
 	"go.uber.org/zap"
 	"moul.io/zapgorm"
+
+	"github.com/indes/flowerss-bot/internal/config"
+	"github.com/indes/flowerss-bot/internal/log"
+	"github.com/indes/flowerss-bot/pkg/client"
 )
 
 var db *gorm.DB
