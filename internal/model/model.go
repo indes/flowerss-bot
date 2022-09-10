@@ -63,7 +63,7 @@ func connectDB() {
 	if config.EnableMysql {
 		db, err = gorm.Open("mysql", config.Mysql.GetMysqlConnectingString())
 	} else {
-		db, err = gorm.Open("sqlite3", config.SQLitePath)
+		db, err = gorm.Open("sqlite", config.SQLitePath)
 	}
 	if err != nil {
 		zap.S().Fatalf("connect db failed, err: %+v", err)
