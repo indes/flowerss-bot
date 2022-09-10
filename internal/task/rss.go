@@ -6,14 +6,14 @@ import (
 	"time"
 
 	"github.com/SlyMarbo/rss"
+	"go.uber.org/atomic"
+	"go.uber.org/zap"
+
 	"github.com/indes/flowerss-bot/internal/bot"
 	"github.com/indes/flowerss-bot/internal/config"
 	"github.com/indes/flowerss-bot/internal/fetch"
 	"github.com/indes/flowerss-bot/internal/model"
 	"github.com/indes/flowerss-bot/pkg/client"
-
-	"go.uber.org/atomic"
-	"go.uber.org/zap"
 )
 
 func init() {

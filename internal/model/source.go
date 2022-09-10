@@ -5,11 +5,11 @@ import (
 	"fmt"
 	"sort"
 
-	"github.com/indes/flowerss-bot/internal/config"
-	"github.com/indes/flowerss-bot/internal/fetch"
-
 	"github.com/SlyMarbo/rss"
 	"github.com/jinzhu/gorm"
+
+	"github.com/indes/flowerss-bot/internal/config"
+	"github.com/indes/flowerss-bot/internal/fetch"
 )
 
 type Source struct {

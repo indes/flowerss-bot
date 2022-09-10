@@ -3,11 +3,11 @@ package model
 import (
 	"strings"
 
+	"github.com/SlyMarbo/rss"
+
 	"github.com/indes/flowerss-bot/internal/config"
 	"github.com/indes/flowerss-bot/internal/id"
 	"github.com/indes/flowerss-bot/internal/tgraph"
-
-	"github.com/SlyMarbo/rss"
 )
 
 // Content fetcher content
