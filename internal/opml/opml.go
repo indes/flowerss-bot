@@ -1,16 +1,11 @@
 package opml
 
 import (
-	"crypto/tls"
 	"encoding/xml"
 	"errors"
 	"io"
-	"io/ioutil"
-	"net/http"
-	"net/url"
 	"time"
 
-	"github.com/indes/flowerss-bot/internal/config"
 	"github.com/indes/flowerss-bot/internal/model"
 )
 
@@ -80,38 +75,6 @@ func ReadOPML(r io.Reader) (*OPML, error) {
 	}
 
 	o, err := NewOPML(body)
-	if err != nil {
-		return nil, errors.New("parse opml file error")
-	}
-	return o, nil
-}
-
-// GetOPMLByURL get OPML form url
-func GetOPMLByURL(fileURL string) (*OPML, error) {
-	var proxy *url.URL
-
-	if config.Socks5 != "" {
-		proxy, _ = url.Parse("socks5://" + config.Socks5)
-	}
-
-	tr := &http.Transport{
-		Proxy:           http.ProxyURL(proxy),
-		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
-	}
-
-	client := &http.Client{
-		Transport: tr,
-		Timeout:   time.Second * 5,
-	}
-	resp, err := client.Get(fileURL)
-
-	if err != nil {
-		return nil, errors.New("fetch opml file error")
-	}
-
-	body, _ := ioutil.ReadAll(resp.Body)
-	o, err := NewOPML(body)
-
 	if err != nil {
 		return nil, errors.New("parse opml file error")
 	}
