@@ -11,7 +11,7 @@ import (
 	"github.com/indes/flowerss-bot/internal/model"
 )
 
-func getTestDB(t *testing.T) *gorm.DB {
+func GetTestDB(t *testing.T) *gorm.DB {
 	db, err := gorm.Open("sqlite3", "file::memory:?cache=shared")
 	if err != nil {
 		t.Log(err)
@@ -21,11 +21,14 @@ func getTestDB(t *testing.T) *gorm.DB {
 	if !db.HasTable(&model.User{}) {
 		db.CreateTable(&model.User{})
 	}
+	if !db.HasTable(&model.Source{}) {
+		db.CreateTable(&model.Source{})
+	}
 	return db
 }
 
 func TestUserStorageImpl_SaveAndGetUser(t *testing.T) {
-	db := getTestDB(t)
+	db := GetTestDB(t)
 	s := NewUserStorageImpl(db)
 	ctx := context.Background()
 

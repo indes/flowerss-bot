@@ -17,9 +17,9 @@ func NewUserStorageImpl(db *gorm.DB) *UserStorageImpl {
 }
 
 func (s *UserStorageImpl) CrateUser(ctx context.Context, user *model.User) error {
-	db := s.db.Create(user)
-	if len(db.GetErrors()) != 0 {
-		return db.GetErrors()[0]
+	result := s.db.Create(user)
+	if len(result.GetErrors()) != 0 {
+		return result.GetErrors()[0]
 	}
 	return nil
 }
