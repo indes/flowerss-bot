@@ -13,16 +13,6 @@ type User struct {
 	EditTime
 }
 
-// FindOrInitUser find subscriber or init a subscriber if user not in db
-//
-// Deprecated: Use model.FindOrCreateUserByTelegramID instead.
-func FindOrInitUser(userID int64) (*User, error) {
-	var user User
-	db.Where(User{ID: userID}).FirstOrCreate(&user)
-
-	return &user, nil
-}
-
 // FindOrCreateUserByTelegramID find subscriber or init a subscriber by telegram ID
 func FindOrCreateUserByTelegramID(telegramID int64) (*User, error) {
 	var user User

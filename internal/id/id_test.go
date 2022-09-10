@@ -1,4 +1,4 @@
-package model
+package id
 
 import "testing"
 
@@ -17,8 +17,8 @@ func Test_genHashID(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := genHashID(tt.args.sLink, tt.args.id); got != tt.want {
-				t.Errorf("genHashID() = %v, want %v", got, tt.want)
+			if got := GenHashID(tt.args.sLink, tt.args.id); got != tt.want {
+				t.Errorf("GenHashID() = %v, want %v", got, tt.want)
 			}
 		})
 	}
