@@ -83,6 +83,8 @@ allowed_users:
 | --------------------------| ----------------------------------------- | ------------------------------------------ |
 | bot_token                 | Telegram Bot Token                        | 必填                                       |
 | telegraph_token           | Telegraph Token, 用于转存原文到 Telegraph   | 可忽略（不转存原文到 Telegraph ）          |
+| telegraph_includes       | 当此列表不为空时，在此列表的 pattern 才会按照原逻辑尝试转存                 | 可忽略          |
+| telegraph_excludes       | 当 telegraph_includes 为空且此列表不为空时，在此列表的 pattern 不会转存 | 可忽略          |
 | preview_text              | 纯文字预览字数（不借助Telegraph）            |可忽略（默认0, 0为禁用）                    |
 | user_agent                | User Agent                                |可忽略                                     |
 | disable_web_page_preview  | 是否禁用 web 页面预览                       | 可忽略（默认 false, true 为禁用）          |

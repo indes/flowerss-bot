@@ -84,6 +84,12 @@ func init() {
 		}
 	}
 
+	if viper.IsSet("telegraph_includes") {
+		TelegraphIncludes = viper.GetStringSlice("telegraph_includes")
+	} else if viper.IsSet("telegraph_excludes") {
+		TelegraphExcludes = viper.GetStringSlice("telegraph_excludes")
+	}
+
 	if viper.IsSet("preview_text") {
 		PreviewText = viper.GetInt("preview_text")
 	}
