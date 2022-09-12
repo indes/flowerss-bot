@@ -60,3 +60,12 @@ func Error(args ...interface{}) {
 func Infof(template string, args ...interface{}) {
 	Logger.Sugar().Infof(template, args)
 }
+
+func Fatal(args ...interface{}) {
+	Logger.Sugar().Fatal(args...)
+}
+
+// Fatalf uses fmt.Sprintf to log a templated message, then calls os.Exit.
+func Fatalf(template string, args ...interface{}) {
+	Logger.Sugar().Fatalf(template, args...)
+}

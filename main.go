@@ -5,10 +5,9 @@ import (
 	"os/signal"
 	"syscall"
 
-	"go.uber.org/zap"
-
 	"github.com/indes/flowerss-bot/internal/bot"
 	"github.com/indes/flowerss-bot/internal/core"
+	"github.com/indes/flowerss-bot/internal/log"
 	"github.com/indes/flowerss-bot/internal/model"
 	"github.com/indes/flowerss-bot/internal/task"
 
@@ -22,8 +21,8 @@ func main() {
 	go handleSignal()
 
 	appCore := core.NewCore()
-	if err := appCore.Run(); err != nil {
-		zap.S().Fatal(err)
+	if err := appCore.Init(); err != nil {
+		log.Fatal(err)
 	}
 
 	bot.Start(appCore)

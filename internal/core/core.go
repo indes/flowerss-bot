@@ -3,9 +3,7 @@ package core
 import (
 	"context"
 	"errors"
-	"time"
 
-	"go.uber.org/zap"
 	"gorm.io/driver/mysql"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
@@ -21,7 +19,6 @@ var (
 )
 
 type Core struct {
-
 	// Storage
 	userStorage         storage.User
 	contentStorage      storage.Content
@@ -38,7 +35,7 @@ func NewCore() *Core {
 		db, err = gorm.Open(sqlite.Open(config.SQLitePath))
 	}
 	if err != nil {
-		zap.S().Fatalf("connect db failed, err: %+v", err)
+		log.Fatalf("connect db failed, err: %+v", err)
 		return nil
 	}
 	return &Core{
@@ -49,25 +46,11 @@ func NewCore() *Core {
 	}
 }
 
-func (c *Core) Run() error {
+func (c *Core) Init() error {
 	c.userStorage.Init(context.Background())
 	c.contentStorage.Init(context.Background())
 	c.sourceStorage.Init(context.Background())
 	c.subscriptionStorage.Init(context.Background())
-
-	go func() {
-		log.Infof("core running!\n")
-		ctx := context.Background()
-		for true {
-			count, err := c.subscriptionStorage.CountSubscriptions(ctx)
-			if err != nil {
-				log.Error(err)
-			} else {
-				log.Infof("CountSubscriptions %v", count)
-			}
-			time.Sleep(3 * time.Second)
-		}
-	}()
 	return nil
 }
 
@@ -93,7 +76,6 @@ func (c *Core) GetUserSubscribedSources(ctx context.Context, userID int64) ([]*m
 
 // AddSubscription 添加订阅
 func (c *Core) AddSubscription(ctx context.Context, userID int64, sourceID uint) error {
-	return errors.New("123")
 	exist, err := c.subscriptionStorage.SubscriptionExist(ctx, userID, sourceID)
 	if err != nil {
 		return err
