@@ -85,7 +85,7 @@ func setCommands() {
 		handler.NewSet(B),
 		handler.NewSetFeedTag(),
 		handler.NewSetUpdateInterval(),
-		handler.NewExport(),
+		handler.NewExport(Core),
 		handler.NewImport(),
 		handler.NewPauseAll(),
 		handler.NewActiveAll(),
