@@ -1,7 +1,5 @@
 package model
 
-import "errors"
-
 // User subscriber
 //
 // TelegramID 用作外键
@@ -18,55 +16,4 @@ func FindOrCreateUserByTelegramID(telegramID int64) (*User, error) {
 	db.Where(User{TelegramID: telegramID}).FirstOrCreate(&user)
 
 	return &user, nil
-}
-
-// GetSubSourceMap get user subscribe and fetcher source
-func (user *User) GetSubSourceMap() (map[Subscribe]Source, error) {
-	m := make(map[Subscribe]Source)
-
-	subs, err := GetSubsByUserID(user.TelegramID)
-	if err != nil {
-		return nil, errors.New("get subs error")
-	}
-
-	for _, sub := range subs {
-		source, err := GetSourceById(sub.SourceID)
-		if err != nil {
-			continue
-		}
-		m[sub] = *source
-	}
-
-	return m, nil
-}
-
-// GetSubSourceList get user subscribe and fetcher source
-func (user *User) GetSubSourceList() ([]*SubWithSource, error) {
-	m := make(map[Subscribe]struct{})
-
-	subs, err := GetSubsByUserID(user.TelegramID)
-	if err != nil {
-		return nil, errors.New("get subs error")
-	}
-
-	subsWithSources := make([]*SubWithSource, 0, len(subs))
-	for _, sub := range subs {
-		sub := sub
-		if _, ok := m[sub]; ok {
-			continue
-		}
-		m[sub] = struct{}{}
-		source, err := GetSourceById(sub.SourceID)
-		if err != nil {
-			continue
-		}
-		subsWithSources = append(
-			subsWithSources, &SubWithSource{
-				Sub: &sub,
-				Src: source,
-			},
-		)
-	}
-
-	return subsWithSources, nil
 }
