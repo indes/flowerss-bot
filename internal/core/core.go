@@ -45,6 +45,11 @@ func NewCore() *Core {
 }
 
 func (c *Core) Run() error {
+	c.userStorage.Init(context.Background())
+	c.contentStorage.Init(context.Background())
+	c.sourceStorage.Init(context.Background())
+	c.subscriptionStorage.Init(context.Background())
+
 	go func() {
 		zap.S().Infoln("core running!")
 		ctx := context.Background()
