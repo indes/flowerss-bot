@@ -4,9 +4,8 @@ import (
 	"context"
 	"testing"
 
-	_ "github.com/jinzhu/gorm/dialects/sqlite"
+	"github.com/iyear/sqlite"
 	"github.com/stretchr/testify/assert"
-	"gorm.io/driver/sqlite" // Sqlite driver based on GGO
 	"gorm.io/gorm"
 
 	"github.com/indes/flowerss-bot/internal/model"
