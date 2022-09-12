@@ -1,7 +1,7 @@
-FROM golang:1.13-alpine as builder
-#ENV CGO_ENABLED=0
+FROM golang:1.18.6-alpine as builder
+ENV CGO_ENABLED=0
 COPY . /flowerss
-RUN apk add git make gcc libc-dev && \
+RUN apk add git make && \
     cd /flowerss && make build
 
 # Image starts here
