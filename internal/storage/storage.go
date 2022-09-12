@@ -57,3 +57,10 @@ type SubscriptionStorage interface {
 		ctx context.Context, sourceID uint, opts *GetSubscriptionsOptions,
 	) (*GetSubscriptionsResult, error)
 }
+
+type ContentStorage interface {
+	// AddContent 添加一条文章
+	AddContent(ctx context.Context, content *model.Content) error
+	// DeleteSourceContents 删除订阅源的所有文章，返回被删除的文章数
+	DeleteSourceContents(ctx context.Context, sourceID uint) (int64, error)
+}
