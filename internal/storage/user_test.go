@@ -26,8 +26,7 @@ func TestUserStorageImpl(t *testing.T) {
 	ctx := context.Background()
 	s.Init(ctx)
 	user := &model.User{
-		TelegramID: 123,
-		State:      1,
+		ID: 123,
 	}
 
 	t.Run(
@@ -42,16 +41,6 @@ func TestUserStorageImpl(t *testing.T) {
 			got, err := s.GetUser(ctx, user.ID)
 			assert.Nil(t, err)
 			assert.NotNil(t, got)
-			assert.Equal(t, user.TelegramID, got.TelegramID)
-		},
-	)
-
-	t.Run(
-		"get user by telegram id", func(t *testing.T) {
-			got, err := s.GetUserByTelegramID(ctx, user.TelegramID)
-			assert.Nil(t, err)
-			assert.NotNil(t, got)
-			assert.Equal(t, user.TelegramID, got.TelegramID)
 			assert.Equal(t, user.ID, got.ID)
 		},
 	)

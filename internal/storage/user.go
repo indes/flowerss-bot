@@ -40,15 +40,3 @@ func (s *UserStorageImpl) GetUser(ctx context.Context, id int64) (*model.User, e
 	}
 	return user, nil
 }
-
-func (s *UserStorageImpl) GetUserByTelegramID(ctx context.Context, telegramID int64) (*model.User, error) {
-	var user = &model.User{}
-	result := s.db.WithContext(ctx).Where(model.User{TelegramID: telegramID}).First(user)
-	if result.Error != nil {
-		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
-			return nil, ErrRecordNotFound
-		}
-		return nil, result.Error
-	}
-	return user, nil
-}
