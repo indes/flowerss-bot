@@ -47,7 +47,7 @@ func (s *SubscriptionStorageImpl) GetSubscriptionsByUserID(
 	}
 
 	result := &GetSubscriptionsResult{}
-	if len(subscriptions) > opts.Count {
+	if opts.Count != -1 && len(subscriptions) > opts.Count {
 		result.HasMore = true
 		subscriptions = subscriptions[:opts.Count]
 	}
