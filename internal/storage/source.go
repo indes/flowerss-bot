@@ -18,7 +18,7 @@ func NewSourceStorageImpl(db *gorm.DB) *SourceStorageImpl {
 }
 
 func (s *SourceStorageImpl) AddSource(ctx context.Context, source *model.Source) error {
-	result := s.db.Create(source)
+	result := s.db.WithContext(ctx).Create(source)
 	if result.Error != nil {
 		return result.Error
 	}
@@ -27,7 +27,7 @@ func (s *SourceStorageImpl) AddSource(ctx context.Context, source *model.Source)
 
 func (s *SourceStorageImpl) GetSource(ctx context.Context, id uint) (*model.Source, error) {
 	var source = &model.Source{}
-	result := s.db.Where(&model.Source{ID: id}).First(source)
+	result := s.db.WithContext(ctx).Where(&model.Source{ID: id}).First(source)
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 			return nil, ErrRecordNotFound
@@ -40,7 +40,7 @@ func (s *SourceStorageImpl) GetSource(ctx context.Context, id uint) (*model.Sour
 
 func (s *SourceStorageImpl) GetSourceByURL(ctx context.Context, url string) (*model.Source, error) {
 	var source = &model.Source{}
-	result := s.db.Where(&model.Source{Link: url}).First(source)
+	result := s.db.WithContext(ctx).Where(&model.Source{Link: url}).First(source)
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 			return nil, ErrRecordNotFound

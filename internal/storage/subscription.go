@@ -14,11 +14,11 @@ type SubscriptionStorageImpl struct {
 }
 
 func NewSubscriptionStorageImpl(db *gorm.DB) *SubscriptionStorageImpl {
-	return &SubscriptionStorageImpl{db: db}
+	return &SubscriptionStorageImpl{db: db.Model(&model.Subscribe{})}
 }
 
 func (s *SubscriptionStorageImpl) AddSubscription(ctx context.Context, subscription *model.Subscribe) error {
-	result := s.db.Create(subscription)
+	result := s.db.WithContext(ctx).Create(subscription)
 	if result.Error != nil {
 		return result.Error
 	}
@@ -32,7 +32,9 @@ func (s *SubscriptionStorageImpl) GetSubscriptionsByUserID(
 
 	count := s.getSubscriptionsCount(opts)
 	orderBy := s.getSubscriptionsOrderBy(opts)
-	dbResult := s.db.Where(&model.Subscribe{UserID: userID}).Limit(count).Order(orderBy).Offset(opts.Offset).Find(subscriptions)
+	dbResult := s.db.WithContext(ctx).Where(
+		&model.Subscribe{UserID: userID},
+	).Limit(count).Order(orderBy).Offset(opts.Offset).Find(&subscriptions)
 	if dbResult.Error != nil {
 		if errors.Is(dbResult.Error, gorm.ErrRecordNotFound) {
 			return nil, ErrRecordNotFound
@@ -53,10 +55,28 @@ func (s *SubscriptionStorageImpl) GetSubscriptionsByUserID(
 func (s *SubscriptionStorageImpl) GetSubscriptionsBySourceID(
 	ctx context.Context, sourceID uint, opts *GetSubscriptionsOptions,
 ) (*GetSubscriptionsResult, error) {
-	//var subscriptions []*model.Subscribe
-	//s.db.Where("source_id=?", s.ID).Find(&subs)
+	var subscriptions []*model.Subscribe
 
-	return nil, nil
+	count := s.getSubscriptionsCount(opts)
+	orderBy := s.getSubscriptionsOrderBy(opts)
+	dbResult := s.db.WithContext(ctx).Where(
+		&model.Subscribe{SourceID: sourceID},
+	).Limit(count).Order(orderBy).Offset(opts.Offset).Find(&subscriptions)
+	if dbResult.Error != nil {
+		if errors.Is(dbResult.Error, gorm.ErrRecordNotFound) {
+			return nil, ErrRecordNotFound
+		}
+		return nil, dbResult.Error
+	}
+
+	result := &GetSubscriptionsResult{}
+	if len(subscriptions) > opts.Count {
+		result.HasMore = true
+		subscriptions = subscriptions[:opts.Count]
+	}
+
+	result.Subscriptions = subscriptions
+	return result, nil
 }
 
 func (s *SubscriptionStorageImpl) getSubscriptionsCount(opts *GetSubscriptionsOptions) int {
@@ -70,7 +90,24 @@ func (s *SubscriptionStorageImpl) getSubscriptionsCount(opts *GetSubscriptionsOp
 func (s *SubscriptionStorageImpl) getSubscriptionsOrderBy(opts *GetSubscriptionsOptions) string {
 	switch opts.SortType {
 	case SubscriptionSortTypeCreatedTimeDesc:
-		return "create_at desc"
+		return "created_at desc"
 	}
 	return ""
+}
+
+func (s *SubscriptionStorageImpl) CountSubscriptions(ctx context.Context) (int64, error) {
+	var count int64
+	dbResult := s.db.WithContext(ctx).Count(&count)
+	if dbResult.Error != nil {
+		return 0, dbResult.Error
+	}
+	return count, nil
+}
+
+func (s *SubscriptionStorageImpl) DeleteSubscription(ctx context.Context, subscriptionID uint) (int64, error) {
+	result := s.db.WithContext(ctx).Delete(&model.Subscribe{}, subscriptionID)
+	if result.Error != nil {
+		return 0, result.Error
+	}
+	return result.RowsAffected, nil
 }

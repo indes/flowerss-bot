@@ -18,7 +18,7 @@ func NewUserStorageImpl(db *gorm.DB) *UserStorageImpl {
 }
 
 func (s *UserStorageImpl) CrateUser(ctx context.Context, user *model.User) error {
-	result := s.db.Create(user)
+	result := s.db.WithContext(ctx).Create(user)
 	if result.Error != nil {
 		return result.Error
 	}
@@ -27,7 +27,7 @@ func (s *UserStorageImpl) CrateUser(ctx context.Context, user *model.User) error
 
 func (s *UserStorageImpl) GetUser(ctx context.Context, id int64) (*model.User, error) {
 	var user = &model.User{}
-	result := s.db.Where(&model.User{ID: id}).First(user)
+	result := s.db.WithContext(ctx).Where(&model.User{ID: id}).First(user)
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 			return nil, ErrRecordNotFound
@@ -39,7 +39,7 @@ func (s *UserStorageImpl) GetUser(ctx context.Context, id int64) (*model.User, e
 
 func (s *UserStorageImpl) GetUserByTelegramID(ctx context.Context, telegramID int64) (*model.User, error) {
 	var user = &model.User{}
-	result := s.db.Where(model.User{TelegramID: telegramID}).First(user)
+	result := s.db.WithContext(ctx).Where(model.User{TelegramID: telegramID}).First(user)
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 			return nil, ErrRecordNotFound

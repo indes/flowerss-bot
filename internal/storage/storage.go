@@ -36,16 +36,14 @@ const (
 )
 
 type GetSubscriptionsOptions struct {
-	Count      int // 需要获取的数量，-1为获取全部
-	Offset     int
-	AttachInfo string
-	SortType   SubscriptionSortType
+	Count    int // 需要获取的数量，-1为获取全部
+	Offset   int
+	SortType SubscriptionSortType
 }
 
 type GetSubscriptionsResult struct {
 	Subscriptions []*model.Subscribe
 	HasMore       bool
-	AttachInfo    string
 }
 
 type SubscriptionStorage interface {
@@ -56,6 +54,8 @@ type SubscriptionStorage interface {
 	GetSubscriptionsBySourceID(
 		ctx context.Context, sourceID uint, opts *GetSubscriptionsOptions,
 	) (*GetSubscriptionsResult, error)
+	CountSubscriptions(ctx context.Context) (int64, error)
+	DeleteSubscription(ctx context.Context, subscriptionID uint) (int64, error)
 }
 
 type ContentStorage interface {

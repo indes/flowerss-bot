@@ -10,6 +10,7 @@ import (
 	"github.com/indes/flowerss-bot/internal/task"
 
 	_ "github.com/jinzhu/gorm/dialects/mysql"
+	_ "modernc.org/sqlite"
 )
 
 func main() {
