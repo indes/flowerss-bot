@@ -55,7 +55,7 @@ type SubscriptionStorage interface {
 		ctx context.Context, sourceID uint, opts *GetSubscriptionsOptions,
 	) (*GetSubscriptionsResult, error)
 	CountSubscriptions(ctx context.Context) (int64, error)
-	DeleteSubscription(ctx context.Context, subscriptionID uint) (int64, error)
+	DeleteSubscription(ctx context.Context, userID int64, sourceID uint) (int64, error)
 }
 
 type ContentStorage interface {

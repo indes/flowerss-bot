@@ -15,32 +15,27 @@ func TestSubscriptionStorageImpl(t *testing.T) {
 	ctx := context.Background()
 	subscriptions := []*model.Subscribe{
 		&model.Subscribe{
-			ID:                 1,
 			SourceID:           1,
 			UserID:             100,
 			EnableNotification: 1,
 		},
 		&model.Subscribe{
-			ID:                 2,
 			SourceID:           1,
 			UserID:             101,
 			EnableNotification: 1,
 		},
 
 		&model.Subscribe{
-			ID:                 3,
 			SourceID:           2,
 			UserID:             100,
 			EnableNotification: 1,
 		},
 		&model.Subscribe{
-			ID:                 4,
 			SourceID:           2,
 			UserID:             101,
 			EnableNotification: 1,
 		},
 		&model.Subscribe{
-			ID:                 5,
 			SourceID:           3,
 			UserID:             101,
 			EnableNotification: 1,
@@ -91,7 +86,7 @@ func TestSubscriptionStorageImpl(t *testing.T) {
 			assert.Equal(t, 0, len(result.Subscriptions))
 			assert.False(t, result.HasMore)
 
-			got, err = s.DeleteSubscription(ctx, 1)
+			got, err = s.DeleteSubscription(ctx, 101, 1)
 			assert.Nil(t, err)
 			assert.Equal(t, int64(1), got)
 

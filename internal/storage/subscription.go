@@ -104,8 +104,10 @@ func (s *SubscriptionStorageImpl) CountSubscriptions(ctx context.Context) (int64
 	return count, nil
 }
 
-func (s *SubscriptionStorageImpl) DeleteSubscription(ctx context.Context, subscriptionID uint) (int64, error) {
-	result := s.db.WithContext(ctx).Delete(&model.Subscribe{}, subscriptionID)
+func (s *SubscriptionStorageImpl) DeleteSubscription(ctx context.Context, userID int64, sourceID uint) (int64, error) {
+	result := s.db.WithContext(ctx).Where(
+		"user_id = ? and source_id = ?", userID, sourceID,
+	).Delete(&model.Subscribe{})
 	if result.Error != nil {
 		return 0, result.Error
 	}
