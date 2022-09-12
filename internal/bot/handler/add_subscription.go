@@ -38,7 +38,6 @@ func (a *AddSubscription) addSubscriptionForChat(ctx tb.Context) error {
 		return ctx.Send(hint, &tb.SendOptions{ReplyTo: ctx.Message()})
 	}
 
-	sourceURL = model.ProcessWechatURL(sourceURL)
 	source, err := model.FindOrNewSourceByUrl(sourceURL)
 	if err != nil {
 		return ctx.Reply(fmt.Sprintf("%s，订阅失败", err))
@@ -104,7 +103,6 @@ func (a *AddSubscription) addSubscriptionForChannel(ctx tb.Context, channelName 
 		return ctx.Reply("您或Bot不是频道管理员，无法设置订阅")
 	}
 
-	sourceURL = model.ProcessWechatURL(sourceURL)
 	source, err := model.FindOrNewSourceByUrl(sourceURL)
 	if err != nil {
 		return ctx.Reply(fmt.Sprintf("%s，订阅失败", err))
