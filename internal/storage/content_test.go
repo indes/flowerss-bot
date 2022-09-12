@@ -22,6 +22,7 @@ func TestContentStorageImpl_AddContent(t *testing.T) {
 		SourceID: 1,
 		HashID:   "id2",
 	}
+
 	t.Run(
 		"add content", func(t *testing.T) {
 			err := s.AddContent(ctx, content)
@@ -32,10 +33,26 @@ func TestContentStorageImpl_AddContent(t *testing.T) {
 	)
 
 	t.Run(
+		"hash id exist", func(t *testing.T) {
+			exist, err := s.HashIDExist(ctx, content.HashID)
+			assert.Nil(t, err)
+			assert.True(t, exist)
+		},
+	)
+
+	t.Run(
 		"del content", func(t *testing.T) {
 			got, err := s.DeleteSourceContents(ctx, content.SourceID)
 			assert.Nil(t, err)
 			assert.Equal(t, int64(2), got)
+		},
+	)
+
+	t.Run(
+		"hash id exist2", func(t *testing.T) {
+			exist, err := s.HashIDExist(ctx, content.HashID)
+			assert.Nil(t, err)
+			assert.False(t, exist)
 		},
 	)
 }
