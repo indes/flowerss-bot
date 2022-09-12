@@ -88,8 +88,19 @@ func (l *ListSubscription) replaySubscribedSources(ctx tb.Context, sources []*mo
 	}
 	var msg strings.Builder
 	msg.WriteString(fmt.Sprintf("共订阅%d个源，订阅列表\n", len(sources)))
+	count := 0
 	for i := range sources {
 		msg.WriteString(fmt.Sprintf("[[%d]] [%s](%s)\n", sources[i].ID, sources[i].Title, sources[i].Link))
+		count++
+		if count == MaxSubsSizePerPage {
+			ctx.Send(msg.String(), &tb.SendOptions{DisableWebPagePreview: true, ParseMode: tb.ModeMarkdown})
+			count = 0
+			msg.Reset()
+		}
 	}
-	return ctx.Send(msg.String(), &tb.SendOptions{DisableWebPagePreview: true, ParseMode: tb.ModeMarkdown})
+
+	if count != 0 {
+		ctx.Send(msg.String(), &tb.SendOptions{DisableWebPagePreview: true, ParseMode: tb.ModeMarkdown})
+	}
+	return nil
 }
