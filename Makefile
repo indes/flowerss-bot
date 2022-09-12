@@ -9,8 +9,9 @@ test:
 all: build
 
 build: get
-	go build -ldflags \
-	"-X 'github.com/indes/flowerss-bot/internal/config.commit=$(COMMIT)' \
+	go build -trimpath -ldflags \
+	"-s -w -buildid= \
+	-X 'github.com/indes/flowerss-bot/internal/config.commit=$(COMMIT)' \
 	-X 'github.com/indes/flowerss-bot/internal/config.date=$(DATA)' \
 	-X 'github.com/indes/flowerss-bot/internal/config.version=$(VERSION)'" -o $(app_name)
 
