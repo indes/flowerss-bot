@@ -4,7 +4,7 @@ import (
 	"context"
 	"testing"
 
-	"github.com/iyear/sqlite"
+	"github.com/glebarez/sqlite"
 	"github.com/stretchr/testify/assert"
 	"gorm.io/gorm"
 
