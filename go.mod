@@ -13,7 +13,7 @@ require (
 	github.com/mattn/go-sqlite3 v1.14.15 // indirect
 	github.com/spf13/viper v1.13.0
 	github.com/stretchr/testify v1.8.0
-	go.uber.org/atomic v1.10.0
+	go.uber.org/atomic v1.9.0
 	go.uber.org/zap v1.23.0
 	golang.org/x/sys v0.0.0-20220811171246-fbc7d0a398ab // indirect
 	gopkg.in/telebot.v3 v3.0.0
