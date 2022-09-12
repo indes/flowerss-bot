@@ -27,8 +27,9 @@ type User interface {
 type Source interface {
 	Storage
 	AddSource(ctx context.Context, source *model.Source) error
-	GetSource(ctx context.Context, sourceID uint) (*model.Source, error)
+	GetSource(ctx context.Context, id uint) (*model.Source, error)
 	GetSourceByURL(ctx context.Context, url string) (*model.Source, error)
+	Delete(ctx context.Context, id uint) error
 }
 
 type SubscriptionSortType = int
@@ -60,6 +61,7 @@ type Subscription interface {
 	) (*GetSubscriptionsResult, error)
 	CountSubscriptions(ctx context.Context) (int64, error)
 	DeleteSubscription(ctx context.Context, userID int64, sourceID uint) (int64, error)
+	CountSourceSubscriptions(ctx context.Context, sourceID uint) (int64, error)
 }
 
 type Content interface {

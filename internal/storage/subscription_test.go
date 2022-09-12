@@ -103,6 +103,10 @@ func TestSubscriptionStorageImpl(t *testing.T) {
 			got, err = s.CountSubscriptions(ctx)
 			assert.Nil(t, err)
 			assert.Equal(t, int64(4), got)
+
+			got, err = s.CountSourceSubscriptions(ctx, 2)
+			assert.Nil(t, err)
+			assert.Equal(t, int64(2), got)
 		},
 	)
 }

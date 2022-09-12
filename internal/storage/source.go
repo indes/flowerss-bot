@@ -53,3 +53,11 @@ func (s *SourceStorageImpl) GetSourceByURL(ctx context.Context, url string) (*mo
 	}
 	return source, nil
 }
+
+func (s *SourceStorageImpl) Delete(ctx context.Context, id uint) error {
+	result := s.db.WithContext(ctx).Where("id = ?", id).Delete(&model.Source{})
+	if result.Error != nil {
+		return result.Error
+	}
+	return nil
+}

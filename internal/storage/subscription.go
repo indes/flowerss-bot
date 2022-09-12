@@ -126,3 +126,12 @@ func (s *SubscriptionStorageImpl) DeleteSubscription(ctx context.Context, userID
 	}
 	return result.RowsAffected, nil
 }
+
+func (s *SubscriptionStorageImpl) CountSourceSubscriptions(ctx context.Context, sourceID uint) (int64, error) {
+	var count int64
+	result := s.db.WithContext(ctx).Where("source_id = ?", sourceID).Count(&count)
+	if result.Error != nil {
+		return 0, result.Error
+	}
+	return count, nil
+}
