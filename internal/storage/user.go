@@ -2,8 +2,9 @@ package storage
 
 import (
 	"context"
+	"errors"
 
-	"github.com/jinzhu/gorm"
+	"gorm.io/gorm"
 
 	"github.com/indes/flowerss-bot/internal/model"
 )
@@ -18,32 +19,32 @@ func NewUserStorageImpl(db *gorm.DB) *UserStorageImpl {
 
 func (s *UserStorageImpl) CrateUser(ctx context.Context, user *model.User) error {
 	result := s.db.Create(user)
-	if len(result.GetErrors()) != 0 {
-		return result.GetErrors()[0]
+	if result.Error != nil {
+		return result.Error
 	}
 	return nil
 }
 
 func (s *UserStorageImpl) GetUser(ctx context.Context, id int64) (*model.User, error) {
 	var user = &model.User{}
-	db := s.db.Where(&model.User{ID: id}).First(user)
-	if db.RecordNotFound() {
-		return nil, ErrRecordNotFound
-	}
-	if len(db.GetErrors()) != 0 {
-		return nil, db.GetErrors()[0]
+	result := s.db.Where(&model.User{ID: id}).First(user)
+	if result.Error != nil {
+		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+			return nil, ErrRecordNotFound
+		}
+		return nil, result.Error
 	}
 	return user, nil
 }
 
 func (s *UserStorageImpl) GetUserByTelegramID(ctx context.Context, telegramID int64) (*model.User, error) {
 	var user = &model.User{}
-	db := s.db.Where(model.User{TelegramID: telegramID}).First(user)
-	if db.RecordNotFound() {
-		return nil, ErrRecordNotFound
-	}
-	if len(db.GetErrors()) != 0 {
-		return nil, db.GetErrors()[0]
+	result := s.db.Where(model.User{TelegramID: telegramID}).First(user)
+	if result.Error != nil {
+		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+			return nil, ErrRecordNotFound
+		}
+		return nil, result.Error
 	}
 	return user, nil
 }

@@ -29,5 +29,31 @@ type SourceStorage interface {
 type FeedStorage interface {
 }
 
+type SubscriptionSortType = int
+
+const (
+	SubscriptionSortTypeCreatedTimeDesc SubscriptionSortType = iota
+)
+
+type GetSubscriptionsOptions struct {
+	Count      int // 需要获取的数量，-1为获取全部
+	Offset     int
+	AttachInfo string
+	SortType   SubscriptionSortType
+}
+
+type GetSubscriptionsResult struct {
+	Subscriptions []*model.Subscribe
+	HasMore       bool
+	AttachInfo    string
+}
+
 type SubscriptionStorage interface {
+	AddSubscription(ctx context.Context, subscription *model.Subscribe) error
+	GetSubscriptionsByUserID(
+		ctx context.Context, userID int64, opts *GetSubscriptionsOptions,
+	) (*GetSubscriptionsResult, error)
+	GetSubscriptionsBySourceID(
+		ctx context.Context, sourceID uint, opts *GetSubscriptionsOptions,
+	) (*GetSubscriptionsResult, error)
 }
