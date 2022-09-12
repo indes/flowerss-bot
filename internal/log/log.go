@@ -48,3 +48,24 @@ func init() {
 	Logger, _ = zapConfig.Build()
 	zap.ReplaceGlobals(Logger)
 }
+
+func Errorf(template string, args ...interface{}) {
+	Logger.Sugar().Errorf(template, args...)
+}
+
+func Error(args ...interface{}) {
+	Logger.Sugar().Error(args...)
+}
+
+func Infof(template string, args ...interface{}) {
+	Logger.Sugar().Infof(template, args)
+}
+
+func Fatal(args ...interface{}) {
+	Logger.Sugar().Fatal(args...)
+}
+
+// Fatalf uses fmt.Sprintf to log a templated message, then calls os.Exit.
+func Fatalf(template string, args ...interface{}) {
+	Logger.Sugar().Fatalf(template, args...)
+}

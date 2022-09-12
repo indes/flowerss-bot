@@ -6,6 +6,8 @@ import (
 	"syscall"
 
 	"github.com/indes/flowerss-bot/internal/bot"
+	"github.com/indes/flowerss-bot/internal/core"
+	"github.com/indes/flowerss-bot/internal/log"
 	"github.com/indes/flowerss-bot/internal/model"
 	"github.com/indes/flowerss-bot/internal/task"
 
@@ -17,7 +19,13 @@ func main() {
 	model.InitDB()
 	task.StartTasks()
 	go handleSignal()
-	bot.Start()
+
+	appCore := core.NewCore()
+	if err := appCore.Init(); err != nil {
+		log.Fatal(err)
+	}
+
+	bot.Start(appCore)
 }
 
 func handleSignal() {

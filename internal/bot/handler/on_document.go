@@ -1,25 +1,31 @@
 package handler
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"strings"
 	"sync"
 
 	"github.com/indes/flowerss-bot/internal/bot/session"
+	"github.com/indes/flowerss-bot/internal/core"
+	"github.com/indes/flowerss-bot/internal/log"
 	"github.com/indes/flowerss-bot/internal/model"
 	"github.com/indes/flowerss-bot/internal/opml"
 
-	"go.uber.org/zap"
 	tb "gopkg.in/telebot.v3"
 )
 
 type OnDocument struct {
-	bot *tb.Bot
+	bot  *tb.Bot
+	core *core.Core
 }
 
-func NewOnDocument(bot *tb.Bot) *OnDocument {
-	return &OnDocument{bot: bot}
+func NewOnDocument(bot *tb.Bot, core *core.Core) *OnDocument {
+	return &OnDocument{
+		bot:  bot,
+		core: core,
+	}
 }
 
 func (o *OnDocument) Command() string {
@@ -42,7 +48,7 @@ func (o *OnDocument) getOPML(ctx tb.Context) (*opml.OPML, error) {
 
 	opmlFile, err := opml.ReadOPML(fileRead)
 	if err != nil {
-		zap.S().Errorf("parser opml failed, %v", err)
+		log.Errorf("parser opml failed, %v", err)
 		return nil, errors.New("获取文件失败")
 	}
 	return opmlFile, nil
@@ -60,61 +66,80 @@ func (o *OnDocument) Handle(ctx tb.Context) error {
 	}
 
 	outlines, _ := opmlFile.GetFlattenOutlines()
-	var failImportList []opml.Outline
-	var successImportList []opml.Outline
+	var failImportList = make([]opml.Outline, len(outlines))
+	failIndex := 0
+	var successImportList = make([]opml.Outline, len(outlines))
+	successIndex := 0
 	wg := &sync.WaitGroup{}
 	for _, outline := range outlines {
 		outline := outline
 		wg.Add(1)
 		go func() {
+			defer wg.Done()
 			source, err := model.FindOrNewSourceByUrl(outline.XMLURL)
 			if err != nil {
-				failImportList = append(failImportList, outline)
-				wg.Done()
+				failImportList[failIndex] = outline
+				failIndex++
 				return
 			}
-			err = model.AddSubscription(userID, source.ID)
+
+			err = o.core.AddSubscription(context.Background(), userID, source.ID)
 			if err != nil {
-				failImportList = append(failImportList, outline)
-				wg.Done()
+				if err == core.ErrSubscriptionExist {
+					successImportList[successIndex] = outline
+					successIndex++
+				} else {
+					failImportList[failIndex] = outline
+					failIndex++
+				}
 				return
 			}
-			zap.S().Infof("%d subscribe [%d]%s %s", ctx.Chat().ID, source.ID, source.Title, source.Link)
-			successImportList = append(successImportList, outline)
-			wg.Done()
+
+			log.Infof("%d subscribe [%d]%s %s", ctx.Chat().ID, source.ID, source.Title, source.Link)
+			successImportList[successIndex] = outline
+			successIndex++
+			return
 		}()
 	}
 	wg.Wait()
 
-	importReport := fmt.Sprintf("<b>导入成功：%d，导入失败：%d</b>", len(successImportList), len(failImportList))
-	if len(successImportList) != 0 {
-		successReport := "\n\n<b>以下订阅源导入成功:</b>"
-		for i, line := range successImportList {
+	var msg strings.Builder
+	msg.WriteString(fmt.Sprintf("<b>导入成功：%d，导入失败：%d</b>\n", successIndex, failIndex))
+	if successIndex != 0 {
+		msg.WriteString("<b>以下订阅源导入成功:</b>\n")
+		for i := 0; i < successIndex; i++ {
+			line := successImportList[i]
 			if line.Text != "" {
-				successReport += fmt.Sprintf("\n[%d] <a href=\"%s\">%s</a>", i+1, line.XMLURL, line.Text)
+				msg.WriteString(
+					fmt.Sprintf("[%d] <a href=\"%s\">%s</a>\n", i+1, line.XMLURL, line.Text),
+				)
 			} else {
-				successReport += fmt.Sprintf("\n[%d] %s", i+1, line.XMLURL)
+				msg.WriteString(fmt.Sprintf("[%d] %s\n", i+1, line.XMLURL))
 			}
 		}
-		importReport += successReport
+
+		msg.WriteString("\n")
 	}
 
-	if len(failImportList) != 0 {
-		failReport := "\n\n<b>以下订阅源导入失败:</b>"
-		for i, line := range failImportList {
+	if failIndex != 0 {
+		msg.WriteString("<b>以下订阅源导入失败:</b>\n")
+		for i := 0; i < failIndex; i++ {
+			line := failImportList[i]
 			if line.Text != "" {
-				failReport += fmt.Sprintf("\n[%d] <a href=\"%s\">%s</a>", i+1, line.XMLURL, line.Text)
+				msg.WriteString(fmt.Sprintf("[%d] <a href=\"%s\">%s</a>\n", i+1, line.XMLURL, line.Text))
 			} else {
-				failReport += fmt.Sprintf("\n[%d] %s", i+1, line.XMLURL)
+				msg.WriteString(fmt.Sprintf("[%d] %s\n", i+1, line.XMLURL))
 			}
 		}
-		importReport += failReport
+
 	}
 
-	return ctx.Reply(importReport, &tb.SendOptions{
-		DisableWebPagePreview: true,
-		ParseMode:             tb.ModeHTML,
-	})
+	return ctx.Reply(
+		msg.String(), &tb.SendOptions{
+			DisableWebPagePreview: true,
+			ParseMode:             tb.ModeHTML,
+		},
+	)
 }
 
 func (o *OnDocument) Middlewares() []tb.MiddlewareFunc {

@@ -29,6 +29,15 @@ func (s *SubscriptionStorageImpl) AddSubscription(ctx context.Context, subscript
 	return nil
 }
 
+func (s *SubscriptionStorageImpl) SubscriptionExist(ctx context.Context, userID int64, sourceID uint) (bool, error) {
+	var count int64
+	result := s.db.WithContext(ctx).Where("user_id = ? and source_id = ?", userID, sourceID).Count(&count)
+	if result.Error != nil {
+		return false, result.Error
+	}
+	return (count > 0), nil
+}
+
 func (s *SubscriptionStorageImpl) GetSubscriptionsByUserID(
 	ctx context.Context, userID int64, opts *GetSubscriptionsOptions,
 ) (*GetSubscriptionsResult, error) {
@@ -47,7 +56,7 @@ func (s *SubscriptionStorageImpl) GetSubscriptionsByUserID(
 	}
 
 	result := &GetSubscriptionsResult{}
-	if len(subscriptions) > opts.Count {
+	if opts.Count != -1 && len(subscriptions) > opts.Count {
 		result.HasMore = true
 		subscriptions = subscriptions[:opts.Count]
 	}

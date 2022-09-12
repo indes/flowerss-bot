@@ -1,12 +1,16 @@
 package handler
 
 import (
+	"context"
 	"fmt"
+	"strings"
 
 	tb "gopkg.in/telebot.v3"
 
 	"github.com/indes/flowerss-bot/internal/bot/chat"
 	"github.com/indes/flowerss-bot/internal/bot/message"
+	"github.com/indes/flowerss-bot/internal/core"
+	"github.com/indes/flowerss-bot/internal/log"
 	"github.com/indes/flowerss-bot/internal/model"
 )
 
@@ -15,10 +19,11 @@ const (
 )
 
 type ListSubscription struct {
+	core *core.Core
 }
 
-func NewListSubscription() *ListSubscription {
-	return &ListSubscription{}
+func NewListSubscription(core *core.Core) *ListSubscription {
+	return &ListSubscription{core: core}
 }
 
 func (l *ListSubscription) Command() string {
@@ -36,27 +41,14 @@ func (l *ListSubscription) listChatSubscription(ctx tb.Context) error {
 		return ctx.Send("无权限")
 	}
 
-	user, err := model.FindOrCreateUserByTelegramID(ctx.Chat().ID)
+	stdCtx := context.Background()
+	sources, err := l.core.GetUserSubscribedSources(stdCtx, ctx.Chat().ID)
 	if err != nil {
-		return ctx.Send("获取频道订阅错误")
+		log.Errorf("GetUserSubscribedSources failed, %v", err)
+		return ctx.Send("获取订阅错误")
 	}
 
-	subSourceMap, err := user.GetSubSourceMap()
-	if err != nil {
-		return ctx.Send("获取频道订阅错误")
-	}
-
-	if len(subSourceMap) == 0 {
-		return ctx.Send("订阅列表为空")
-	}
-
-	rspMessage := "当前订阅列表：\n"
-	for sub, source := range subSourceMap {
-		rspMessage = rspMessage + fmt.Sprintf("[[%d]] [%s](%s)\n", sub.ID, source.Title, source.Link)
-	}
-	return ctx.Send(
-		rspMessage, &tb.SendOptions{DisableWebPagePreview: true, ParseMode: tb.ModeMarkdown},
-	)
+	return l.replaySubscribedSources(ctx, sources)
 }
 
 func (l *ListSubscription) listChannelSubscription(ctx tb.Context, channelName string) error {
@@ -69,36 +61,13 @@ func (l *ListSubscription) listChannelSubscription(ctx tb.Context, channelName s
 		return ctx.Send("非频道管理员无法执行此操作")
 	}
 
-	user, err := model.FindOrCreateUserByTelegramID(channelChat.ID)
+	stdCtx := context.Background()
+	sources, err := l.core.GetUserSubscribedSources(stdCtx, channelChat.ID)
 	if err != nil {
-		return ctx.Send("获取频道订阅错误")
+		log.Errorf("GetUserSubscribedSources failed, %v", err)
+		return ctx.Send("获取订阅错误")
 	}
-
-	subSourceList, err := user.GetSubSourceList()
-	if err != nil {
-		return ctx.Send("获取频道订阅错误")
-	}
-	if len(subSourceList) == 0 {
-		return ctx.Send(
-			fmt.Sprintf("频道 [%s](https://t.me/%s) 订阅列表为空", channelChat.Title, channelChat.Username),
-			&tb.SendOptions{DisableWebPagePreview: true, ParseMode: tb.ModeMarkdown},
-		)
-	}
-
-	rspMessage := ""
-	if len(subSourceList) > MaxSubsSizePerPage {
-		rspMessage = fmt.Sprintf("频道 [%s](https://t.me/%s) 订阅列表[1-%d]：\n", channelChat.Title, channelChat.Username, MaxSubsSizePerPage)
-	} else {
-		rspMessage = fmt.Sprintf("频道 [%s](https://t.me/%s) 订阅列表：\n", channelChat.Title, channelChat.Username)
-	}
-	for i, ss := range subSourceList {
-		if i != 0 && i%MaxSubsSizePerPage == 0 {
-			err = ctx.Send(rspMessage, &tb.SendOptions{DisableWebPagePreview: true, ParseMode: tb.ModeMarkdown})
-			rspMessage = fmt.Sprintf("频道 [%s](https://t.me/%s) 订阅列表[%d-%d]：\n", channelChat.Title, channelChat.Username, i+1, i+MaxSubsSizePerPage)
-		}
-		rspMessage = rspMessage + fmt.Sprintf("[[%d]] [%s](%s)\n", ss.Sub.ID, ss.Src.Title, ss.Src.Link)
-	}
-	return ctx.Send(rspMessage, &tb.SendOptions{DisableWebPagePreview: true, ParseMode: tb.ModeMarkdown})
+	return l.replaySubscribedSources(ctx, sources)
 }
 
 func (l *ListSubscription) Handle(ctx tb.Context) error {
@@ -110,5 +79,28 @@ func (l *ListSubscription) Handle(ctx tb.Context) error {
 }
 
 func (l *ListSubscription) Middlewares() []tb.MiddlewareFunc {
+	return nil
+}
+
+func (l *ListSubscription) replaySubscribedSources(ctx tb.Context, sources []*model.Source) error {
+	if len(sources) == 0 {
+		return ctx.Send("订阅列表为空")
+	}
+	var msg strings.Builder
+	msg.WriteString(fmt.Sprintf("共订阅%d个源，订阅列表\n", len(sources)))
+	count := 0
+	for i := range sources {
+		msg.WriteString(fmt.Sprintf("[[%d]] [%s](%s)\n", sources[i].ID, sources[i].Title, sources[i].Link))
+		count++
+		if count == MaxSubsSizePerPage {
+			ctx.Send(msg.String(), &tb.SendOptions{DisableWebPagePreview: true, ParseMode: tb.ModeMarkdown})
+			count = 0
+			msg.Reset()
+		}
+	}
+
+	if count != 0 {
+		ctx.Send(msg.String(), &tb.SendOptions{DisableWebPagePreview: true, ParseMode: tb.ModeMarkdown})
+	}
 	return nil
 }

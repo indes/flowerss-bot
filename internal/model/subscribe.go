@@ -4,8 +4,6 @@ import (
 	"errors"
 	"strings"
 
-	"github.com/jinzhu/gorm"
-
 	"github.com/indes/flowerss-bot/internal/config"
 )
 
@@ -23,41 +21,6 @@ type Subscribe struct {
 	Interval           int
 	WaitTime           int
 	EditTime
-}
-
-type SubWithSource struct {
-	Sub *Subscribe
-	Src *Source
-}
-
-func AddSubscription(userID int64, sourceID uint) error {
-	var subscribe Subscribe
-	errs := db.Where("user_id=? and source_id=?", userID, sourceID).Find(&subscribe).GetErrors()
-	if len(errs) == 0 {
-		return nil
-	}
-
-	var recordNotFound bool = false
-	for _, err := range errs {
-		if err == gorm.ErrRecordNotFound {
-			recordNotFound = true
-		} else {
-			return err
-		}
-	}
-
-	if recordNotFound {
-		subscribe.UserID = userID
-		subscribe.SourceID = sourceID
-		subscribe.EnableNotification = 1
-		subscribe.EnableTelegraph = 1
-		subscribe.Interval = config.UpdateInterval
-		subscribe.WaitTime = config.UpdateInterval
-		if errs := db.Create(&subscribe).GetErrors(); len(errs) != 0 {
-			return errs[0]
-		}
-	}
-	return nil
 }
 
 func GetSubscribeByUserIDAndSourceID(userID int64, sourceID uint) (*Subscribe, error) {

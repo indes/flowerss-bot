@@ -16,16 +16,15 @@ type Storage interface {
 	Init(ctx context.Context) error
 }
 
-// UserStorage 用户存储接口
-type UserStorage interface {
+// User 用户存储接口
+type User interface {
 	Storage
 	CrateUser(ctx context.Context, user *model.User) error
 	GetUser(ctx context.Context, id int64) (*model.User, error)
-	GetUserByTelegramID(ctx context.Context, telegramID int64) (*model.User, error)
 }
 
-// SourceStorage 订阅源存储接口
-type SourceStorage interface {
+// Source 订阅源存储接口
+type Source interface {
 	Storage
 	AddSource(ctx context.Context, source *model.Source) error
 	GetSource(ctx context.Context, sourceID uint) (*model.Source, error)
@@ -49,9 +48,10 @@ type GetSubscriptionsResult struct {
 	HasMore       bool
 }
 
-type SubscriptionStorage interface {
+type Subscription interface {
 	Storage
 	AddSubscription(ctx context.Context, subscription *model.Subscribe) error
+	SubscriptionExist(ctx context.Context, userID int64, sourceID uint) (bool, error)
 	GetSubscriptionsByUserID(
 		ctx context.Context, userID int64, opts *GetSubscriptionsOptions,
 	) (*GetSubscriptionsResult, error)
@@ -62,7 +62,7 @@ type SubscriptionStorage interface {
 	DeleteSubscription(ctx context.Context, userID int64, sourceID uint) (int64, error)
 }
 
-type ContentStorage interface {
+type Content interface {
 	Storage
 	// AddContent 添加一条文章
 	AddContent(ctx context.Context, content *model.Content) error

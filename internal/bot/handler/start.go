@@ -3,10 +3,9 @@ package handler
 import (
 	"fmt"
 
-	"go.uber.org/zap"
 	tb "gopkg.in/telebot.v3"
 
-	"github.com/indes/flowerss-bot/internal/model"
+	"github.com/indes/flowerss-bot/internal/log"
 )
 
 type Start struct {
@@ -25,8 +24,7 @@ func (s *Start) Description() string {
 }
 
 func (s *Start) Handle(ctx tb.Context) error {
-	user, _ := model.FindOrCreateUserByTelegramID(ctx.Chat().ID)
-	zap.S().Infof("/start user_id: %d telegram_id: %d", user.ID, user.TelegramID)
+	log.Infof("/start id: %d", ctx.Chat().ID)
 	return ctx.Send(fmt.Sprintf("你好，欢迎使用flowerss。"))
 }
 

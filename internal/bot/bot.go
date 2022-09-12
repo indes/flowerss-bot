@@ -8,6 +8,7 @@ import (
 	"github.com/indes/flowerss-bot/internal/bot/handler"
 	"github.com/indes/flowerss-bot/internal/bot/middleware"
 	"github.com/indes/flowerss-bot/internal/config"
+	"github.com/indes/flowerss-bot/internal/core"
 	"github.com/indes/flowerss-bot/pkg/client"
 
 	"go.uber.org/zap"
@@ -17,6 +18,8 @@ import (
 var (
 	// B bot
 	B *tb.Bot
+
+	Core *core.Core
 )
 
 func init() {
@@ -59,11 +62,12 @@ func init() {
 }
 
 // Start bot
-func Start() {
+func Start(appCore *core.Core) {
 	if config.RunMode == config.TestMode {
 		return
 	}
 
+	Core = appCore
 	zap.S().Infof("bot start %s", config.AppVersionInfo())
 	setCommands()
 	B.Start()
@@ -73,15 +77,15 @@ func setCommands() {
 	commandHandlers := []handler.CommandHandler{
 		handler.NewStart(),
 		handler.NewPing(B),
-		handler.NewAddSubscription(),
+		handler.NewAddSubscription(Core),
 		handler.NewRemoveSubscription(B),
-		handler.NewListSubscription(),
+		handler.NewListSubscription(Core),
 		handler.NewRemoveAllSubscription(),
-		handler.NewOnDocument(B),
+		handler.NewOnDocument(B, Core),
 		handler.NewSet(B),
 		handler.NewSetFeedTag(),
 		handler.NewSetUpdateInterval(),
-		handler.NewExport(),
+		handler.NewExport(Core),
 		handler.NewImport(),
 		handler.NewPauseAll(),
 		handler.NewActiveAll(),
