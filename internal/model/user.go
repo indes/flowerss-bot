@@ -8,8 +8,7 @@ import "errors"
 type User struct {
 	ID         int64 `gorm:"primary_key"`
 	TelegramID int64
-	Source     []Source `gorm:"many2many:subscribes;"`
-	State      int      `gorm:"DEFAULT:0;"`
+	State      int `gorm:"DEFAULT:0;"`
 	EditTime
 }
 
@@ -61,10 +60,12 @@ func (user *User) GetSubSourceList() ([]*SubWithSource, error) {
 		if err != nil {
 			continue
 		}
-		subsWithSources = append(subsWithSources, &SubWithSource{
-			Sub: &sub,
-			Src: source,
-		})
+		subsWithSources = append(
+			subsWithSources, &SubWithSource{
+				Sub: &sub,
+				Src: source,
+			},
+		)
 	}
 
 	return subsWithSources, nil

@@ -17,6 +17,10 @@ func NewSubscriptionStorageImpl(db *gorm.DB) *SubscriptionStorageImpl {
 	return &SubscriptionStorageImpl{db: db.Model(&model.Subscribe{})}
 }
 
+func (s *SubscriptionStorageImpl) Init(ctx context.Context) error {
+	return s.db.Migrator().AutoMigrate(&model.Subscribe{})
+}
+
 func (s *SubscriptionStorageImpl) AddSubscription(ctx context.Context, subscription *model.Subscribe) error {
 	result := s.db.WithContext(ctx).Create(subscription)
 	if result.Error != nil {

@@ -12,8 +12,13 @@ var (
 	ErrRecordNotFound = errors.New("record not found")
 )
 
+type Storage interface {
+	Init(ctx context.Context) error
+}
+
 // UserStorage 用户存储接口
 type UserStorage interface {
+	Storage
 	CrateUser(ctx context.Context, user *model.User) error
 	GetUser(ctx context.Context, id int64) (*model.User, error)
 	GetUserByTelegramID(ctx context.Context, telegramID int64) (*model.User, error)
@@ -21,6 +26,7 @@ type UserStorage interface {
 
 // SourceStorage 订阅源存储接口
 type SourceStorage interface {
+	Storage
 	AddSource(ctx context.Context, source *model.Source) error
 	GetSource(ctx context.Context, sourceID uint) (*model.Source, error)
 	GetSourceByURL(ctx context.Context, url string) (*model.Source, error)
@@ -47,6 +53,7 @@ type GetSubscriptionsResult struct {
 }
 
 type SubscriptionStorage interface {
+	Storage
 	AddSubscription(ctx context.Context, subscription *model.Subscribe) error
 	GetSubscriptionsByUserID(
 		ctx context.Context, userID int64, opts *GetSubscriptionsOptions,
@@ -59,6 +66,7 @@ type SubscriptionStorage interface {
 }
 
 type ContentStorage interface {
+	Storage
 	// AddContent 添加一条文章
 	AddContent(ctx context.Context, content *model.Content) error
 	// DeleteSourceContents 删除订阅源的所有文章，返回被删除的文章数

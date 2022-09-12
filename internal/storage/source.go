@@ -17,6 +17,10 @@ func NewSourceStorageImpl(db *gorm.DB) *SourceStorageImpl {
 	return &SourceStorageImpl{db: db}
 }
 
+func (s *SourceStorageImpl) Init(ctx context.Context) error {
+	return s.db.Migrator().AutoMigrate(&model.Source{})
+}
+
 func (s *SourceStorageImpl) AddSource(ctx context.Context, source *model.Source) error {
 	result := s.db.WithContext(ctx).Create(source)
 	if result.Error != nil {

@@ -16,6 +16,10 @@ func NewContentStorageImpl(db *gorm.DB) *ContentStorageImpl {
 	return &ContentStorageImpl{db: db.Model(&model.Content{})}
 }
 
+func (s *ContentStorageImpl) Init(ctx context.Context) error {
+	return s.db.Migrator().AutoMigrate(&model.Content{})
+}
+
 func (s *ContentStorageImpl) DeleteSourceContents(ctx context.Context, sourceID uint) (int64, error) {
 	result := s.db.WithContext(ctx).Where("source_id = ?", sourceID).Delete(&model.Content{})
 	if result.Error != nil {

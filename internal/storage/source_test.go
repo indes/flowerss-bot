@@ -13,6 +13,7 @@ func TestSourceStorageImpl(t *testing.T) {
 	db := GetTestDB(t)
 	s := NewSourceStorageImpl(db)
 	ctx := context.Background()
+	s.Init(ctx)
 
 	source := &model.Source{
 		Link: "http://google.com",

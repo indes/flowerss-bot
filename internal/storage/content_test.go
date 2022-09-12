@@ -13,6 +13,7 @@ func TestContentStorageImpl(t *testing.T) {
 	db := GetTestDB(t)
 	s := NewContentStorageImpl(db)
 	ctx := context.Background()
+	s.Init(ctx)
 
 	content := &model.Content{
 		SourceID: 1,

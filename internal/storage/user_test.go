@@ -17,19 +17,14 @@ func GetTestDB(t *testing.T) *gorm.DB {
 		t.Log(err)
 		return nil
 	}
-
-	db.AutoMigrate(&model.User{})
-	db.AutoMigrate(&model.Source{})
-	db.AutoMigrate(&model.Subscribe{})
-	db.AutoMigrate(&model.Content{})
-	return db
+	return db.Debug()
 }
 
 func TestUserStorageImpl(t *testing.T) {
 	db := GetTestDB(t)
 	s := NewUserStorageImpl(db)
 	ctx := context.Background()
-
+	s.Init(ctx)
 	user := &model.User{
 		TelegramID: 123,
 		State:      1,

@@ -13,6 +13,8 @@ func TestSubscriptionStorageImpl(t *testing.T) {
 	db := GetTestDB(t)
 	s := NewSubscriptionStorageImpl(db)
 	ctx := context.Background()
+	s.Init(ctx)
+
 	subscriptions := []*model.Subscribe{
 		&model.Subscribe{
 			SourceID:           1,
