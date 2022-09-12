@@ -38,6 +38,15 @@ func NewCore() *Core {
 		log.Fatalf("connect db failed, err: %+v", err)
 		return nil
 	}
+
+	if config.DBLogMode {
+		db = db.Debug()
+	}
+
+	sqlDB, err := db.DB()
+	sqlDB.SetMaxIdleConns(10)
+	sqlDB.SetMaxOpenConns(50)
+
 	return &Core{
 		userStorage:         storage.NewUserStorageImpl(db),
 		contentStorage:      storage.NewContentStorageImpl(db),
