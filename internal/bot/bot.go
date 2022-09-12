@@ -77,11 +77,11 @@ func setCommands() {
 	commandHandlers := []handler.CommandHandler{
 		handler.NewStart(),
 		handler.NewPing(B),
-		handler.NewAddSubscription(),
+		handler.NewAddSubscription(Core),
 		handler.NewRemoveSubscription(B),
 		handler.NewListSubscription(Core),
 		handler.NewRemoveAllSubscription(),
-		handler.NewOnDocument(B),
+		handler.NewOnDocument(B, Core),
 		handler.NewSet(B),
 		handler.NewSetFeedTag(),
 		handler.NewSetUpdateInterval(),

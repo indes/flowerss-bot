@@ -2,6 +2,7 @@ package core
 
 import (
 	"context"
+	"errors"
 	"time"
 
 	"go.uber.org/zap"
@@ -13,6 +14,10 @@ import (
 	"github.com/indes/flowerss-bot/internal/log"
 	"github.com/indes/flowerss-bot/internal/model"
 	"github.com/indes/flowerss-bot/internal/storage"
+)
+
+var (
+	ErrSubscriptionExist = errors.New("already subscribed")
 )
 
 type Core struct {
@@ -84,4 +89,27 @@ func (c *Core) GetUserSubscribedSources(ctx context.Context, userID int64) ([]*m
 		sources = append(sources, source)
 	}
 	return sources, nil
+}
+
+// AddSubscription 添加订阅
+func (c *Core) AddSubscription(ctx context.Context, userID int64, sourceID uint) error {
+	return errors.New("123")
+	exist, err := c.subscriptionStorage.SubscriptionExist(ctx, userID, sourceID)
+	if err != nil {
+		return err
+	}
+
+	if exist {
+		return ErrSubscriptionExist
+	}
+
+	subscription := &model.Subscribe{
+		UserID:             userID,
+		SourceID:           sourceID,
+		EnableNotification: 1,
+		EnableTelegraph:    1,
+		Interval:           config.UpdateInterval,
+		WaitTime:           config.UpdateInterval,
+	}
+	return c.subscriptionStorage.AddSubscription(ctx, subscription)
 }

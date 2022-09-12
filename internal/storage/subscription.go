@@ -29,7 +29,7 @@ func (s *SubscriptionStorageImpl) AddSubscription(ctx context.Context, subscript
 	return nil
 }
 
-func (s *SubscriptionStorageImpl) SubscriptionExist(ctx context.Context, userID int64, sourceID int64) (bool, error) {
+func (s *SubscriptionStorageImpl) SubscriptionExist(ctx context.Context, userID int64, sourceID uint) (bool, error) {
 	var count int64
 	result := s.db.WithContext(ctx).Where("user_id = ? and source_id = ?", userID, sourceID).Count(&count)
 	if result.Error != nil {
