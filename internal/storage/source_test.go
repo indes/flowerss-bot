@@ -9,7 +9,7 @@ import (
 	"github.com/indes/flowerss-bot/internal/model"
 )
 
-func TestSourceStorageImpl_AddAndGetSource(t *testing.T) {
+func TestSourceStorageImpl(t *testing.T) {
 	db := GetTestDB(t)
 	s := NewSourceStorageImpl(db)
 	ctx := context.Background()

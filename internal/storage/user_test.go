@@ -26,7 +26,7 @@ func GetTestDB(t *testing.T) *gorm.DB {
 	return db
 }
 
-func TestUserStorageImpl_SaveAndGetUser(t *testing.T) {
+func TestUserStorageImpl(t *testing.T) {
 	db := GetTestDB(t)
 	s := NewUserStorageImpl(db)
 	ctx := context.Background()

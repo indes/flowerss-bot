@@ -4,7 +4,7 @@ import (
 	"testing"
 )
 
-func TestSubscriptionStorageImpl_GetSubscriptionsBySourceID(t *testing.T) {
+func TestSubscriptionStorageImpl(t *testing.T) {
 	//db := GetTestDB(t)
 	//s := NewSubscriptionStorageImpl(db)
 	//ctx := context.Background()

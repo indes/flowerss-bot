@@ -9,7 +9,7 @@ import (
 	"github.com/indes/flowerss-bot/internal/model"
 )
 
-func TestContentStorageImpl_AddContent(t *testing.T) {
+func TestContentStorageImpl(t *testing.T) {
 	db := GetTestDB(t)
 	s := NewContentStorageImpl(db)
 	ctx := context.Background()
