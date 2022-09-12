@@ -32,9 +32,6 @@ type SourceStorage interface {
 	GetSourceByURL(ctx context.Context, url string) (*model.Source, error)
 }
 
-type FeedStorage interface {
-}
-
 type SubscriptionSortType = int
 
 const (
