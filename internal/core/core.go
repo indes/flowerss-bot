@@ -51,14 +51,14 @@ func (c *Core) Run() error {
 	c.subscriptionStorage.Init(context.Background())
 
 	go func() {
-		zap.S().Infoln("core running!")
+		log.Infof("core running!\n")
 		ctx := context.Background()
 		for true {
 			count, err := c.subscriptionStorage.CountSubscriptions(ctx)
 			if err != nil {
-				zap.S().Errorln(err)
+				log.Error(err)
 			} else {
-				zap.S().Infof("CountSubscriptions %v", count)
+				log.Infof("CountSubscriptions %v", count)
 			}
 			time.Sleep(3 * time.Second)
 		}

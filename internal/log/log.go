@@ -56,3 +56,7 @@ func Errorf(template string, args ...interface{}) {
 func Error(args ...interface{}) {
 	Logger.Sugar().Error(args...)
 }
+
+func Infof(template string, args ...interface{}) {
+	Logger.Sugar().Infof(template, args)
+}
