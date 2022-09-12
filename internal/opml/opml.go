@@ -108,7 +108,7 @@ func (o OPML) XML() (string, error) {
 }
 
 // ToOPML dump sources to opml file
-func ToOPML(sources []model.Source) (string, error) {
+func ToOPML(sources []*model.Source) (string, error) {
 	O := OPML{}
 	O.XMLName.Local = "opml"
 	O.Version = "2.0"

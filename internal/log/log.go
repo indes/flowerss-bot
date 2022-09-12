@@ -49,7 +49,10 @@ func init() {
 	zap.ReplaceGlobals(Logger)
 }
 
-// Errorf uses fmt.Sprintf to log a templated message.
 func Errorf(template string, args ...interface{}) {
 	Logger.Sugar().Errorf(template, args...)
+}
+
+func Error(args ...interface{}) {
+	Logger.Sugar().Error(args...)
 }
