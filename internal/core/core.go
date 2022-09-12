@@ -15,7 +15,8 @@ import (
 )
 
 var (
-	ErrSubscriptionExist = errors.New("already subscribed")
+	ErrSubscriptionExist    = errors.New("already subscribed")
+	ErrSubscriptionNotExist = errors.New("subscription not exist")
 )
 
 type Core struct {
@@ -103,4 +104,52 @@ func (c *Core) AddSubscription(ctx context.Context, userID int64, sourceID uint)
 		WaitTime:           config.UpdateInterval,
 	}
 	return c.subscriptionStorage.AddSubscription(ctx, subscription)
+}
+
+// Unsubscribe 添加订阅
+func (c *Core) Unsubscribe(ctx context.Context, userID int64, sourceID uint) error {
+	exist, err := c.subscriptionStorage.SubscriptionExist(ctx, userID, sourceID)
+	if err != nil {
+		return err
+	}
+
+	if !exist {
+		return ErrSubscriptionNotExist
+	}
+
+	// 移除该用户订阅
+	_, err = c.subscriptionStorage.DeleteSubscription(ctx, userID, sourceID)
+	if err != nil {
+		return err
+	}
+
+	// 获取源的订阅数量
+	count, err := c.subscriptionStorage.CountSourceSubscriptions(ctx, sourceID)
+	if err != nil {
+		return err
+	}
+
+	if count != 0 {
+		return nil
+	}
+
+	// 如果源不再有订阅用户，移除该订阅源
+	if err := c.removeSource(ctx, sourceID); err != nil {
+		return err
+	}
+	return nil
+}
+
+// removeSource 移除订阅源
+func (c *Core) removeSource(ctx context.Context, sourceID uint) error {
+	if err := c.sourceStorage.Delete(ctx, sourceID); err != nil {
+		return err
+	}
+
+	count, err := c.contentStorage.DeleteSourceContents(ctx, sourceID)
+	if err != nil {
+		return err
+	}
+	log.Infof("remove source %d and %d contents", sourceID, count)
+	return nil
 }

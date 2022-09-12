@@ -1,24 +1,30 @@
 package handler
 
 import (
+	"context"
 	"fmt"
-	"strconv"
 	"strings"
 
-	"go.uber.org/zap"
+	"github.com/spf13/cast"
 	tb "gopkg.in/telebot.v3"
 
 	"github.com/indes/flowerss-bot/internal/bot/chat"
 	"github.com/indes/flowerss-bot/internal/bot/message"
+	"github.com/indes/flowerss-bot/internal/core"
+	"github.com/indes/flowerss-bot/internal/log"
 	"github.com/indes/flowerss-bot/internal/model"
 )
 
 type RemoveSubscription struct {
-	bot *tb.Bot
+	bot  *tb.Bot
+	core *core.Core
 }
 
-func NewRemoveSubscription(bot *tb.Bot) *RemoveSubscription {
-	return &RemoveSubscription{bot: bot}
+func NewRemoveSubscription(bot *tb.Bot, core *core.Core) *RemoveSubscription {
+	return &RemoveSubscription{
+		bot:  bot,
+		core: core,
+	}
 }
 
 func (s *RemoveSubscription) Command() string {
@@ -58,9 +64,9 @@ func (s *RemoveSubscription) removeForChannel(ctx tb.Context, channelName string
 		}
 		return ctx.Reply("退订失败")
 	}
-	zap.S().Infof("%d for [%d]%s unsubscribe %s", ctx.Chat().ID, source.ID, source.Title, source.Link)
+	log.Infof("%d for [%d]%s unsubscribe %s", ctx.Chat().ID, source.ID, source.Title, source.Link)
 	if err := sub.Unsub(); err != nil {
-		zap.S().Errorf(
+		log.Errorf(
 			"%d for [%d]%s unsubscribe %s failed, %v",
 			ctx.Chat().ID, source.ID, source.Title, source.Link, err,
 		)
@@ -115,9 +121,9 @@ func (s *RemoveSubscription) removeForChat(ctx tb.Context) error {
 		return ctx.Reply("未订阅该RSS源")
 	}
 
-	zap.S().Infof("%d unsubscribe [%d]%s %s", ctx.Chat().ID, source.ID, source.Title, source.Link)
-	if err := model.UnsubByUserIDAndSource(ctx.Chat().ID, source); err != nil {
-		zap.S().Errorf(
+	log.Infof("%d unsubscribe [%d]%s %s", ctx.Chat().ID, source.ID, source.Title, source.Link)
+	if err := s.core.Unsubscribe(context.Background(), ctx.Chat().ID, source.ID); err != nil {
+		log.Errorf(
 			"%d for [%d]%s unsubscribe %s failed, %v",
 			ctx.Chat().ID, source.ID, source.Title, source.Link, err,
 		)
@@ -146,10 +152,11 @@ const (
 )
 
 type RemoveSubscriptionItemButton struct {
+	core *core.Core
 }
 
-func NewRemoveSubscriptionItemButton() *RemoveSubscriptionItemButton {
-	return &RemoveSubscriptionItemButton{}
+func NewRemoveSubscriptionItemButton(core *core.Core) *RemoveSubscriptionItemButton {
+	return &RemoveSubscriptionItemButton{core: core}
 }
 
 func (r *RemoveSubscriptionItemButton) CallbackUnique() string {
@@ -170,15 +177,15 @@ func (r *RemoveSubscriptionItemButton) Handle(ctx tb.Context) error {
 		return ctx.Edit("退订错误！")
 	}
 
-	userID, _ := strconv.Atoi(data[0])
-	subID, _ := strconv.Atoi(data[1])
-	sourceID, _ := strconv.Atoi(data[2])
-	source, err := model.GetSourceById(uint(sourceID))
+	userID := cast.ToInt64(data[0])
+	sourceID := cast.ToUint(data[2])
+	source, err := model.GetSourceById(sourceID)
 	if err != nil {
 		return ctx.Edit("退订错误！")
 	}
 
-	if err := model.UnsubByUserIDAndSubID(int64(userID), uint(subID)); err != nil {
+	if err := r.core.Unsubscribe(context.Background(), userID, sourceID); err != nil {
+		log.Errorf("unsubscribe data %s failed, %v", ctx.Callback().Data, err)
 		return ctx.Edit("退订错误！")
 	}
 
