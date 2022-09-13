@@ -2,6 +2,7 @@ package handler
 
 import (
 	"bytes"
+	"context"
 	"fmt"
 	"strconv"
 	"strings"
@@ -12,15 +13,20 @@ import (
 	"github.com/indes/flowerss-bot/internal/bot/chat"
 	"github.com/indes/flowerss-bot/internal/bot/session"
 	"github.com/indes/flowerss-bot/internal/config"
+	"github.com/indes/flowerss-bot/internal/core"
 	"github.com/indes/flowerss-bot/internal/model"
 )
 
 type Set struct {
-	bot *tb.Bot
+	bot  *tb.Bot
+	core *core.Core
 }
 
-func NewSet(bot *tb.Bot) *Set {
-	return &Set{bot: bot}
+func NewSet(bot *tb.Bot, core *core.Core) *Set {
+	return &Set{
+		bot:  bot,
+		core: core,
+	}
 }
 
 func (s *Set) Command() string {
@@ -38,7 +44,7 @@ func (s *Set) Handle(ctx tb.Context) error {
 		ownerID = mentionChat.ID
 	}
 
-	sources, err := model.GetSourcesByUserID(ownerID)
+	sources, err := s.core.GetUserSubscribedSources(context.Background(), ownerID)
 	if err != nil {
 		return ctx.Reply("获取订阅失败")
 	}

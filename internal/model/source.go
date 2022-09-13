@@ -111,56 +111,6 @@ func (s *Source) NeedUpdate() bool {
 	}
 }
 
-func GetSourcesByUserID(userID int64) ([]Source, error) {
-	var sources []Source
-	subs, err := GetSubsByUserID(userID)
-
-	if err != nil {
-		return nil, err
-	}
-
-	for _, sub := range subs {
-		var source Source
-		db.Where("id=?", sub.SourceID).First(&source)
-		if source.ID == sub.SourceID {
-			sources = append(sources, source)
-		}
-	}
-
-	sort.SliceStable(
-		sources, func(i, j int) bool {
-			return sources[i].ID < sources[j].ID
-		},
-	)
-
-	return sources, nil
-}
-
-func GetErrorSourcesByUserID(userID int64) ([]Source, error) {
-	var sources []Source
-	subs, err := GetSubsByUserID(userID)
-
-	if err != nil {
-		return nil, err
-	}
-
-	for _, sub := range subs {
-		var source Source
-		db.Where("id=?", sub.SourceID).First(&source)
-		if source.ID == sub.SourceID && source.ErrorCount >= config.ErrorThreshold {
-			sources = append(sources, source)
-		}
-	}
-
-	sort.SliceStable(
-		sources, func(i, j int) bool {
-			return sources[i].ID < sources[j].ID
-		},
-	)
-
-	return sources, nil
-}
-
 func ActiveSourcesByUserID(userID int64) error {
 	subs, err := GetSubsByUserID(userID)
 
