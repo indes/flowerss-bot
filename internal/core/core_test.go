@@ -8,6 +8,8 @@ import (
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 
+	"github.com/indes/flowerss-bot/internal/model"
+	"github.com/indes/flowerss-bot/internal/storage"
 	"github.com/indes/flowerss-bot/internal/storage/mock"
 )
 
@@ -73,6 +75,68 @@ func TestCore_AddSubscription(t *testing.T) {
 
 			err := c.AddSubscription(ctx, userID, sourceID)
 			assert.Nil(t, err)
+		},
+	)
+}
+
+func TestCore_GetUserSubscribedSources(t *testing.T) {
+	c, s := getTestCore(t)
+	defer s.Ctrl.Finish()
+	ctx := context.Background()
+
+	userID := int64(1)
+	sourceID1 := uint(101)
+	sourceID2 := uint(102)
+	subscriptionsResult := &storage.GetSubscriptionsResult{
+		Subscriptions: []*model.Subscribe{
+			&model.Subscribe{SourceID: sourceID1},
+			&model.Subscribe{SourceID: sourceID2},
+		},
+	}
+	t.Run(
+		"subscription err", func(t *testing.T) {
+			s.Subscription.EXPECT().GetSubscriptionsByUserID(ctx, userID, gomock.Any()).Return(
+				nil, errors.New("err"),
+			)
+
+			sources, err := c.GetUserSubscribedSources(ctx, userID)
+			assert.Error(t, err)
+			assert.Nil(t, sources)
+		},
+	)
+
+	t.Run(
+		"source err", func(t *testing.T) {
+			s.Subscription.EXPECT().GetSubscriptionsByUserID(ctx, userID, gomock.Any()).Return(
+				subscriptionsResult, nil,
+			)
+
+			s.Source.EXPECT().GetSource(ctx, sourceID1).Return(
+				nil, errors.New("err"),
+			).Times(1)
+			s.Source.EXPECT().GetSource(ctx, gomock.Any()).Return(
+				&model.Source{}, nil,
+			)
+
+			sources, err := c.GetUserSubscribedSources(ctx, userID)
+			assert.Nil(t, err)
+			assert.Equal(t, len(subscriptionsResult.Subscriptions)-1, len(sources))
+		},
+	)
+
+	t.Run(
+		"source success", func(t *testing.T) {
+			s.Subscription.EXPECT().GetSubscriptionsByUserID(ctx, userID, gomock.Any()).Return(
+				subscriptionsResult, nil,
+			)
+
+			s.Source.EXPECT().GetSource(ctx, gomock.Any()).Return(
+				&model.Source{}, nil,
+			).Times(len(subscriptionsResult.Subscriptions))
+
+			sources, err := c.GetUserSubscribedSources(ctx, userID)
+			assert.Nil(t, err)
+			assert.Equal(t, len(subscriptionsResult.Subscriptions), len(sources))
 		},
 	)
 }

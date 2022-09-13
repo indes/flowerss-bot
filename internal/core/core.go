@@ -88,7 +88,7 @@ func (c *Core) GetUserSubscribedSources(ctx context.Context, userID int64) ([]*m
 	for _, subs := range result.Subscriptions {
 		source, err := c.sourceStorage.GetSource(ctx, subs.SourceID)
 		if err != nil {
-			log.Errorf("get source failed, %v", err)
+			log.Errorf("get source %d failed, %v", subs.SourceID, err)
 			continue
 		}
 		sources = append(sources, source)
