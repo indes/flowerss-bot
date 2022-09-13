@@ -140,3 +140,91 @@ func TestCore_GetUserSubscribedSources(t *testing.T) {
 		},
 	)
 }
+
+func TestCore_Unsubscribe(t *testing.T) {
+	c, s := getTestCore(t)
+	defer s.Ctrl.Finish()
+	ctx := context.Background()
+
+	userID := int64(1)
+	sourceID1 := uint(101)
+
+	t.Run(
+		"SubscriptionExist err", func(t *testing.T) {
+			s.Subscription.EXPECT().SubscriptionExist(ctx, userID, sourceID1).Return(
+				false, errors.New("err"),
+			).Times(1)
+			err := c.Unsubscribe(ctx, userID, sourceID1)
+			assert.Error(t, err)
+		},
+	)
+
+	t.Run(
+		"subscription not exist", func(t *testing.T) {
+			s.Subscription.EXPECT().SubscriptionExist(ctx, userID, sourceID1).Return(
+				false, nil,
+			).Times(1)
+			err := c.Unsubscribe(ctx, userID, sourceID1)
+			assert.Equal(t, ErrSubscriptionNotExist, err)
+		},
+	)
+
+	s.Subscription.EXPECT().SubscriptionExist(ctx, gomock.Any(), gomock.Any()).Return(
+		true, nil,
+	).AnyTimes()
+
+	t.Run(
+		"unsubscribe failed", func(t *testing.T) {
+			s.Subscription.EXPECT().DeleteSubscription(ctx, userID, sourceID1).Return(
+				int64(1), errors.New("err"),
+			).Times(1)
+			err := c.Unsubscribe(ctx, userID, sourceID1)
+			assert.Error(t, err)
+		},
+	)
+
+	s.Subscription.EXPECT().DeleteSubscription(ctx, gomock.Any(), gomock.Any()).Return(
+		int64(1), nil,
+	).AnyTimes()
+
+	t.Run(
+		"count subs", func(t *testing.T) {
+			s.Subscription.EXPECT().CountSourceSubscriptions(ctx, sourceID1).Return(
+				int64(1), errors.New("err"),
+			).Times(1)
+			err := c.Unsubscribe(ctx, userID, sourceID1)
+			assert.Error(t, err)
+
+			s.Subscription.EXPECT().CountSourceSubscriptions(ctx, sourceID1).Return(
+				int64(1), nil,
+			).Times(1)
+			err = c.Unsubscribe(ctx, userID, sourceID1)
+			assert.Nil(t, err)
+		},
+	)
+
+	s.Subscription.EXPECT().CountSourceSubscriptions(ctx, gomock.Any()).Return(
+		int64(0), nil,
+	).AnyTimes()
+
+	t.Run(
+		"remove source", func(t *testing.T) {
+			s.Source.EXPECT().Delete(ctx, sourceID1).Return(
+				errors.New("err"),
+			).Times(1)
+
+			err := c.Unsubscribe(ctx, userID, sourceID1)
+			assert.Error(t, err)
+
+			s.Source.EXPECT().Delete(ctx, sourceID1).Return(nil).AnyTimes()
+
+			s.Content.EXPECT().DeleteSourceContents(ctx, sourceID1).Return(int64(0), errors.New("err")).Times(1)
+			err = c.Unsubscribe(ctx, userID, sourceID1)
+			assert.Error(t, err)
+
+			s.Content.EXPECT().DeleteSourceContents(ctx, sourceID1).Return(int64(1), nil).Times(1)
+			err = c.Unsubscribe(ctx, userID, sourceID1)
+			assert.Nil(t, err)
+		},
+	)
+}
