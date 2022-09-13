@@ -27,7 +27,19 @@ type Core struct {
 	subscriptionStorage storage.Subscription
 }
 
-func NewCore() *Core {
+func NewCore(
+	userStorage storage.User, contentStorage storage.Content, sourceStorage storage.Source,
+	subscriptionStorage storage.Subscription,
+) *Core {
+	return &Core{
+		userStorage:         userStorage,
+		contentStorage:      contentStorage,
+		sourceStorage:       sourceStorage,
+		subscriptionStorage: subscriptionStorage,
+	}
+}
+
+func NewCoreFormConfig() *Core {
 	var err error
 	var db *gorm.DB
 	if config.EnableMysql {
@@ -48,12 +60,12 @@ func NewCore() *Core {
 	sqlDB.SetMaxIdleConns(10)
 	sqlDB.SetMaxOpenConns(50)
 
-	return &Core{
-		userStorage:         storage.NewUserStorageImpl(db),
-		contentStorage:      storage.NewContentStorageImpl(db),
-		sourceStorage:       storage.NewSourceStorageImpl(db),
-		subscriptionStorage: storage.NewSubscriptionStorageImpl(db),
-	}
+	return NewCore(
+		storage.NewUserStorageImpl(db),
+		storage.NewContentStorageImpl(db),
+		storage.NewSourceStorageImpl(db),
+		storage.NewSubscriptionStorageImpl(db),
+	)
 }
 
 func (c *Core) Init() error {
