@@ -82,7 +82,7 @@ func setCommands() {
 		handler.NewListSubscription(Core),
 		handler.NewRemoveAllSubscription(),
 		handler.NewOnDocument(B, Core),
-		handler.NewSet(B),
+		handler.NewSet(B, Core),
 		handler.NewSetFeedTag(),
 		handler.NewSetUpdateInterval(),
 		handler.NewExport(Core),
