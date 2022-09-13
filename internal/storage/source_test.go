@@ -23,25 +23,24 @@ func TestSourceStorageImpl(t *testing.T) {
 		"add source", func(t *testing.T) {
 			err := s.AddSource(ctx, source)
 			assert.Nil(t, err)
-		},
-	)
 
-	t.Run(
-		"get user", func(t *testing.T) {
 			got, err := s.GetSource(ctx, source.ID)
 			assert.Nil(t, err)
 			assert.NotNil(t, got)
 			assert.Equal(t, source.Link, got.Link)
+
+			got, err = s.GetSourceByURL(ctx, source.Link)
+			assert.Nil(t, err)
+			assert.NotNil(t, got)
+			assert.Equal(t, source.ID, got.ID)
+
+			err = s.Delete(ctx, got.ID)
+			assert.Nil(t, err)
+
+			got, err = s.GetSource(ctx, source.ID)
+			assert.Equal(t, ErrRecordNotFound, err)
+			assert.Nil(t, got)
 		},
 	)
 
-	t.Run(
-		"get source by url", func(t *testing.T) {
-			got, err := s.GetSourceByURL(ctx, source.Link)
-			assert.Nil(t, err)
-			assert.NotNil(t, got)
-			assert.NotNil(t, got)
-			assert.Equal(t, source.ID, got.ID)
-		},
-	)
 }

@@ -11,8 +11,9 @@ import (
 
 var (
 	// Logger 日志对象
-	Logger    *zap.Logger
-	zapConfig zap.Config
+	Logger       *zap.Logger
+	globalLogger *zap.Logger
+	zapConfig    zap.Config
 )
 
 func init() {
@@ -47,25 +48,26 @@ func init() {
 
 	Logger, _ = zapConfig.Build()
 	zap.ReplaceGlobals(Logger)
+	globalLogger = Logger.WithOptions(zap.AddCallerSkip(1))
 }
 
 func Errorf(template string, args ...interface{}) {
-	Logger.Sugar().Errorf(template, args...)
+	globalLogger.Sugar().Errorf(template, args...)
 }
 
 func Error(args ...interface{}) {
-	Logger.Sugar().Error(args...)
+	globalLogger.Sugar().Error(args...)
 }
 
 func Infof(template string, args ...interface{}) {
-	Logger.Sugar().Infof(template, args)
+	globalLogger.Sugar().Infof(template, args...)
 }
 
 func Fatal(args ...interface{}) {
-	Logger.Sugar().Fatal(args...)
+	globalLogger.Sugar().Fatal(args...)
 }
 
 // Fatalf uses fmt.Sprintf to log a templated message, then calls os.Exit.
 func Fatalf(template string, args ...interface{}) {
-	Logger.Sugar().Fatalf(template, args...)
+	globalLogger.Sugar().Fatalf(template, args...)
 }

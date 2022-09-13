@@ -20,7 +20,7 @@ func main() {
 	task.StartTasks()
 	go handleSignal()
 
-	appCore := core.NewCore()
+	appCore := core.NewCoreFormConfig()
 	if err := appCore.Init(); err != nil {
 		log.Fatal(err)
 	}

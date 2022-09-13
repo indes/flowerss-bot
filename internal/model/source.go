@@ -83,9 +83,11 @@ func GetSubscribedNormalSources() []*Source {
 			subscribedSources = append(subscribedSources, source)
 		}
 	}
-	sort.SliceStable(subscribedSources, func(i, j int) bool {
-		return subscribedSources[i].ID < subscribedSources[j].ID
-	})
+	sort.SliceStable(
+		subscribedSources, func(i, j int) bool {
+			return subscribedSources[i].ID < subscribedSources[j].ID
+		},
+	)
 	return subscribedSources
 }
 
@@ -125,9 +127,11 @@ func GetSourcesByUserID(userID int64) ([]Source, error) {
 		}
 	}
 
-	sort.SliceStable(sources, func(i, j int) bool {
-		return sources[i].ID < sources[j].ID
-	})
+	sort.SliceStable(
+		sources, func(i, j int) bool {
+			return sources[i].ID < sources[j].ID
+		},
+	)
 
 	return sources, nil
 }
@@ -148,9 +152,11 @@ func GetErrorSourcesByUserID(userID int64) ([]Source, error) {
 		}
 	}
 
-	sort.SliceStable(sources, func(i, j int) bool {
-		return sources[i].ID < sources[j].ID
-	})
+	sort.SliceStable(
+		sources, func(i, j int) bool {
+			return sources[i].ID < sources[j].ID
+		},
+	)
 
 	return sources, nil
 }
@@ -215,19 +221,4 @@ func GetSourceById(id uint) (*Source, error) {
 	}
 
 	return &source, nil
-}
-
-func (s *Source) GetSubscribeNum() int {
-	var subs []Subscribe
-	db.Where("source_id=?", s.ID).Find(&subs)
-	return len(subs)
-}
-
-func (s *Source) DeleteContents() {
-	DeleteContentsBySourceID(s.ID)
-}
-
-func (s *Source) DeleteDueNoSubscriber() {
-	s.DeleteContents()
-	db.Delete(&s)
 }

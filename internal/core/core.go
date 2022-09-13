@@ -15,7 +15,8 @@ import (
 )
 
 var (
-	ErrSubscriptionExist = errors.New("already subscribed")
+	ErrSubscriptionExist    = errors.New("already subscribed")
+	ErrSubscriptionNotExist = errors.New("subscription not exist")
 )
 
 type Core struct {
@@ -26,7 +27,19 @@ type Core struct {
 	subscriptionStorage storage.Subscription
 }
 
-func NewCore() *Core {
+func NewCore(
+	userStorage storage.User, contentStorage storage.Content, sourceStorage storage.Source,
+	subscriptionStorage storage.Subscription,
+) *Core {
+	return &Core{
+		userStorage:         userStorage,
+		contentStorage:      contentStorage,
+		sourceStorage:       sourceStorage,
+		subscriptionStorage: subscriptionStorage,
+	}
+}
+
+func NewCoreFormConfig() *Core {
 	var err error
 	var db *gorm.DB
 	if config.EnableMysql {
@@ -47,12 +60,12 @@ func NewCore() *Core {
 	sqlDB.SetMaxIdleConns(10)
 	sqlDB.SetMaxOpenConns(50)
 
-	return &Core{
-		userStorage:         storage.NewUserStorageImpl(db),
-		contentStorage:      storage.NewContentStorageImpl(db),
-		sourceStorage:       storage.NewSourceStorageImpl(db),
-		subscriptionStorage: storage.NewSubscriptionStorageImpl(db),
-	}
+	return NewCore(
+		storage.NewUserStorageImpl(db),
+		storage.NewContentStorageImpl(db),
+		storage.NewSourceStorageImpl(db),
+		storage.NewSubscriptionStorageImpl(db),
+	)
 }
 
 func (c *Core) Init() error {
@@ -75,7 +88,7 @@ func (c *Core) GetUserSubscribedSources(ctx context.Context, userID int64) ([]*m
 	for _, subs := range result.Subscriptions {
 		source, err := c.sourceStorage.GetSource(ctx, subs.SourceID)
 		if err != nil {
-			log.Errorf("get source failed, %v", err)
+			log.Errorf("get source %d failed, %v", subs.SourceID, err)
 			continue
 		}
 		sources = append(sources, source)
@@ -103,4 +116,52 @@ func (c *Core) AddSubscription(ctx context.Context, userID int64, sourceID uint)
 		WaitTime:           config.UpdateInterval,
 	}
 	return c.subscriptionStorage.AddSubscription(ctx, subscription)
+}
+
+// Unsubscribe 添加订阅
+func (c *Core) Unsubscribe(ctx context.Context, userID int64, sourceID uint) error {
+	exist, err := c.subscriptionStorage.SubscriptionExist(ctx, userID, sourceID)
+	if err != nil {
+		return err
+	}
+
+	if !exist {
+		return ErrSubscriptionNotExist
+	}
+
+	// 移除该用户订阅
+	_, err = c.subscriptionStorage.DeleteSubscription(ctx, userID, sourceID)
+	if err != nil {
+		return err
+	}
+
+	// 获取源的订阅数量
+	count, err := c.subscriptionStorage.CountSourceSubscriptions(ctx, sourceID)
+	if err != nil {
+		return err
+	}
+
+	if count != 0 {
+		return nil
+	}
+
+	// 如果源不再有订阅用户，移除该订阅源
+	if err := c.removeSource(ctx, sourceID); err != nil {
+		return err
+	}
+	return nil
+}
+
+// removeSource 移除订阅源
+func (c *Core) removeSource(ctx context.Context, sourceID uint) error {
+	if err := c.sourceStorage.Delete(ctx, sourceID); err != nil {
+		return err
+	}
+
+	count, err := c.contentStorage.DeleteSourceContents(ctx, sourceID)
+	if err != nil {
+		return err
+	}
+	log.Infof("remove source %d and %d contents", sourceID, count)
+	return nil
 }
