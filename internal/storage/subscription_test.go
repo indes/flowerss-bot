@@ -120,6 +120,7 @@ func TestSubscriptionStorageImpl(t *testing.T) {
 
 	t.Run(
 		"update subscription", func(t *testing.T) {
+			subscriptions[0].ID = 100
 			err := s.UpdateSubscription(ctx, subscriptions[0].UserID, subscriptions[0].SourceID, subscriptions[0])
 			assert.Nil(t, err)
 
