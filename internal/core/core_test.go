@@ -308,3 +308,44 @@ func TestCore_GetSource(t *testing.T) {
 		},
 	)
 }
+
+func TestCore_GetSubscription(t *testing.T) {
+	c, s := getTestCore(t)
+	defer s.Ctrl.Finish()
+	ctx := context.Background()
+	userID := int64(101)
+	sourceID := uint(1)
+
+	t.Run(
+		"subscription err", func(t *testing.T) {
+			s.Subscription.EXPECT().GetSubscription(ctx, userID, sourceID).Return(
+				nil, errors.New("err"),
+			).Times(1)
+			got, err := c.GetSubscription(ctx, userID, sourceID)
+			assert.Error(t, err)
+			assert.Nil(t, got)
+		},
+	)
+
+	t.Run(
+		"subscription not exist", func(t *testing.T) {
+			s.Subscription.EXPECT().GetSubscription(ctx, userID, sourceID).Return(
+				nil, storage.ErrRecordNotFound,
+			).Times(1)
+			got, err := c.GetSubscription(ctx, userID, sourceID)
+			assert.Equal(t, ErrSubscriptionNotExist, err)
+			assert.Nil(t, got)
+		},
+	)
+
+	t.Run(
+		"ok", func(t *testing.T) {
+			s.Subscription.EXPECT().GetSubscription(ctx, userID, sourceID).Return(
+				&model.Subscribe{}, nil,
+			).Times(1)
+			got, err := c.GetSubscription(ctx, userID, sourceID)
+			assert.Nil(t, err)
+			assert.NotNil(t, got)
+		},
+	)
+}

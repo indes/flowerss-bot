@@ -213,3 +213,15 @@ func (c *Core) UnsubscribeAllSource(ctx context.Context, userID int64) error {
 	wg.Wait()
 	return nil
 }
+
+// GetSubscription 获取订阅
+func (c *Core) GetSubscription(ctx context.Context, userID int64, sourceID uint) (*model.Subscribe, error) {
+	subscription, err := c.subscriptionStorage.GetSubscription(ctx, userID, sourceID)
+	if err != nil {
+		if err == storage.ErrRecordNotFound {
+			return nil, ErrSubscriptionNotExist
+		}
+		return nil, err
+	}
+	return subscription, nil
+}

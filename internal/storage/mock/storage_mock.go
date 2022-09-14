@@ -293,6 +293,21 @@ func (mr *MockSubscriptionMockRecorder) DeleteSubscription(ctx, userID, sourceID
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteSubscription", reflect.TypeOf((*MockSubscription)(nil).DeleteSubscription), ctx, userID, sourceID)
 }
 
+// GetSubscription mocks base method.
+func (m *MockSubscription) GetSubscription(ctx context.Context, userID int64, sourceID uint) (*model.Subscribe, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetSubscription", ctx, userID, sourceID)
+	ret0, _ := ret[0].(*model.Subscribe)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetSubscription indicates an expected call of GetSubscription.
+func (mr *MockSubscriptionMockRecorder) GetSubscription(ctx, userID, sourceID interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetSubscription", reflect.TypeOf((*MockSubscription)(nil).GetSubscription), ctx, userID, sourceID)
+}
+
 // GetSubscriptionsBySourceID mocks base method.
 func (m *MockSubscription) GetSubscriptionsBySourceID(ctx context.Context, sourceID uint, opts *storage.GetSubscriptionsOptions) (*storage.GetSubscriptionsResult, error) {
 	m.ctrl.T.Helper()

@@ -38,6 +38,20 @@ func (s *SubscriptionStorageImpl) SubscriptionExist(ctx context.Context, userID 
 	return (count > 0), nil
 }
 
+func (s *SubscriptionStorageImpl) GetSubscription(ctx context.Context, userID int64, sourceID uint) (
+	*model.Subscribe, error,
+) {
+	subscription := &model.Subscribe{}
+	result := s.db.WithContext(ctx).Where("user_id = ? and source_id = ?", userID, sourceID).First(subscription)
+	if result.Error != nil {
+		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+			return nil, ErrRecordNotFound
+		}
+		return nil, result.Error
+	}
+	return subscription, nil
+}
+
 func (s *SubscriptionStorageImpl) GetSubscriptionsByUserID(
 	ctx context.Context, userID int64, opts *GetSubscriptionsOptions,
 ) (*GetSubscriptionsResult, error) {

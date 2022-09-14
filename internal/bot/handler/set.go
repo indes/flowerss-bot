@@ -8,6 +8,7 @@ import (
 	"strings"
 	"text/template"
 
+	"github.com/spf13/cast"
 	tb "gopkg.in/telebot.v3"
 
 	"github.com/indes/flowerss-bot/internal/bot/chat"
@@ -102,11 +103,12 @@ const (
 )
 
 type SetFeedItemButton struct {
-	bot *tb.Bot
+	bot  *tb.Bot
+	core *core.Core
 }
 
-func NewSetFeedItemButton(bot *tb.Bot) *SetFeedItemButton {
-	return &SetFeedItemButton{bot: bot}
+func NewSetFeedItemButton(bot *tb.Bot, core *core.Core) *SetFeedItemButton {
+	return &SetFeedItemButton{bot: bot, core: core}
 }
 
 func (r *SetFeedItemButton) CallbackUnique() string {
@@ -135,13 +137,13 @@ func (r *SetFeedItemButton) Handle(ctx tb.Context) error {
 		}
 	}
 
-	sourceID, _ := strconv.Atoi(data[1])
-	source, err := model.GetSourceById(uint(sourceID))
+	sourceID := cast.ToUint(data[1])
+	source, err := r.core.GetSource(context.Background(), sourceID)
 	if err != nil {
 		return ctx.Edit("找不到该订阅源")
 	}
 
-	sub, err := model.GetSubscribeByUserIDAndSourceID(subscriberID, source.ID)
+	sub, err := r.core.GetSubscription(context.Background(), subscriberID, source.ID)
 	if err != nil {
 		return ctx.Edit("用户未订阅该rss")
 	}

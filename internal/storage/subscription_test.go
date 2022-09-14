@@ -58,6 +58,10 @@ func TestSubscriptionStorageImpl(t *testing.T) {
 			assert.Nil(t, err)
 			assert.True(t, exist)
 
+			subscription, err := s.GetSubscription(ctx, 101, 1)
+			assert.Nil(t, err)
+			assert.NotNil(t, subscription)
+
 			opt := &GetSubscriptionsOptions{
 				Count: 2,
 			}
@@ -99,6 +103,10 @@ func TestSubscriptionStorageImpl(t *testing.T) {
 			exist, err = s.SubscriptionExist(ctx, 101, 1)
 			assert.Nil(t, err)
 			assert.False(t, exist)
+
+			subscription, err = s.GetSubscription(ctx, 101, 1)
+			assert.Error(t, err)
+			assert.Nil(t, subscription)
 
 			got, err = s.CountSubscriptions(ctx)
 			assert.Nil(t, err)

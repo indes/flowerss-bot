@@ -55,6 +55,7 @@ type Subscription interface {
 	Storage
 	AddSubscription(ctx context.Context, subscription *model.Subscribe) error
 	SubscriptionExist(ctx context.Context, userID int64, sourceID uint) (bool, error)
+	GetSubscription(ctx context.Context, userID int64, sourceID uint) (*model.Subscribe, error)
 	GetSubscriptionsByUserID(
 		ctx context.Context, userID int64, opts *GetSubscriptionsOptions,
 	) (*GetSubscriptionsResult, error)
