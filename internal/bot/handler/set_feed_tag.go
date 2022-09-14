@@ -1,21 +1,23 @@
 package handler
 
 import (
-	"strconv"
+	"context"
 	"strings"
+
+	"github.com/spf13/cast"
+	tb "gopkg.in/telebot.v3"
 
 	"github.com/indes/flowerss-bot/internal/bot/message"
 	"github.com/indes/flowerss-bot/internal/bot/session"
-	"github.com/indes/flowerss-bot/internal/model"
-
-	tb "gopkg.in/telebot.v3"
+	"github.com/indes/flowerss-bot/internal/core"
 )
 
 type SetFeedTag struct {
+	core *core.Core
 }
 
-func NewSetFeedTag() *SetFeedTag {
-	return &SetFeedTag{}
+func NewSetFeedTag(core *core.Core) *SetFeedTag {
+	return &SetFeedTag{core: core}
 }
 
 func (s *SetFeedTag) Command() string {
@@ -38,36 +40,23 @@ func (s *SetFeedTag) Handle(ctx tb.Context) error {
 	msg := s.getMessageWithoutMention(ctx)
 	args := strings.Split(strings.TrimSpace(msg), " ")
 	if len(args) < 1 {
-		return ctx.Reply("/setfeedtag [sub id] [tag1] [tag2] 设置订阅标签（最多设置三个Tag，以空格分割）")
+		return ctx.Reply("/setfeedtag [sourceID] [tag1] [tag2] 设置订阅标签（最多设置三个Tag，以空格分割）")
 	}
 
 	// 截短参数
 	if len(args) > 4 {
 		args = args[:4]
 	}
-	subID, err := strconv.Atoi(args[0])
-	if err != nil {
-		return ctx.Reply("请输入正确的订阅id!")
-	}
 
-	sub, err := model.GetSubscribeByID(subID)
-	if err != nil || sub == nil {
-		return ctx.Reply("请输入正确的订阅id!")
-	}
-
+	sourceID := cast.ToUint(args[0])
 	mentionChat, _ := session.GetMentionChatFromCtxStore(ctx)
 	subscribeUserID := ctx.Chat().ID
 	if mentionChat != nil {
 		subscribeUserID = mentionChat.ID
 	}
 
-	if subscribeUserID != sub.UserID {
-		return ctx.Reply("订阅记录与操作者id不一致")
-	}
-
-	if err := sub.SetTag(args[1:]); err != nil {
+	if err := s.core.SetSubscriptionTag(context.Background(), subscribeUserID, sourceID, args[1:]); err != nil {
 		return ctx.Reply("订阅标签设置失败!")
-
 	}
 	return ctx.Reply("订阅标签设置成功!")
 }

@@ -6,6 +6,7 @@ import (
 
 	"gorm.io/gorm"
 
+	"github.com/indes/flowerss-bot/internal/log"
 	"github.com/indes/flowerss-bot/internal/model"
 )
 
@@ -36,6 +37,20 @@ func (s *SubscriptionStorageImpl) SubscriptionExist(ctx context.Context, userID 
 		return false, result.Error
 	}
 	return (count > 0), nil
+}
+
+func (s *SubscriptionStorageImpl) GetSubscription(ctx context.Context, userID int64, sourceID uint) (
+	*model.Subscribe, error,
+) {
+	subscription := &model.Subscribe{}
+	result := s.db.WithContext(ctx).Where("user_id = ? and source_id = ?", userID, sourceID).First(subscription)
+	if result.Error != nil {
+		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+			return nil, ErrRecordNotFound
+		}
+		return nil, result.Error
+	}
+	return subscription, nil
 }
 
 func (s *SubscriptionStorageImpl) GetSubscriptionsByUserID(
@@ -134,4 +149,19 @@ func (s *SubscriptionStorageImpl) CountSourceSubscriptions(ctx context.Context, 
 		return 0, result.Error
 	}
 	return count, nil
+}
+
+func (s *SubscriptionStorageImpl) UpdateSubscription(
+	ctx context.Context, userID int64, sourceID uint, newSubscription *model.Subscribe,
+) error {
+	result := s.db.WithContext(ctx).Where(
+		"user_id = ? and source_id = ?", userID, sourceID,
+	).Updates(newSubscription)
+	if result.Error != nil {
+		return result.Error
+	}
+	log.Debugf(
+		"update %d row, userID %d sourceID %d new %#v", result.RowsAffected, userID, sourceID, newSubscription,
+	)
+	return nil
 }

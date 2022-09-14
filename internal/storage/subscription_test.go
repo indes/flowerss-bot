@@ -26,7 +26,6 @@ func TestSubscriptionStorageImpl(t *testing.T) {
 			UserID:             101,
 			EnableNotification: 1,
 		},
-
 		&model.Subscribe{
 			SourceID:           2,
 			UserID:             100,
@@ -57,6 +56,10 @@ func TestSubscriptionStorageImpl(t *testing.T) {
 			exist, err := s.SubscriptionExist(ctx, 101, 1)
 			assert.Nil(t, err)
 			assert.True(t, exist)
+
+			subscription, err := s.GetSubscription(ctx, 101, 1)
+			assert.Nil(t, err)
+			assert.NotNil(t, subscription)
 
 			opt := &GetSubscriptionsOptions{
 				Count: 2,
@@ -100,6 +103,10 @@ func TestSubscriptionStorageImpl(t *testing.T) {
 			assert.Nil(t, err)
 			assert.False(t, exist)
 
+			subscription, err = s.GetSubscription(ctx, 101, 1)
+			assert.Error(t, err)
+			assert.Nil(t, subscription)
+
 			got, err = s.CountSubscriptions(ctx)
 			assert.Nil(t, err)
 			assert.Equal(t, int64(4), got)
@@ -107,6 +114,30 @@ func TestSubscriptionStorageImpl(t *testing.T) {
 			got, err = s.CountSourceSubscriptions(ctx, 2)
 			assert.Nil(t, err)
 			assert.Equal(t, int64(2), got)
+		},
+	)
+
+	t.Run(
+		"update subscription", func(t *testing.T) {
+			sub := &model.Subscribe{
+				ID:                 10001,
+				SourceID:           1000,
+				UserID:             1002,
+				EnableNotification: 1,
+			}
+			err := s.UpdateSubscription(ctx, sub.UserID, sub.SourceID, sub)
+			assert.Nil(t, err)
+
+			err = s.AddSubscription(ctx, sub)
+			assert.Nil(t, err)
+
+			sub.Tag = "tag"
+			err = s.UpdateSubscription(ctx, sub.UserID, sub.SourceID, sub)
+			assert.Nil(t, err)
+
+			subscription, err := s.GetSubscription(ctx, sub.UserID, sub.SourceID)
+			assert.Nil(t, err)
+			assert.Equal(t, sub.Tag, subscription.Tag)
 		},
 	)
 }

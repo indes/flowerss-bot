@@ -55,6 +55,7 @@ type Subscription interface {
 	Storage
 	AddSubscription(ctx context.Context, subscription *model.Subscribe) error
 	SubscriptionExist(ctx context.Context, userID int64, sourceID uint) (bool, error)
+	GetSubscription(ctx context.Context, userID int64, sourceID uint) (*model.Subscribe, error)
 	GetSubscriptionsByUserID(
 		ctx context.Context, userID int64, opts *GetSubscriptionsOptions,
 	) (*GetSubscriptionsResult, error)
@@ -64,6 +65,9 @@ type Subscription interface {
 	CountSubscriptions(ctx context.Context) (int64, error)
 	DeleteSubscription(ctx context.Context, userID int64, sourceID uint) (int64, error)
 	CountSourceSubscriptions(ctx context.Context, sourceID uint) (int64, error)
+	UpdateSubscription(
+		ctx context.Context, userID int64, sourceID uint, newSubscription *model.Subscribe,
+	) error
 }
 
 type Content interface {
