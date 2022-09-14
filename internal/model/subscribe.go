@@ -43,26 +43,6 @@ func GetSubscriberBySource(s *Source) []*Subscribe {
 	return subs
 }
 
-func UnsubAllByUserID(userID int64) (success int, fail int, err error) {
-	success = 0
-	fail = 0
-	var subs []Subscribe
-
-	db.Where("user_id=?", userID).Find(&subs)
-
-	for _, sub := range subs {
-		err := sub.Unsub()
-		if err != nil {
-			fail += 1
-		} else {
-			success += 1
-		}
-	}
-	err = nil
-
-	return
-}
-
 func GetSubsByUserID(userID int64) ([]Subscribe, error) {
 	var subs []Subscribe
 	db.Where("user_id=?", userID).Order("id").Find(&subs)

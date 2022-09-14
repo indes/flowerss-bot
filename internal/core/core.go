@@ -3,6 +3,7 @@ package core
 import (
 	"context"
 	"errors"
+	"sync"
 
 	"gorm.io/driver/mysql"
 	"gorm.io/driver/sqlite"
@@ -189,4 +190,26 @@ func (c *Core) GetSource(ctx context.Context, id uint) (*model.Source, error) {
 		return nil, err
 	}
 	return source, nil
+}
+
+// UnsubscribeAllSource 添加订阅
+func (c *Core) UnsubscribeAllSource(ctx context.Context, userID int64) error {
+	sources, err := c.GetUserSubscribedSources(ctx, userID)
+	if err != nil {
+		return err
+	}
+
+	var wg sync.WaitGroup
+	for i := range sources {
+		wg.Add(1)
+		i := i
+		go func() {
+			defer wg.Done()
+			if err := c.Unsubscribe(ctx, userID, sources[i].ID); err != nil {
+				log.Errorf("user %d unsubscribe %d failed, %v", userID, sources[i].ID, err)
+			}
+		}()
+	}
+	wg.Wait()
+	return nil
 }

@@ -98,7 +98,7 @@ func setCommands() {
 	}
 
 	ButtonHandlers := []handler.ButtonHandler{
-		handler.NewRemoveAllSubscriptionButton(),
+		handler.NewRemoveAllSubscriptionButton(Core),
 		handler.NewCancelRemoveAllSubscriptionButton(),
 		handler.NewSetFeedItemButton(B),
 		handler.NewRemoveSubscriptionItemButton(Core),
