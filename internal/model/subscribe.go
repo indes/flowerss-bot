@@ -2,7 +2,6 @@ package model
 
 import (
 	"errors"
-	"strings"
 
 	"github.com/indes/flowerss-bot/internal/config"
 )
@@ -21,15 +20,6 @@ type Subscribe struct {
 	Interval           int
 	WaitTime           int
 	EditTime
-}
-
-func GetSubscribeByUserIDAndSourceID(userID int64, sourceID uint) (*Subscribe, error) {
-	var sub Subscribe
-	db.Where("user_id=? and source_id=?", userID, sourceID).First(&sub)
-	if sub.UserID != int64(userID) {
-		return nil, errors.New("未订阅该RSS源")
-	}
-	return &sub, nil
 }
 
 func GetSubscriberBySource(s *Source) []*Subscribe {
@@ -83,21 +73,6 @@ func (s *Source) ToggleEnabled() error {
 	///TODO a hack for save source changes
 	s.Save()
 
-	return nil
-}
-
-func (s *Subscribe) SetTag(tags []string) error {
-	defer s.Save()
-
-	tagStr := strings.Join(tags, " #")
-
-	s.Tag = "#" + tagStr
-	return nil
-}
-
-func (s *Subscribe) SetInterval(interval int) error {
-	defer s.Save()
-	s.Interval = interval
 	return nil
 }
 

@@ -1,21 +1,25 @@
 package handler
 
 import (
+	"context"
 	"strconv"
 	"strings"
 
+	"github.com/spf13/cast"
 	tb "gopkg.in/telebot.v3"
 
 	"github.com/indes/flowerss-bot/internal/bot/message"
 	"github.com/indes/flowerss-bot/internal/bot/session"
-	"github.com/indes/flowerss-bot/internal/model"
+	"github.com/indes/flowerss-bot/internal/core"
+	"github.com/indes/flowerss-bot/internal/log"
 )
 
 type SetUpdateInterval struct {
+	core *core.Core
 }
 
-func NewSetUpdateInterval() *SetUpdateInterval {
-	return &SetUpdateInterval{}
+func NewSetUpdateInterval(core *core.Core) *SetUpdateInterval {
+	return &SetUpdateInterval{core: core}
 }
 
 func (s *SetUpdateInterval) Command() string {
@@ -38,7 +42,7 @@ func (s *SetUpdateInterval) Handle(ctx tb.Context) error {
 	msg := s.getMessageWithoutMention(ctx)
 	args := strings.Split(strings.TrimSpace(msg), " ")
 	if len(args) < 2 {
-		return ctx.Reply("/setinterval [interval] [sub id] 设置订阅刷新频率（可设置多个sub id，以空格分割）")
+		return ctx.Reply("/setinterval [interval] [sourceID] 设置订阅刷新频率（可设置多个sub id，以空格分割）")
 	}
 
 	interval, err := strconv.Atoi(args[0])
@@ -51,22 +55,15 @@ func (s *SetUpdateInterval) Handle(ctx tb.Context) error {
 	if mentionChat != nil {
 		subscribeUserID = mentionChat.ID
 	}
+
 	for _, id := range args[1:] {
-		subID, err := strconv.Atoi(id)
-		if err != nil {
-			return ctx.Reply("请输入正确的订阅id!")
+		sourceID := cast.ToUint(id)
+		if err := s.core.SetSubscriptionInterval(
+			context.Background(), subscribeUserID, sourceID, interval,
+		); err != nil {
+			log.Errorf("SetSubscriptionInterval failed, %v", err)
+			return ctx.Reply("抓取频率设置失败!")
 		}
-
-		sub, err := model.GetSubscribeByID(subID)
-		if err != nil || sub == nil {
-			return ctx.Reply("请输入正确的订阅id!")
-		}
-
-		if sub.UserID != subscribeUserID {
-			return ctx.Reply("订阅id与订阅者id不匹配!")
-		}
-
-		_ = sub.SetInterval(interval)
 	}
 	return ctx.Reply("抓取频率设置成功!")
 }

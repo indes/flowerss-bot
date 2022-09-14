@@ -237,3 +237,14 @@ func (c *Core) SetSubscriptionTag(ctx context.Context, userID int64, sourceID ui
 	subscription.Tag = "#" + strings.Join(tags, " #")
 	return c.subscriptionStorage.UpdateSubscription(ctx, userID, sourceID, subscription)
 }
+
+// SetSubscriptionInterval
+func (c *Core) SetSubscriptionInterval(ctx context.Context, userID int64, sourceID uint, interval int) error {
+	subscription, err := c.GetSubscription(ctx, userID, sourceID)
+	if err != nil {
+		return err
+	}
+
+	subscription.Interval = interval
+	return c.subscriptionStorage.UpdateSubscription(ctx, userID, sourceID, subscription)
+}
