@@ -367,6 +367,20 @@ func (mr *MockSubscriptionMockRecorder) SubscriptionExist(ctx, userID, sourceID 
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SubscriptionExist", reflect.TypeOf((*MockSubscription)(nil).SubscriptionExist), ctx, userID, sourceID)
 }
 
+// UpdateSubscription mocks base method.
+func (m *MockSubscription) UpdateSubscription(ctx context.Context, userID int64, sourceID uint, newSubscription *model.Subscribe) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateSubscription", ctx, userID, sourceID, newSubscription)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// UpdateSubscription indicates an expected call of UpdateSubscription.
+func (mr *MockSubscriptionMockRecorder) UpdateSubscription(ctx, userID, sourceID, newSubscription interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateSubscription", reflect.TypeOf((*MockSubscription)(nil).UpdateSubscription), ctx, userID, sourceID, newSubscription)
+}
+
 // MockContent is a mock of Content interface.
 type MockContent struct {
 	ctrl     *gomock.Controller
