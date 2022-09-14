@@ -1,11 +1,11 @@
 package handler
 
 import (
-	"fmt"
+	"context"
 
 	tb "gopkg.in/telebot.v3"
 
-	"github.com/indes/flowerss-bot/internal/model"
+	"github.com/indes/flowerss-bot/internal/core"
 )
 
 type RemoveAllSubscription struct {
@@ -51,10 +51,11 @@ const (
 )
 
 type RemoveAllSubscriptionButton struct {
+	core *core.Core
 }
 
-func NewRemoveAllSubscriptionButton() *RemoveAllSubscriptionButton {
-	return &RemoveAllSubscriptionButton{}
+func NewRemoveAllSubscriptionButton(core *core.Core) *RemoveAllSubscriptionButton {
+	return &RemoveAllSubscriptionButton{core: core}
 }
 
 func (r *RemoveAllSubscriptionButton) CallbackUnique() string {
@@ -66,11 +67,11 @@ func (r *RemoveAllSubscriptionButton) Description() string {
 }
 
 func (r *RemoveAllSubscriptionButton) Handle(ctx tb.Context) error {
-	success, fail, err := model.UnsubAllByUserID(ctx.Sender().ID)
+	err := r.core.UnsubscribeAllSource(context.Background(), ctx.Sender().ID)
 	if err != nil {
 		return ctx.Edit("退订失败")
 	}
-	return ctx.Edit(fmt.Sprintf("退订成功：%d\n退订失败：%d", success, fail))
+	return ctx.Edit("退订成功")
 }
 
 func (r *RemoveAllSubscriptionButton) Middlewares() []tb.MiddlewareFunc {
