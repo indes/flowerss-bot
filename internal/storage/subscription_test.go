@@ -124,10 +124,8 @@ func TestSubscriptionStorageImpl(t *testing.T) {
 			err := s.UpdateSubscription(ctx, subscriptions[0].UserID, subscriptions[0].SourceID, subscriptions[0])
 			assert.Nil(t, err)
 
-			for _, subscription := range subscriptions {
-				err := s.AddSubscription(ctx, subscription)
-				assert.Nil(t, err)
-			}
+			err = s.AddSubscription(ctx, subscriptions[0])
+			assert.Nil(t, err)
 
 			subscriptions[0].Tag = "tag"
 			err = s.UpdateSubscription(ctx, subscriptions[0].UserID, subscriptions[0].SourceID, subscriptions[0])
