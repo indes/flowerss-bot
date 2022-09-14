@@ -100,7 +100,7 @@ func setCommands() {
 	ButtonHandlers := []handler.ButtonHandler{
 		handler.NewRemoveAllSubscriptionButton(Core),
 		handler.NewCancelRemoveAllSubscriptionButton(),
-		handler.NewSetFeedItemButton(B),
+		handler.NewSetFeedItemButton(B, Core),
 		handler.NewRemoveSubscriptionItemButton(Core),
 		handler.NewNotificationSwitchButton(B),
 		handler.NewSetSubscriptionTagButton(B),
