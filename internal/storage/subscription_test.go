@@ -26,7 +26,6 @@ func TestSubscriptionStorageImpl(t *testing.T) {
 			UserID:             101,
 			EnableNotification: 1,
 		},
-
 		&model.Subscribe{
 			SourceID:           2,
 			UserID:             100,
@@ -120,20 +119,25 @@ func TestSubscriptionStorageImpl(t *testing.T) {
 
 	t.Run(
 		"update subscription", func(t *testing.T) {
-			subscriptions[0].ID = 100
-			err := s.UpdateSubscription(ctx, subscriptions[0].UserID, subscriptions[0].SourceID, subscriptions[0])
+			sub := &model.Subscribe{
+				ID:                 10001,
+				SourceID:           1000,
+				UserID:             1002,
+				EnableNotification: 1,
+			}
+			err := s.UpdateSubscription(ctx, sub.UserID, sub.SourceID, sub)
 			assert.Nil(t, err)
 
-			err = s.AddSubscription(ctx, subscriptions[0])
+			err = s.AddSubscription(ctx, sub)
 			assert.Nil(t, err)
 
-			subscriptions[0].Tag = "tag"
-			err = s.UpdateSubscription(ctx, subscriptions[0].UserID, subscriptions[0].SourceID, subscriptions[0])
+			sub.Tag = "tag"
+			err = s.UpdateSubscription(ctx, sub.UserID, sub.SourceID, sub)
 			assert.Nil(t, err)
 
-			subscription, err := s.GetSubscription(ctx, subscriptions[0].UserID, subscriptions[0].SourceID)
+			subscription, err := s.GetSubscription(ctx, sub.UserID, sub.SourceID)
 			assert.Nil(t, err)
-			assert.Equal(t, subscriptions[0].Tag, subscription.Tag)
+			assert.Equal(t, sub.Tag, subscription.Tag)
 		},
 	)
 }
