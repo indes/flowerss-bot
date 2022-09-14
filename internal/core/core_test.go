@@ -228,3 +228,83 @@ func TestCore_Unsubscribe(t *testing.T) {
 		},
 	)
 }
+
+func TestCore_GetSourceByURL(t *testing.T) {
+	c, s := getTestCore(t)
+	defer s.Ctrl.Finish()
+	ctx := context.Background()
+	sourceURL := "http://google.com"
+
+	t.Run(
+		"source err", func(t *testing.T) {
+			s.Source.EXPECT().GetSourceByURL(ctx, sourceURL).Return(
+				nil, errors.New("err"),
+			).Times(1)
+			got, err := c.GetSourceByURL(ctx, sourceURL)
+			assert.Error(t, err)
+			assert.Nil(t, got)
+		},
+	)
+
+	t.Run(
+		"source not exist", func(t *testing.T) {
+			s.Source.EXPECT().GetSourceByURL(ctx, sourceURL).Return(
+				nil, storage.ErrRecordNotFound,
+			).Times(1)
+			got, err := c.GetSourceByURL(ctx, sourceURL)
+			assert.Equal(t, ErrSourceNotExist, err)
+			assert.Nil(t, got)
+		},
+	)
+
+	t.Run(
+		"ok", func(t *testing.T) {
+			s.Source.EXPECT().GetSourceByURL(ctx, sourceURL).Return(
+				&model.Source{}, nil,
+			).Times(1)
+			got, err := c.GetSourceByURL(ctx, sourceURL)
+			assert.Nil(t, err)
+			assert.NotNil(t, got)
+		},
+	)
+}
+
+func TestCore_GetSource(t *testing.T) {
+	c, s := getTestCore(t)
+	defer s.Ctrl.Finish()
+	ctx := context.Background()
+	sourceID := uint(1)
+
+	t.Run(
+		"source err", func(t *testing.T) {
+			s.Source.EXPECT().GetSource(ctx, sourceID).Return(
+				nil, errors.New("err"),
+			).Times(1)
+			got, err := c.GetSource(ctx, sourceID)
+			assert.Error(t, err)
+			assert.Nil(t, got)
+		},
+	)
+
+	t.Run(
+		"source not exist", func(t *testing.T) {
+			s.Source.EXPECT().GetSource(ctx, sourceID).Return(
+				nil, storage.ErrRecordNotFound,
+			).Times(1)
+			got, err := c.GetSource(ctx, sourceID)
+			assert.Equal(t, ErrSourceNotExist, err)
+			assert.Nil(t, got)
+		},
+	)
+
+	t.Run(
+		"ok", func(t *testing.T) {
+			s.Source.EXPECT().GetSource(ctx, sourceID).Return(
+				&model.Source{}, nil,
+			).Times(1)
+			got, err := c.GetSource(ctx, sourceID)
+			assert.Nil(t, err)
+			assert.NotNil(t, got)
+		},
+	)
+}

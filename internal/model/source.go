@@ -32,14 +32,6 @@ func (s *Source) appendContents(items []*rss.Item) error {
 	return nil
 }
 
-func GetSourceByUrl(url string) (*Source, error) {
-	var source Source
-	if err := db.Where("link=?", url).Find(&source).Error; err != nil {
-		return nil, err
-	}
-	return &source, nil
-}
-
 func FindOrNewSourceByUrl(url string) (*Source, error) {
 	var source Source
 

@@ -70,11 +70,6 @@ func GenContentAndCheckByFeedItem(s *Source, item *rss.Item) (*Content, bool, er
 	return &content, isBroaded, nil
 }
 
-// DeleteContentsBySourceID delete contents in the db by sourceID
-func DeleteContentsBySourceID(sid uint) {
-	db.Delete(Content{}, "source_id = ?", sid)
-}
-
 // PublishItem publish item to telegraph
 func PublishItem(source *Source, item *rss.Item, html string) string {
 	url, _ := tgraph.PublishHtml(source.Title, item.Title, item.Link, html)

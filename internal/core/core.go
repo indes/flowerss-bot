@@ -17,6 +17,7 @@ import (
 var (
 	ErrSubscriptionExist    = errors.New("already subscribed")
 	ErrSubscriptionNotExist = errors.New("subscription not exist")
+	ErrSourceNotExist       = errors.New("source not exist")
 )
 
 type Core struct {
@@ -164,4 +165,28 @@ func (c *Core) removeSource(ctx context.Context, sourceID uint) error {
 	}
 	log.Infof("remove source %d and %d contents", sourceID, count)
 	return nil
+}
+
+// GetSourceByURL 获取用户订阅的订阅源
+func (c *Core) GetSourceByURL(ctx context.Context, sourceURL string) (*model.Source, error) {
+	source, err := c.sourceStorage.GetSourceByURL(ctx, sourceURL)
+	if err != nil {
+		if err == storage.ErrRecordNotFound {
+			return nil, ErrSourceNotExist
+		}
+		return nil, err
+	}
+	return source, nil
+}
+
+// GetSource 获取用户订阅的订阅源
+func (c *Core) GetSource(ctx context.Context, id uint) (*model.Source, error) {
+	source, err := c.sourceStorage.GetSource(ctx, id)
+	if err != nil {
+		if err == storage.ErrRecordNotFound {
+			return nil, ErrSourceNotExist
+		}
+		return nil, err
+	}
+	return source, nil
 }

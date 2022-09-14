@@ -63,16 +63,6 @@ func UnsubAllByUserID(userID int64) (success int, fail int, err error) {
 	return
 }
 
-func GetSubByUserIDAndURL(userID int64, url string) (*Subscribe, error) {
-	var sub Subscribe
-	source, err := GetSourceByUrl(url)
-	if err != nil {
-		return &sub, err
-	}
-	err = db.Where("user_id=? and source_id=?", userID, source.ID).First(&sub).Error
-	return &sub, err
-}
-
 func GetSubsByUserID(userID int64) ([]Subscribe, error) {
 	var subs []Subscribe
 	db.Where("user_id=?", userID).Order("id").Find(&subs)
