@@ -65,6 +65,9 @@ type Subscription interface {
 	CountSubscriptions(ctx context.Context) (int64, error)
 	DeleteSubscription(ctx context.Context, userID int64, sourceID uint) (int64, error)
 	CountSourceSubscriptions(ctx context.Context, sourceID uint) (int64, error)
+	UpdateSubscription(
+		ctx context.Context, userID int64, sourceID uint, newSubscription *model.Subscribe,
+	) error
 }
 
 type Content interface {

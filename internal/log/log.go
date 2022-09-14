@@ -71,3 +71,7 @@ func Fatal(args ...interface{}) {
 func Fatalf(template string, args ...interface{}) {
 	globalLogger.Sugar().Fatalf(template, args...)
 }
+
+func Debugf(template string, args ...interface{}) {
+	globalLogger.Sugar().Debugf(template, args...)
+}

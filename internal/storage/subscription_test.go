@@ -117,4 +117,24 @@ func TestSubscriptionStorageImpl(t *testing.T) {
 			assert.Equal(t, int64(2), got)
 		},
 	)
+
+	t.Run(
+		"update subscription", func(t *testing.T) {
+			err := s.UpdateSubscription(ctx, subscriptions[0].UserID, subscriptions[0].SourceID, subscriptions[0])
+			assert.Nil(t, err)
+
+			for _, subscription := range subscriptions {
+				err := s.AddSubscription(ctx, subscription)
+				assert.Nil(t, err)
+			}
+
+			subscriptions[0].Tag = "tag"
+			err = s.UpdateSubscription(ctx, subscriptions[0].UserID, subscriptions[0].SourceID, subscriptions[0])
+			assert.Nil(t, err)
+
+			subscription, err := s.GetSubscription(ctx, subscriptions[0].UserID, subscriptions[0].SourceID)
+			assert.Nil(t, err)
+			assert.Equal(t, subscriptions[0].Tag, subscription.Tag)
+		},
+	)
 }
