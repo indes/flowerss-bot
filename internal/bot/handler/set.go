@@ -4,11 +4,8 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"strconv"
-	"strings"
 	"text/template"
 
-	"github.com/spf13/cast"
 	tb "gopkg.in/telebot.v3"
 
 	"github.com/indes/flowerss-bot/internal/bot/chat"
@@ -64,13 +61,18 @@ func (s *Set) Handle(ctx tb.Context) error {
 			tb.ReplyButton{Text: text},
 		}
 		replyKeys = append(replyKeys, replyButton)
+		attachData := &session.Attachment{
+			UserId:   ctx.Chat().ID,
+			SourceId: uint32(source.ID),
+		}
 
+		data := session.Marshal(attachData)
 		setFeedItemBtns = append(
 			setFeedItemBtns, []tb.InlineButton{
 				tb.InlineButton{
 					Unique: SetFeedItemButtonUnique,
 					Text:   fmt.Sprintf("[%d] %s", source.ID, source.Title),
-					Data:   fmt.Sprintf("%d:%d", ownerID, source.ID),
+					Data:   data,
 				},
 			},
 		)
@@ -120,11 +122,12 @@ func (r *SetFeedItemButton) Description() string {
 }
 
 func (r *SetFeedItemButton) Handle(ctx tb.Context) error {
-	data := strings.Split(ctx.Callback().Data, ":")
-	if len(data) < 2 {
-		return nil
+	attachData, err := session.UnmarshalAttachment(ctx.Callback().Data)
+	if err != nil {
+		return ctx.Edit("退订错误！")
 	}
-	subscriberID, _ := strconv.ParseInt(data[0], 10, 64)
+
+	subscriberID := attachData.GetUserId()
 	// 如果订阅者与按钮点击者id不一致，需要验证管理员权限
 	if subscriberID != ctx.Callback().Sender.ID {
 		channelChat, err := r.bot.ChatByUsername(fmt.Sprintf("%d", subscriberID))
@@ -137,7 +140,7 @@ func (r *SetFeedItemButton) Handle(ctx tb.Context) error {
 		}
 	}
 
-	sourceID := cast.ToUint(data[1])
+	sourceID := uint(attachData.GetSourceId())
 	source, err := r.core.GetSource(context.Background(), sourceID)
 	if err != nil {
 		return ctx.Edit("找不到该订阅源")
@@ -163,13 +166,13 @@ func genFeedSetBtn(
 	c *tb.Callback, sub *model.Subscribe, source *model.Source,
 ) [][]tb.InlineButton {
 	setSubTagKey := tb.InlineButton{
-		Unique: "set_set_sub_tag_btn",
+		Unique: SetSubscriptionTagButtonUnique,
 		Text:   "标签设置",
 		Data:   c.Data,
 	}
 
 	toggleNoticeKey := tb.InlineButton{
-		Unique: "set_toggle_notice_btn",
+		Unique: NotificationSwitchButtonUnique,
 		Text:   "开启通知",
 		Data:   c.Data,
 	}

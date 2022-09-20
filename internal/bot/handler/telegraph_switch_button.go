@@ -10,6 +10,7 @@ import (
 
 	"github.com/indes/flowerss-bot/internal/bot/chat"
 	"github.com/indes/flowerss-bot/internal/config"
+	"github.com/indes/flowerss-bot/internal/core"
 	"github.com/indes/flowerss-bot/internal/model"
 )
 
@@ -18,11 +19,12 @@ const (
 )
 
 type TelegraphSwitchButton struct {
-	bot *tb.Bot
+	bot  *tb.Bot
+	core *core.Core
 }
 
-func NewTelegraphSwitchButton(bot *tb.Bot) *TelegraphSwitchButton {
-	return &TelegraphSwitchButton{bot: bot}
+func NewTelegraphSwitchButton(bot *tb.Bot, core *core.Core) *TelegraphSwitchButton {
+	return &TelegraphSwitchButton{bot: bot, core: core}
 }
 
 func (b *TelegraphSwitchButton) CallbackUnique() string {
