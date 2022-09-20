@@ -104,7 +104,7 @@ func setCommands() {
 		handler.NewRemoveSubscriptionItemButton(Core),
 		handler.NewNotificationSwitchButton(B, Core),
 		handler.NewSetSubscriptionTagButton(B),
-		handler.NewTelegraphSwitchButton(B),
+		handler.NewTelegraphSwitchButton(B, Core),
 		handler.NewSubscriptionSwitchButton(B),
 	}
 
