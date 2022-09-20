@@ -10,7 +10,6 @@ require (
 	github.com/grokify/html-strip-tags-go v0.0.0-20200923094847-079d207a09f1
 	github.com/indes/telegraph-go v1.0.1
 	github.com/jinzhu/gorm v1.9.16
-	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/magiconair/properties v1.8.6
 	github.com/mattn/go-sqlite3 v1.14.15 // indirect
 	github.com/spf13/cast v1.5.0
