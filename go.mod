@@ -19,6 +19,7 @@ require (
 	go.uber.org/atomic v1.9.0
 	go.uber.org/zap v1.23.0
 	golang.org/x/sys v0.0.0-20220811171246-fbc7d0a398ab // indirect
+	google.golang.org/protobuf v1.28.1
 	gopkg.in/telebot.v3 v3.0.0
 	gorm.io/driver/mysql v1.3.6
 	gorm.io/driver/sqlite v1.3.6
