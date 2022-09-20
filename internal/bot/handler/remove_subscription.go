@@ -168,8 +168,8 @@ func (r *RemoveSubscriptionItemButton) Handle(ctx tb.Context) error {
 		return ctx.Edit("退订错误！")
 	}
 
-	userID := attachData.UserId
-	sourceID := uint(attachData.SourceId)
+	userID := attachData.GetUserId()
+	sourceID := uint(attachData.GetSourceId())
 	source, err := r.core.GetSource(context.Background(), sourceID)
 	if err != nil {
 		return ctx.Edit("退订错误！")
