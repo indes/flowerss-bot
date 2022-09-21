@@ -6,6 +6,7 @@ import (
 
 	"gorm.io/gorm"
 
+	"github.com/indes/flowerss-bot/internal/log"
 	"github.com/indes/flowerss-bot/internal/model"
 )
 
@@ -59,5 +60,15 @@ func (s *SourceStorageImpl) Delete(ctx context.Context, id uint) error {
 	if result.Error != nil {
 		return result.Error
 	}
+	return nil
+}
+
+func (s *SourceStorageImpl) UpdateSource(ctx context.Context, sourceID uint, newSource *model.Source) error {
+	newSource.ID = sourceID
+	result := s.db.Save(newSource)
+	if result.Error != nil {
+		return result.Error
+	}
+	log.Debugf("update %d row,  sourceID %d new %#v", result.RowsAffected, sourceID, newSource)
 	return nil
 }

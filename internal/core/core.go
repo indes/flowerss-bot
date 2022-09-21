@@ -248,3 +248,30 @@ func (c *Core) SetSubscriptionInterval(ctx context.Context, userID int64, source
 	subscription.Interval = interval
 	return c.subscriptionStorage.UpdateSubscription(ctx, userID, sourceID, subscription)
 }
+
+// EnableSourceUpdate 开启订阅源更新
+func (c *Core) EnableSourceUpdate(ctx context.Context, sourceID uint) error {
+	return c.ClearSourceErrorCount(ctx, sourceID)
+}
+
+// DisableSourceUpdate 关闭订阅源更新
+func (c *Core) DisableSourceUpdate(ctx context.Context, sourceID uint) error {
+	source, err := c.GetSource(ctx, sourceID)
+	if err != nil {
+		return err
+	}
+
+	source.ErrorCount = config.ErrorThreshold + 1
+	return c.sourceStorage.UpdateSource(ctx, sourceID, source)
+}
+
+// ClearSourceErrorCount 清空订阅源错误计数
+func (c *Core) ClearSourceErrorCount(ctx context.Context, sourceID uint) error {
+	source, err := c.GetSource(ctx, sourceID)
+	if err != nil {
+		return err
+	}
+
+	source.ErrorCount = 0
+	return c.sourceStorage.UpdateSource(ctx, sourceID, source)
+}

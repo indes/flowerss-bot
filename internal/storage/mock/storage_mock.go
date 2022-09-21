@@ -211,6 +211,20 @@ func (mr *MockSourceMockRecorder) Init(ctx interface{}) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Init", reflect.TypeOf((*MockSource)(nil).Init), ctx)
 }
 
+// UpdateSource mocks base method.
+func (m *MockSource) UpdateSource(ctx context.Context, sourceID uint, newSource *model.Source) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateSource", ctx, sourceID, newSource)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// UpdateSource indicates an expected call of UpdateSource.
+func (mr *MockSourceMockRecorder) UpdateSource(ctx, sourceID, newSource interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateSource", reflect.TypeOf((*MockSource)(nil).UpdateSource), ctx, sourceID, newSource)
+}
+
 // MockSubscription is a mock of Subscription interface.
 type MockSubscription struct {
 	ctrl     *gomock.Controller

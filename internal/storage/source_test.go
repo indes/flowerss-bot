@@ -43,4 +43,23 @@ func TestSourceStorageImpl(t *testing.T) {
 		},
 	)
 
+	t.Run(
+		"update source", func(t *testing.T) {
+			source := &model.Source{
+				ID:    1,
+				Link:  "http://google.com",
+				Title: "title",
+			}
+			err := s.UpdateSource(ctx, source.ID, source)
+			assert.Nil(t, err)
+
+			source.Title = "title2"
+			err = s.UpdateSource(ctx, source.ID, source)
+			assert.Nil(t, err)
+
+			got, err := s.GetSource(ctx, source.ID)
+			assert.Nil(t, err)
+			assert.Equal(t, source.Title, got.Title)
+		},
+	)
 }
