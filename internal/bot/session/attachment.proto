@@ -1,0 +1,10 @@
+//go:generate protoc --go_out=. attachment.proto
+syntax = "proto3";
+
+package session;
+option go_package = "../session";
+
+message Attachment {
+  int64 user_id = 1;
+  uint32 source_id = 2;
+}

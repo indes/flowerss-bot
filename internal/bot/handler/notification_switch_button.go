@@ -2,15 +2,15 @@ package handler
 
 import (
 	"bytes"
-	"strconv"
-	"strings"
+	"context"
 	"text/template"
 
 	tb "gopkg.in/telebot.v3"
 
 	"github.com/indes/flowerss-bot/internal/bot/chat"
+	"github.com/indes/flowerss-bot/internal/bot/session"
 	"github.com/indes/flowerss-bot/internal/config"
-	"github.com/indes/flowerss-bot/internal/model"
+	"github.com/indes/flowerss-bot/internal/core"
 )
 
 const (
@@ -18,11 +18,12 @@ const (
 )
 
 type NotificationSwitchButton struct {
-	bot *tb.Bot
+	bot  *tb.Bot
+	core *core.Core
 }
 
-func NewNotificationSwitchButton(bot *tb.Bot) *NotificationSwitchButton {
-	return &NotificationSwitchButton{bot: bot}
+func NewNotificationSwitchButton(bot *tb.Bot, core *core.Core) *NotificationSwitchButton {
+	return &NotificationSwitchButton{bot: bot, core: core}
 }
 
 func (b *NotificationSwitchButton) CallbackUnique() string {
@@ -39,8 +40,12 @@ func (b *NotificationSwitchButton) Handle(ctx tb.Context) error {
 		return ctx.Respond(&tb.CallbackResponse{Text: "error"})
 	}
 
-	data := strings.Split(c.Data, ":")
-	subscriberID, _ := strconv.ParseInt(data[0], 10, 64)
+	attachData, err := session.UnmarshalAttachment(ctx.Callback().Data)
+	if err != nil {
+		return ctx.Edit("系统错误！")
+	}
+
+	subscriberID := attachData.GetUserId()
 	if subscriberID != c.Sender.ID {
 		// 如果订阅者与按钮点击者id不一致，需要验证管理员权限
 		channelChat, err := b.bot.ChatByID(subscriberID)
@@ -52,17 +57,13 @@ func (b *NotificationSwitchButton) Handle(ctx tb.Context) error {
 		}
 	}
 
-	msg := strings.Split(c.Message.Text, "\n")
-	subID, err := strconv.Atoi(strings.Split(msg[1], " ")[1])
+	sourceID := uint(attachData.GetSourceId())
+	sub, err := b.core.GetSubscription(context.Background(), subscriberID, sourceID)
 	if err != nil {
 		return ctx.Respond(&tb.CallbackResponse{Text: "error"})
 	}
-	sub, err := model.GetSubscribeByID(subID)
-	if sub == nil || err != nil {
-		return ctx.Respond(&tb.CallbackResponse{Text: "error"})
-	}
 
-	source, _ := model.GetSourceById(sub.SourceID)
+	source, _ := b.core.GetSource(context.Background(), sourceID)
 	t := template.New("setting template")
 	_, _ = t.Parse(feedSettingTmpl)
 

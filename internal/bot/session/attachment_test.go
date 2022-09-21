@@ -9,11 +9,12 @@ import (
 func TestAttachment(t *testing.T) {
 	t.Run(
 		"encode and decode", func(t *testing.T) {
-			a := &Attachment{UserID: 123, SourceID: 321}
-			data := a.Marshal()
+			a := &Attachment{UserId: 123, SourceId: 321}
+			data := Marshal(a)
 			a2, err := UnmarshalAttachment(data)
 			assert.Nil(t, err)
-			assert.Equal(t, a, a2)
+			assert.Equal(t, a.GetUserId(), a2.GetUserId())
+			assert.Equal(t, a.GetSourceId(), a2.GetSourceId())
 		},
 	)
 }

@@ -1,25 +1,31 @@
 package session
 
-import jsoniter "github.com/json-iterator/go"
+import (
+	"encoding/hex"
 
-var json = jsoniter.ConfigCompatibleWithStandardLibrary
+	"google.golang.org/protobuf/proto"
 
-// Attachment 透传信息，用于bot按钮信息透传
-type Attachment struct {
-	UserID   int64 `json:"user_id"`
-	SourceID uint  `json:"source_id"`
+	"github.com/indes/flowerss-bot/internal/log"
+)
+
+// Marshal 编码成字符串
+func Marshal(a *Attachment) string {
+	bytes, err := proto.Marshal(a)
+	if err != nil {
+		log.Errorf("marshal attachment failed, %v", err)
+		return ""
+	}
+	return hex.EncodeToString(bytes)
 }
 
-// Marshal 编码成json字符串
-func (a *Attachment) Marshal() string {
-	str, _ := json.MarshalToString(a)
-	return str
-}
-
-// ParseAttachment 从json字符串解析透传信息
+// UnmarshalAttachment 从字符串解析透传信息
 func UnmarshalAttachment(data string) (*Attachment, error) {
+	bytes, err := hex.DecodeString(data)
+	if err != nil {
+		return nil, err
+	}
 	a := &Attachment{}
-	if err := json.UnmarshalFromString(data, a); err != nil {
+	if err := proto.Unmarshal(bytes, a); err != nil {
 		return nil, err
 	}
 	return a, nil

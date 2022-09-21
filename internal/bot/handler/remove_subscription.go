@@ -3,13 +3,12 @@ package handler
 import (
 	"context"
 	"fmt"
-	"strings"
 
-	"github.com/spf13/cast"
 	tb "gopkg.in/telebot.v3"
 
 	"github.com/indes/flowerss-bot/internal/bot/chat"
 	"github.com/indes/flowerss-bot/internal/bot/message"
+	"github.com/indes/flowerss-bot/internal/bot/session"
 	"github.com/indes/flowerss-bot/internal/core"
 	"github.com/indes/flowerss-bot/internal/log"
 )
@@ -85,12 +84,18 @@ func (s *RemoveSubscription) removeForChat(ctx tb.Context) error {
 
 		var unsubFeedItemButtons [][]tb.InlineButton
 		for _, source := range sources {
+			attachData := &session.Attachment{
+				UserId:   ctx.Chat().ID,
+				SourceId: uint32(source.ID),
+			}
+
+			data := session.Marshal(attachData)
 			unsubFeedItemButtons = append(
 				unsubFeedItemButtons, []tb.InlineButton{
 					{
-						Unique: "unsub_feed_item_btn",
+						Unique: RemoveSubscriptionItemButtonUnique,
 						Text:   fmt.Sprintf("[%d] %s", source.ID, source.Title),
-						Data:   fmt.Sprintf("%d::%d", ctx.Chat().ID, source.ID),
+						Data:   data,
 					},
 				},
 			)
@@ -158,13 +163,13 @@ func (r *RemoveSubscriptionItemButton) Handle(ctx tb.Context) error {
 		return ctx.Edit("内部错误！")
 	}
 
-	data := strings.Split(ctx.Callback().Data, ":")
-	if len(data) != 3 {
+	attachData, err := session.UnmarshalAttachment(ctx.Callback().Data)
+	if err != nil {
 		return ctx.Edit("退订错误！")
 	}
 
-	userID := cast.ToInt64(data[0])
-	sourceID := cast.ToUint(data[2])
+	userID := attachData.GetUserId()
+	sourceID := uint(attachData.GetSourceId())
 	source, err := r.core.GetSource(context.Background(), sourceID)
 	if err != nil {
 		return ctx.Edit("退订错误！")

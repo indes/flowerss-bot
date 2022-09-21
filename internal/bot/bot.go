@@ -102,10 +102,10 @@ func setCommands() {
 		handler.NewCancelRemoveAllSubscriptionButton(),
 		handler.NewSetFeedItemButton(B, Core),
 		handler.NewRemoveSubscriptionItemButton(Core),
-		handler.NewNotificationSwitchButton(B),
+		handler.NewNotificationSwitchButton(B, Core),
 		handler.NewSetSubscriptionTagButton(B),
-		handler.NewTelegraphSwitchButton(B),
-		handler.NewSubscriptionSwitchButton(B),
+		handler.NewTelegraphSwitchButton(B, Core),
+		handler.NewSubscriptionSwitchButton(B, Core),
 	}
 
 	for _, h := range ButtonHandlers {
