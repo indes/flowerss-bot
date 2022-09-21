@@ -32,6 +32,7 @@ type Source interface {
 	GetSource(ctx context.Context, id uint) (*model.Source, error)
 	GetSourceByURL(ctx context.Context, url string) (*model.Source, error)
 	Delete(ctx context.Context, id uint) error
+	UpdateSource(ctx context.Context, sourceID uint, newSource *model.Source) error
 }
 
 type SubscriptionSortType = int
