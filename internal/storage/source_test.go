@@ -53,9 +53,6 @@ func TestSourceStorageImpl(t *testing.T) {
 			err := s.UpdateSource(ctx, source.ID, source)
 			assert.Nil(t, err)
 
-			err = s.AddSource(ctx, source)
-			assert.Nil(t, err)
-
 			source.Title = "title2"
 			err = s.UpdateSource(ctx, source.ID, source)
 			assert.Nil(t, err)
