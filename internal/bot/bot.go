@@ -105,7 +105,7 @@ func setCommands() {
 		handler.NewNotificationSwitchButton(B, Core),
 		handler.NewSetSubscriptionTagButton(B),
 		handler.NewTelegraphSwitchButton(B, Core),
-		handler.NewSubscriptionSwitchButton(B),
+		handler.NewSubscriptionSwitchButton(B, Core),
 	}
 
 	for _, h := range ButtonHandlers {

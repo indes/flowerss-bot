@@ -39,12 +39,6 @@ func GetSubsByUserID(userID int64) ([]Subscribe, error) {
 	return subs, nil
 }
 
-func GetSubscribeByID(id int) (*Subscribe, error) {
-	var sub Subscribe
-	err := db.Where("id=?  ", id).First(&sub).Error
-	return &sub, err
-}
-
 func (s *Subscribe) ToggleNotification() error {
 	if s.EnableNotification != 1 {
 		s.EnableNotification = 1

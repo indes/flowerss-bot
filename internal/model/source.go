@@ -1,7 +1,6 @@
 package model
 
 import (
-	"errors"
 	"fmt"
 	"sort"
 
@@ -153,14 +152,4 @@ func (s *Source) EraseErrorCount() {
 
 func (s *Source) Save() {
 	db.Save(&s)
-}
-
-func GetSourceById(id uint) (*Source, error) {
-	var source Source
-
-	if err := db.Where("id=?", id).First(&source); err.Error != nil {
-		return nil, errors.New("未找到 RSS 源")
-	}
-
-	return &source, nil
 }

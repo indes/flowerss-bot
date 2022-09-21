@@ -58,7 +58,6 @@ func (b *NotificationSwitchButton) Handle(ctx tb.Context) error {
 	}
 
 	sourceID := uint(attachData.GetSourceId())
-
 	sub, err := b.core.GetSubscription(context.Background(), subscriberID, sourceID)
 	if err != nil {
 		return ctx.Respond(&tb.CallbackResponse{Text: "error"})
