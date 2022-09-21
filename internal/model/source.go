@@ -102,44 +102,6 @@ func (s *Source) NeedUpdate() bool {
 	}
 }
 
-func ActiveSourcesByUserID(userID int64) error {
-	subs, err := GetSubsByUserID(userID)
-
-	if err != nil {
-		return err
-	}
-
-	for _, sub := range subs {
-		var source Source
-		db.Where("id=?", sub.SourceID).First(&source)
-		if source.ID == sub.SourceID {
-			source.ErrorCount = 0
-			db.Save(&source)
-		}
-	}
-
-	return nil
-}
-
-func PauseSourcesByUserID(userID int64) error {
-	subs, err := GetSubsByUserID(userID)
-
-	if err != nil {
-		return err
-	}
-
-	for _, sub := range subs {
-		var source Source
-		db.Where("id=?", sub.SourceID).First(&source)
-		if source.ID == sub.SourceID {
-			source.ErrorCount = config.ErrorThreshold + 1
-			db.Save(&source)
-		}
-	}
-
-	return nil
-}
-
 func (s *Source) AddErrorCount() {
 	s.ErrorCount++
 	s.Save()

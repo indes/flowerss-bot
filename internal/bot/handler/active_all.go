@@ -1,18 +1,21 @@
 package handler
 
 import (
+	"context"
 	"fmt"
 
-	"github.com/indes/flowerss-bot/internal/bot/session"
-	"github.com/indes/flowerss-bot/internal/model"
 	tb "gopkg.in/telebot.v3"
+
+	"github.com/indes/flowerss-bot/internal/bot/session"
+	"github.com/indes/flowerss-bot/internal/core"
 )
 
 type ActiveAll struct {
+	core *core.Core
 }
 
-func NewActiveAll() *ActiveAll {
-	return &ActiveAll{}
+func NewActiveAll(core *core.Core) *ActiveAll {
+	return &ActiveAll{core: core}
 }
 
 func (a *ActiveAll) Command() string {
@@ -30,8 +33,16 @@ func (a *ActiveAll) Handle(ctx tb.Context) error {
 		subscribeUserID = mentionChat.ID
 	}
 
-	if err := model.ActiveSourcesByUserID(subscribeUserID); err != nil {
-		return ctx.Reply("激活失败")
+	source, err := a.core.GetUserSubscribedSources(context.Background(), subscribeUserID)
+	if err != nil {
+		return ctx.Reply("系统错误")
+	}
+
+	for _, s := range source {
+		err := a.core.EnableSourceUpdate(context.Background(), s.ID)
+		if err != nil {
+			return ctx.Reply("激活失败")
+		}
 	}
 
 	reply := "订阅已全部开启"
@@ -39,10 +50,12 @@ func (a *ActiveAll) Handle(ctx tb.Context) error {
 		reply = fmt.Sprintf("频道 [%s](https://t.me/%s) 订阅已全部开启", mentionChat.Title, mentionChat.Username)
 	}
 
-	return ctx.Reply(reply, &tb.SendOptions{
-		DisableWebPagePreview: true,
-		ParseMode:             tb.ModeMarkdown,
-	})
+	return ctx.Reply(
+		reply, &tb.SendOptions{
+			DisableWebPagePreview: true,
+			ParseMode:             tb.ModeMarkdown,
+		},
+	)
 }
 
 func (a *ActiveAll) Middlewares() []tb.MiddlewareFunc {

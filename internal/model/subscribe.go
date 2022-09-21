@@ -33,12 +33,6 @@ func GetSubscriberBySource(s *Source) []*Subscribe {
 	return subs
 }
 
-func GetSubsByUserID(userID int64) ([]Subscribe, error) {
-	var subs []Subscribe
-	db.Where("user_id=?", userID).Order("id").Find(&subs)
-	return subs, nil
-}
-
 func (s *Subscribe) ToggleNotification() error {
 	if s.EnableNotification != 1 {
 		s.EnableNotification = 1

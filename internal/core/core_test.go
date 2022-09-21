@@ -349,3 +349,93 @@ func TestCore_GetSubscription(t *testing.T) {
 		},
 	)
 }
+
+func TestCore_DisableSourceUpdate(t *testing.T) {
+	c, s := getTestCore(t)
+	defer s.Ctrl.Finish()
+	ctx := context.Background()
+	sourceID := uint(1)
+
+	t.Run(
+		"get source err", func(t *testing.T) {
+			s.Source.EXPECT().GetSource(ctx, sourceID).Return(
+				nil, errors.New("err"),
+			).Times(1)
+			err := c.DisableSourceUpdate(ctx, sourceID)
+			assert.Error(t, err)
+		},
+	)
+
+	t.Run(
+		"update source err", func(t *testing.T) {
+			s.Source.EXPECT().GetSource(ctx, sourceID).Return(
+				&model.Source{}, nil,
+			).Times(1)
+
+			s.Source.EXPECT().UpdateSource(ctx, sourceID, gomock.Any()).Return(
+				errors.New("err"),
+			).Times(1)
+			err := c.DisableSourceUpdate(ctx, sourceID)
+			assert.Error(t, err)
+		},
+	)
+
+	t.Run(
+		"update source err", func(t *testing.T) {
+			s.Source.EXPECT().GetSource(ctx, sourceID).Return(
+				&model.Source{}, nil,
+			).Times(1)
+
+			s.Source.EXPECT().UpdateSource(ctx, sourceID, gomock.Any()).Return(
+				nil,
+			).Times(1)
+			err := c.DisableSourceUpdate(ctx, sourceID)
+			assert.Nil(t, err)
+		},
+	)
+}
+
+func TestCore_ClearSourceErrorCount(t *testing.T) {
+	c, s := getTestCore(t)
+	defer s.Ctrl.Finish()
+	ctx := context.Background()
+	sourceID := uint(1)
+
+	t.Run(
+		"get source err", func(t *testing.T) {
+			s.Source.EXPECT().GetSource(ctx, sourceID).Return(
+				nil, errors.New("err"),
+			).Times(1)
+			err := c.ClearSourceErrorCount(ctx, sourceID)
+			assert.Error(t, err)
+		},
+	)
+
+	t.Run(
+		"update source err", func(t *testing.T) {
+			s.Source.EXPECT().GetSource(ctx, sourceID).Return(
+				&model.Source{}, nil,
+			).Times(1)
+
+			s.Source.EXPECT().UpdateSource(ctx, sourceID, gomock.Any()).Return(
+				errors.New("err"),
+			).Times(1)
+			err := c.ClearSourceErrorCount(ctx, sourceID)
+			assert.Error(t, err)
+		},
+	)
+
+	t.Run(
+		"update source err", func(t *testing.T) {
+			s.Source.EXPECT().GetSource(ctx, sourceID).Return(
+				&model.Source{}, nil,
+			).Times(1)
+
+			s.Source.EXPECT().UpdateSource(ctx, sourceID, gomock.Any()).Return(
+				nil,
+			).Times(1)
+			err := c.ClearSourceErrorCount(ctx, sourceID)
+			assert.Nil(t, err)
+		},
+	)
+}

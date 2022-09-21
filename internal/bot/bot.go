@@ -87,8 +87,8 @@ func setCommands() {
 		handler.NewSetUpdateInterval(Core),
 		handler.NewExport(Core),
 		handler.NewImport(),
-		handler.NewPauseAll(),
-		handler.NewActiveAll(),
+		handler.NewPauseAll(Core),
+		handler.NewActiveAll(Core),
 		handler.NewHelp(),
 		handler.NewVersion(),
 	}
