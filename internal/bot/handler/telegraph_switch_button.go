@@ -57,20 +57,21 @@ func (b *TelegraphSwitchButton) Handle(ctx tb.Context) error {
 	}
 
 	sourceID := uint(attachData.GetSourceId())
+	source, _ := b.core.GetSource(context.Background(), sourceID)
+
+	err = b.core.ToggleSubscriptionTelegraph(context.Background(), subscriberID, sourceID)
+	if err != nil {
+		return ctx.Respond(&tb.CallbackResponse{Text: "error"})
+	}
+
 	sub, err := b.core.GetSubscription(context.Background(), subscriberID, sourceID)
 	if sub == nil || err != nil {
 		return ctx.Respond(&tb.CallbackResponse{Text: "error"})
 	}
 
-	source, _ := b.core.GetSource(context.Background(), sourceID)
 	t := template.New("setting template")
 	_, _ = t.Parse(feedSettingTmpl)
 
-	err = sub.ToggleTelegraph()
-	if err != nil {
-		return ctx.Respond(&tb.CallbackResponse{Text: "error"})
-	}
-	sub.Save()
 	text := new(bytes.Buffer)
 	_ = t.Execute(text, map[string]interface{}{"source": source, "sub": sub, "Count": config.ErrorThreshold})
 	_ = ctx.Respond(&tb.CallbackResponse{Text: "修改成功"})

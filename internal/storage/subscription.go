@@ -165,3 +165,18 @@ func (s *SubscriptionStorageImpl) UpdateSubscription(
 	)
 	return nil
 }
+
+func (s *SubscriptionStorageImpl) UpsertSubscription(
+	ctx context.Context, userID int64, sourceID uint, newSubscription *model.Subscribe,
+) error {
+	result := s.db.WithContext(ctx).Where(
+		"user_id = ? and source_id = ?", userID, sourceID,
+	).Save(newSubscription)
+	if result.Error != nil {
+		return result.Error
+	}
+	log.Debugf(
+		"update %d row, userID %d sourceID %d new %#v", result.RowsAffected, userID, sourceID, newSubscription,
+	)
+	return nil
+}

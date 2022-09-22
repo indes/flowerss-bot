@@ -2,8 +2,6 @@ package model
 
 import (
 	"errors"
-
-	"github.com/indes/flowerss-bot/internal/config"
 )
 
 const (
@@ -31,37 +29,6 @@ func GetSubscriberBySource(s *Source) []*Subscribe {
 
 	db.Where("source_id=?", s.ID).Find(&subs)
 	return subs
-}
-
-func (s *Subscribe) ToggleNotification() error {
-	if s.EnableNotification != 1 {
-		s.EnableNotification = 1
-	} else {
-		s.EnableNotification = 0
-	}
-	return nil
-}
-
-func (s *Subscribe) ToggleTelegraph() error {
-	if s.EnableTelegraph != 1 {
-		s.EnableTelegraph = 1
-	} else {
-		s.EnableTelegraph = 0
-	}
-	return nil
-}
-
-func (s *Source) ToggleEnabled() error {
-	if s.ErrorCount >= config.ErrorThreshold {
-		s.ErrorCount = 0
-	} else {
-		s.ErrorCount = config.ErrorThreshold
-	}
-
-	///TODO a hack for save source changes
-	s.Save()
-
-	return nil
 }
 
 func (s *Subscribe) Unsub() error {
