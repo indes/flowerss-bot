@@ -33,15 +33,6 @@ func GetSubscriberBySource(s *Source) []*Subscribe {
 	return subs
 }
 
-func (s *Subscribe) ToggleNotification() error {
-	if s.EnableNotification != 1 {
-		s.EnableNotification = 1
-	} else {
-		s.EnableNotification = 0
-	}
-	return nil
-}
-
 func (s *Subscribe) ToggleTelegraph() error {
 	if s.EnableTelegraph != 1 {
 		s.EnableTelegraph = 1

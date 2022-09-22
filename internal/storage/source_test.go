@@ -50,11 +50,11 @@ func TestSourceStorageImpl(t *testing.T) {
 				Link:  "http://google.com",
 				Title: "title",
 			}
-			err := s.UpdateSource(ctx, source.ID, source)
+			err := s.UpsertSource(ctx, source.ID, source)
 			assert.Nil(t, err)
 
 			source.Title = "title2"
-			err = s.UpdateSource(ctx, source.ID, source)
+			err = s.UpsertSource(ctx, source.ID, source)
 			assert.Nil(t, err)
 
 			got, err := s.GetSource(ctx, source.ID)

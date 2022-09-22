@@ -262,7 +262,7 @@ func (c *Core) DisableSourceUpdate(ctx context.Context, sourceID uint) error {
 	}
 
 	source.ErrorCount = config.ErrorThreshold + 1
-	return c.sourceStorage.UpdateSource(ctx, sourceID, source)
+	return c.sourceStorage.UpsertSource(ctx, sourceID, source)
 }
 
 // ClearSourceErrorCount 清空订阅源错误计数
@@ -273,5 +273,18 @@ func (c *Core) ClearSourceErrorCount(ctx context.Context, sourceID uint) error {
 	}
 
 	source.ErrorCount = 0
-	return c.sourceStorage.UpdateSource(ctx, sourceID, source)
+	return c.sourceStorage.UpsertSource(ctx, sourceID, source)
+}
+
+func (c *Core) ToggleSubscriptionNotice(ctx context.Context, userID int64, sourceID uint) error {
+	subscription, err := c.GetSubscription(ctx, userID, sourceID)
+	if err != nil {
+		return err
+	}
+	if subscription.EnableNotification == 1 {
+		subscription.EnableNotification = 0
+	} else {
+		subscription.EnableNotification = 1
+	}
+	return c.subscriptionStorage.UpsertSubscription(ctx, userID, sourceID, subscription)
 }

@@ -63,9 +63,9 @@ func (s *SourceStorageImpl) Delete(ctx context.Context, id uint) error {
 	return nil
 }
 
-func (s *SourceStorageImpl) UpdateSource(ctx context.Context, sourceID uint, newSource *model.Source) error {
+func (s *SourceStorageImpl) UpsertSource(ctx context.Context, sourceID uint, newSource *model.Source) error {
 	newSource.ID = sourceID
-	result := s.db.Save(newSource)
+	result := s.db.WithContext(ctx).Save(newSource)
 	if result.Error != nil {
 		return result.Error
 	}

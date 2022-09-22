@@ -58,20 +58,19 @@ func (b *NotificationSwitchButton) Handle(ctx tb.Context) error {
 	}
 
 	sourceID := uint(attachData.GetSourceId())
-	sub, err := b.core.GetSubscription(context.Background(), subscriberID, sourceID)
-	if err != nil {
-		return ctx.Respond(&tb.CallbackResponse{Text: "error"})
-	}
-
 	source, _ := b.core.GetSource(context.Background(), sourceID)
 	t := template.New("setting template")
 	_, _ = t.Parse(feedSettingTmpl)
 
-	err = sub.ToggleNotification()
+	err = b.core.ToggleSubscriptionNotice(context.Background(), subscriberID, sourceID)
 	if err != nil {
 		return ctx.Respond(&tb.CallbackResponse{Text: "error"})
 	}
-	sub.Save()
+
+	sub, err := b.core.GetSubscription(context.Background(), subscriberID, sourceID)
+	if err != nil {
+		return ctx.Respond(&tb.CallbackResponse{Text: "error"})
+	}
 	text := new(bytes.Buffer)
 	_ = t.Execute(text, map[string]interface{}{"source": source, "sub": sub, "Count": config.ErrorThreshold})
 	_ = ctx.Respond(&tb.CallbackResponse{Text: "修改成功"})
