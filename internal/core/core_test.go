@@ -532,3 +532,51 @@ func TestCore_ToggleSourceUpdateStatus(t *testing.T) {
 		},
 	)
 }
+
+func TestCore_ToggleSubscriptionTelegraph(t *testing.T) {
+	c, s := getTestCore(t)
+	defer s.Ctrl.Finish()
+	ctx := context.Background()
+	userID := int64(123)
+	sourceID := uint(1)
+
+	t.Run(
+		"get subscription err", func(t *testing.T) {
+			s.Subscription.EXPECT().GetSubscription(ctx, userID, sourceID).Return(
+				nil, errors.New("err"),
+			).Times(1)
+			err := c.ToggleSubscriptionTelegraph(ctx, userID, sourceID)
+			assert.Error(t, err)
+		},
+	)
+
+	t.Run(
+		"update subscription err", func(t *testing.T) {
+			s.Subscription.EXPECT().GetSubscription(ctx, userID, sourceID).Return(
+				&model.Subscribe{}, nil,
+			).Times(1)
+
+			s.Subscription.EXPECT().UpsertSubscription(ctx, userID, sourceID, gomock.Any()).Return(
+				errors.New("err"),
+			).Times(1)
+
+			err := c.ToggleSubscriptionTelegraph(ctx, userID, sourceID)
+			assert.Error(t, err)
+		},
+	)
+
+	t.Run(
+		"ok", func(t *testing.T) {
+			s.Subscription.EXPECT().GetSubscription(ctx, userID, sourceID).Return(
+				&model.Subscribe{}, nil,
+			).Times(1)
+
+			s.Subscription.EXPECT().UpsertSubscription(ctx, userID, sourceID, gomock.Any()).Return(
+				nil,
+			).Times(1)
+
+			err := c.ToggleSubscriptionTelegraph(ctx, userID, sourceID)
+			assert.Nil(t, err)
+		},
+	)
+}

@@ -31,15 +31,6 @@ func GetSubscriberBySource(s *Source) []*Subscribe {
 	return subs
 }
 
-func (s *Subscribe) ToggleTelegraph() error {
-	if s.EnableTelegraph != 1 {
-		s.EnableTelegraph = 1
-	} else {
-		s.EnableTelegraph = 0
-	}
-	return nil
-}
-
 func (s *Subscribe) Unsub() error {
 	if s.ID == 0 {
 		return errors.New("can't delete 0 subscribe")

@@ -302,3 +302,16 @@ func (c *Core) ToggleSourceUpdateStatus(ctx context.Context, sourceID uint) erro
 	}
 	return c.sourceStorage.UpsertSource(ctx, sourceID, source)
 }
+
+func (c *Core) ToggleSubscriptionTelegraph(ctx context.Context, userID int64, sourceID uint) error {
+	subscription, err := c.GetSubscription(ctx, userID, sourceID)
+	if err != nil {
+		return err
+	}
+	if subscription.EnableTelegraph == 1 {
+		subscription.EnableTelegraph = 0
+	} else {
+		subscription.EnableTelegraph = 1
+	}
+	return c.subscriptionStorage.UpsertSubscription(ctx, userID, sourceID, subscription)
+}
