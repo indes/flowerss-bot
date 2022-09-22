@@ -22,6 +22,6 @@ require (
 	gopkg.in/telebot.v3 v3.0.0
 	gorm.io/driver/mysql v1.3.6
 	gorm.io/driver/sqlite v1.3.6
-	gorm.io/gorm v1.23.9
+	gorm.io/gorm v1.23.10
 	moul.io/zapgorm v1.1.5
 )
