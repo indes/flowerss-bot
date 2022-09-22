@@ -59,15 +59,15 @@ func (b *SubscriptionSwitchButton) Handle(ctx tb.Context) error {
 		return ctx.Respond(&tb.CallbackResponse{Text: "error"})
 	}
 
+	err = b.core.ToggleSourceUpdateStatus(context.Background(), sourceID)
+	if err != nil {
+		return ctx.Respond(&tb.CallbackResponse{Text: "error"})
+	}
+
 	source, _ := b.core.GetSource(context.Background(), sourceID)
 	t := template.New("setting template")
 	_, _ = t.Parse(feedSettingTmpl)
 
-	err = source.ToggleEnabled()
-	if err != nil {
-		return ctx.Respond(&tb.CallbackResponse{Text: "error"})
-	}
-	sub.Save()
 	text := new(bytes.Buffer)
 	_ = t.Execute(text, map[string]interface{}{"source": source, "sub": sub, "Count": config.ErrorThreshold})
 	_ = ctx.Respond(&tb.CallbackResponse{Text: "修改成功"})

@@ -65,7 +65,7 @@ func (s *SourceStorageImpl) Delete(ctx context.Context, id uint) error {
 
 func (s *SourceStorageImpl) UpsertSource(ctx context.Context, sourceID uint, newSource *model.Source) error {
 	newSource.ID = sourceID
-	result := s.db.WithContext(ctx).Save(newSource)
+	result := s.db.WithContext(ctx).Where("id = ?", sourceID).Save(newSource)
 	if result.Error != nil {
 		return result.Error
 	}

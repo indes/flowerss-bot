@@ -288,3 +288,17 @@ func (c *Core) ToggleSubscriptionNotice(ctx context.Context, userID int64, sourc
 	}
 	return c.subscriptionStorage.UpsertSubscription(ctx, userID, sourceID, subscription)
 }
+
+func (c *Core) ToggleSourceUpdateStatus(ctx context.Context, sourceID uint) error {
+	source, err := c.GetSource(ctx, sourceID)
+	if err != nil {
+		return err
+	}
+
+	if source.ErrorCount < config.ErrorThreshold {
+		source.ErrorCount = config.ErrorThreshold + 1
+	} else {
+		source.ErrorCount = 0
+	}
+	return c.sourceStorage.UpsertSource(ctx, sourceID, source)
+}

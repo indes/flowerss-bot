@@ -2,8 +2,6 @@ package model
 
 import (
 	"errors"
-
-	"github.com/indes/flowerss-bot/internal/config"
 )
 
 const (
@@ -39,19 +37,6 @@ func (s *Subscribe) ToggleTelegraph() error {
 	} else {
 		s.EnableTelegraph = 0
 	}
-	return nil
-}
-
-func (s *Source) ToggleEnabled() error {
-	if s.ErrorCount >= config.ErrorThreshold {
-		s.ErrorCount = 0
-	} else {
-		s.ErrorCount = config.ErrorThreshold
-	}
-
-	///TODO a hack for save source changes
-	s.Save()
-
 	return nil
 }
 

@@ -487,3 +487,48 @@ func TestCore_ToggleSubscriptionNotice(t *testing.T) {
 		},
 	)
 }
+
+func TestCore_ToggleSourceUpdateStatus(t *testing.T) {
+	c, s := getTestCore(t)
+	defer s.Ctrl.Finish()
+	ctx := context.Background()
+	sourceID := uint(1)
+
+	t.Run(
+		"get source err", func(t *testing.T) {
+			s.Source.EXPECT().GetSource(ctx, sourceID).Return(
+				nil, errors.New("err"),
+			).Times(1)
+			err := c.ToggleSourceUpdateStatus(ctx, sourceID)
+			assert.Error(t, err)
+		},
+	)
+
+	t.Run(
+		"update source err", func(t *testing.T) {
+			s.Source.EXPECT().GetSource(ctx, sourceID).Return(
+				&model.Source{}, nil,
+			).Times(1)
+
+			s.Source.EXPECT().UpsertSource(ctx, sourceID, gomock.Any()).Return(
+				errors.New("err"),
+			).Times(1)
+			err := c.ToggleSourceUpdateStatus(ctx, sourceID)
+			assert.Error(t, err)
+		},
+	)
+
+	t.Run(
+		"ok", func(t *testing.T) {
+			s.Source.EXPECT().GetSource(ctx, sourceID).Return(
+				&model.Source{}, nil,
+			).Times(1)
+
+			s.Source.EXPECT().UpsertSource(ctx, sourceID, gomock.Any()).Return(
+				nil,
+			).Times(1)
+			err := c.ToggleSourceUpdateStatus(ctx, sourceID)
+			assert.Nil(t, err)
+		},
+	)
+}
