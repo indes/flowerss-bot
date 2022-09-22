@@ -4,10 +4,6 @@ import (
 	"errors"
 )
 
-const (
-	MaxSubscribeTagLength = 250
-)
-
 type Subscribe struct {
 	ID                 uint `gorm:"primary_key;AUTO_INCREMENT"`
 	UserID             int64
@@ -37,8 +33,4 @@ func (s *Subscribe) Unsub() error {
 	}
 
 	return db.Delete(&s).Error
-}
-
-func (s *Subscribe) Save() {
-	db.Save(&s)
 }
