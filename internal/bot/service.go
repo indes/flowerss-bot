@@ -11,12 +11,12 @@ import (
 	"github.com/indes/flowerss-bot/internal/model"
 )
 
-//SendError send error user
+// SendError send error user
 func SendError(c *tb.Chat) {
 	_, _ = B.Send(c, "请输入正确的指令！")
 }
 
-//BroadcastNews send new contents message to subscriber
+// BroadcastNews send new contents message to subscriber
 func BroadcastNews(source *model.Source, subs []*model.Subscribe, contents []*model.Content) {
 	zap.S().Infow(
 		"broadcast news",
@@ -92,7 +92,9 @@ func BroadcastSourceError(source *model.Source) {
 	subs := model.GetSubscriberBySource(source)
 	var u tb.User
 	for _, sub := range subs {
-		message := fmt.Sprintf("[%s](%s) 已经累计连续%d次更新失败，暂时停止更新", source.Title, source.Link, config.ErrorThreshold)
+		message := fmt.Sprintf(
+			"[%s](%s) 已经累计连续%d次更新失败，暂时停止更新", source.Title, source.Link, config.ErrorThreshold,
+		)
 		u.ID = sub.UserID
 		_, _ = B.Send(
 			&u, message, &tb.SendOptions{
@@ -100,28 +102,4 @@ func BroadcastSourceError(source *model.Source) {
 			},
 		)
 	}
-}
-
-// GetMentionFromMessage get message mention
-func GetMentionFromMessage(m *tb.Message) (mention string) {
-	if m.Text != "" {
-		for _, entity := range m.Entities {
-			if entity.Type == tb.EntityMention {
-				if mention == "" {
-					mention = m.Text[entity.Offset : entity.Offset+entity.Length]
-					return
-				}
-			}
-		}
-	} else {
-		for _, entity := range m.CaptionEntities {
-			if entity.Type == tb.EntityMention {
-				if mention == "" {
-					mention = m.Caption[entity.Offset : entity.Offset+entity.Length]
-					return
-				}
-			}
-		}
-	}
-	return
 }
