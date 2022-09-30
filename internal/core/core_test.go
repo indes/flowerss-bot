@@ -31,7 +31,7 @@ func getTestCore(t *testing.T) (*Core, *mockStorage) {
 		Source:       mock.NewMockSource(ctrl),
 		Ctrl:         ctrl,
 	}
-	c := NewCore(s.User, s.Content, s.Source, s.Subscription)
+	c := NewCore(s.User, s.Content, s.Source, s.Subscription, nil)
 	return c, s
 }
 
