@@ -18,25 +18,25 @@ import (
 
 func main() {
 	model.InitDB()
-	go handleSignal()
 
 	appCore := core.NewCoreFormConfig()
 	if err := appCore.Init(); err != nil {
 		log.Fatal(err)
 	}
-
+	go handleSignal(appCore)
 	b := bot.NewBot(appCore)
 	appCore.RegisterRssUpdateObserver(b)
 	appCore.Run()
 	b.Run()
 }
 
-func handleSignal() {
+func handleSignal(appCore *core.Core) {
 	c := make(chan os.Signal)
 	signal.Notify(c, os.Interrupt, os.Kill, syscall.SIGINT, syscall.SIGQUIT, syscall.SIGTERM)
 
 	<-c
 
+	appCore.Stop()
 	model.Disconnect()
 	os.Exit(0)
 }

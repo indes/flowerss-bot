@@ -89,6 +89,11 @@ func (c *Core) Run() error {
 	return nil
 }
 
+func (c *Core) Stop() error {
+	c.rssTask.Stop()
+	return nil
+}
+
 func (c *Core) RegisterRssUpdateObserver(o task.RssUpdateObserver) {
 	c.rssTask.Register(o)
 }
