@@ -5,19 +5,19 @@ import (
 	"os/signal"
 	"syscall"
 
+	_ "github.com/jinzhu/gorm/dialects/mysql"
+	_ "github.com/jinzhu/gorm/dialects/sqlite"
+
 	"github.com/indes/flowerss-bot/internal/bot"
+
+	//"github.com/indes/flowerss-bot/internal/bot"
 	"github.com/indes/flowerss-bot/internal/core"
 	"github.com/indes/flowerss-bot/internal/log"
 	"github.com/indes/flowerss-bot/internal/model"
-	"github.com/indes/flowerss-bot/internal/task"
-
-	_ "github.com/jinzhu/gorm/dialects/mysql"
-	_ "github.com/jinzhu/gorm/dialects/sqlite"
 )
 
 func main() {
 	model.InitDB()
-	task.StartTasks()
 	go handleSignal()
 
 	appCore := core.NewCoreFormConfig()
@@ -25,7 +25,10 @@ func main() {
 		log.Fatal(err)
 	}
 
-	bot.Start(appCore)
+	b := bot.NewBot(appCore)
+	appCore.RegisterRssUpdateObserver(b)
+	appCore.Run()
+	b.Run()
 }
 
 func handleSignal() {
@@ -34,7 +37,6 @@ func handleSignal() {
 
 	<-c
 
-	task.StopTasks()
 	model.Disconnect()
 	os.Exit(0)
 }

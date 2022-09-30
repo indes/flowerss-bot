@@ -11,6 +11,7 @@ import (
 	"gorm.io/gorm"
 
 	"github.com/indes/flowerss-bot/internal/config"
+	"github.com/indes/flowerss-bot/internal/core/task"
 	"github.com/indes/flowerss-bot/internal/log"
 	"github.com/indes/flowerss-bot/internal/model"
 	"github.com/indes/flowerss-bot/internal/storage"
@@ -28,17 +29,20 @@ type Core struct {
 	contentStorage      storage.Content
 	sourceStorage       storage.Source
 	subscriptionStorage storage.Subscription
+
+	rssTask *task.RssUpdateTask
 }
 
 func NewCore(
 	userStorage storage.User, contentStorage storage.Content, sourceStorage storage.Source,
-	subscriptionStorage storage.Subscription,
+	subscriptionStorage storage.Subscription, rssTask *task.RssUpdateTask,
 ) *Core {
 	return &Core{
 		userStorage:         userStorage,
 		contentStorage:      contentStorage,
 		sourceStorage:       sourceStorage,
 		subscriptionStorage: subscriptionStorage,
+		rssTask:             rssTask,
 	}
 }
 
@@ -68,6 +72,7 @@ func NewCoreFormConfig() *Core {
 		storage.NewContentStorageImpl(db),
 		storage.NewSourceStorageImpl(db),
 		storage.NewSubscriptionStorageImpl(db),
+		task.NewRssTask(),
 	)
 }
 
@@ -77,6 +82,15 @@ func (c *Core) Init() error {
 	c.sourceStorage.Init(context.Background())
 	c.subscriptionStorage.Init(context.Background())
 	return nil
+}
+
+func (c *Core) Run() error {
+	c.rssTask.Start()
+	return nil
+}
+
+func (c *Core) RegisterRssUpdateObserver(o task.RssUpdateObserver) {
+	c.rssTask.Register(o)
 }
 
 // GetUserSubscribedSources 获取用户订阅的订阅源

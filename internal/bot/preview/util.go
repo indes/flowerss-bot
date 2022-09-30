@@ -1,4 +1,4 @@
-package bot
+package preview
 
 import (
 	"html"
@@ -8,7 +8,7 @@ import (
 	strip "github.com/grokify/html-strip-tags-go"
 )
 
-func trimDescription(desc string, limit int) string {
+func TrimDescription(desc string, limit int) string {
 	if limit == 0 {
 		return ""
 	}
@@ -17,10 +17,15 @@ func trimDescription(desc string, limit int) string {
 			regexp.MustCompile("\n+").ReplaceAllLiteralString(
 				strings.ReplaceAll(
 					regexp.MustCompile(`<br(| /)>`).ReplaceAllString(
-						html.UnescapeString(desc), "<br>"),
-					"<br>", "\n"),
-				"\n")),
-		"\n")
+						html.UnescapeString(desc), "<br>",
+					),
+					"<br>", "\n",
+				),
+				"\n",
+			),
+		),
+		"\n",
+	)
 
 	contentDescRune := []rune(desc)
 	if len(contentDescRune) > limit {
