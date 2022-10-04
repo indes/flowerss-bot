@@ -1,6 +1,7 @@
 package task
 
 import (
+	"context"
 	"fmt"
 	"sync"
 	"time"
@@ -11,7 +12,9 @@ import (
 
 	"github.com/indes/flowerss-bot/internal/config"
 	"github.com/indes/flowerss-bot/internal/fetch"
+	"github.com/indes/flowerss-bot/internal/log"
 	"github.com/indes/flowerss-bot/internal/model"
+	"github.com/indes/flowerss-bot/internal/storage"
 	"github.com/indes/flowerss-bot/pkg/client"
 )
 
@@ -22,7 +25,7 @@ type RssUpdateObserver interface {
 }
 
 // NewRssTask new RssUpdateTask
-func NewRssTask() *RssUpdateTask {
+func NewRssTask(subscriptionStorage storage.Subscription) *RssUpdateTask {
 	clientOpts := []client.HttpClientOption{
 		client.WithTimeout(10 * time.Second),
 	}
@@ -38,6 +41,7 @@ func NewRssTask() *RssUpdateTask {
 	return &RssUpdateTask{
 		observerList: []RssUpdateObserver{},
 		httpClient:   httpClient,
+		subscription: subscriptionStorage,
 	}
 }
 
@@ -46,6 +50,7 @@ type RssUpdateTask struct {
 	observerList []RssUpdateObserver
 	isStop       atomic.Bool
 	httpClient   *client.HttpClient
+	subscription storage.Subscription
 }
 
 // Register 注册rss更新订阅者
@@ -67,7 +72,7 @@ func (t *RssUpdateTask) Start() {
 	t.isStop.Store(false)
 	go func() {
 		for {
-			if t.isStop.Load() == true {
+			if t.isStop.Load() {
 				zap.S().Info("RssUpdateTask stopped")
 				return
 			}
@@ -87,8 +92,17 @@ func (t *RssUpdateTask) Start() {
 				}
 
 				if len(newContents) > 0 {
-					subs := model.GetSubscriberBySource(source)
-					t.notifyAllObserverUpdate(source, newContents, subs)
+					opt := &storage.GetSubscriptionsOptions{
+						Count: -1,
+					}
+					result, err := t.subscription.GetSubscriptionsBySourceID(
+						context.Background(), source.ID, opt,
+					)
+					if err != nil {
+						log.Errorf("get subscriptions failed, %v", err)
+						continue
+					}
+					t.notifyAllObserverUpdate(source, newContents, result.Subscriptions)
 				}
 			}
 

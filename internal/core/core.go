@@ -67,12 +67,13 @@ func NewCoreFormConfig() *Core {
 	sqlDB.SetMaxIdleConns(10)
 	sqlDB.SetMaxOpenConns(50)
 
+	subscriptionStorage := storage.NewSubscriptionStorageImpl(db)
 	return NewCore(
 		storage.NewUserStorageImpl(db),
 		storage.NewContentStorageImpl(db),
 		storage.NewSourceStorageImpl(db),
-		storage.NewSubscriptionStorageImpl(db),
-		task.NewRssTask(),
+		subscriptionStorage,
+		task.NewRssTask(subscriptionStorage),
 	)
 }
 
@@ -333,4 +334,17 @@ func (c *Core) ToggleSubscriptionTelegraph(ctx context.Context, userID int64, so
 		subscription.EnableTelegraph = 1
 	}
 	return c.subscriptionStorage.UpsertSubscription(ctx, userID, sourceID, subscription)
+}
+
+func (c *Core) GetSourceAllSubsciptions(
+	ctx context.Context, sourceID uint,
+) ([]*model.Subscribe, error) {
+	opt := &storage.GetSubscriptionsOptions{
+		Count: -1,
+	}
+	result, err := c.subscriptionStorage.GetSubscriptionsBySourceID(ctx, sourceID, opt)
+	if err != nil {
+		return nil, err
+	}
+	return result.Subscriptions, nil
 }

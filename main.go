@@ -9,8 +9,6 @@ import (
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
 
 	"github.com/indes/flowerss-bot/internal/bot"
-
-	//"github.com/indes/flowerss-bot/internal/bot"
 	"github.com/indes/flowerss-bot/internal/core"
 	"github.com/indes/flowerss-bot/internal/log"
 	"github.com/indes/flowerss-bot/internal/model"

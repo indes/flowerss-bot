@@ -1,6 +1,7 @@
 package bot
 
 import (
+	"context"
 	"fmt"
 	"strings"
 	"time"
@@ -186,7 +187,7 @@ func (b *Bot) BroadcastNews(source *model.Source, subs []*model.Subscribe, conte
 						"title", source.Title,
 						"link", source.Link,
 					)
-					sub.Unsub()
+					b.core.Unsubscribe(context.Background(), sub.UserID, sub.SourceID)
 				}
 
 				/*
@@ -208,7 +209,10 @@ func (b *Bot) BroadcastNews(source *model.Source, subs []*model.Subscribe, conte
 
 // BroadcastSourceError send fetcher update error message to subscribers
 func (b *Bot) BroadcastSourceError(source *model.Source) {
-	subs := model.GetSubscriberBySource(source)
+	subs, err := b.core.GetSourceAllSubsciptions(context.Background(), source.ID)
+	if err != nil {
+		log.Errorf("get subscriptions failed, %v", err)
+	}
 	var u tb.User
 	for _, sub := range subs {
 		message := fmt.Sprintf(
