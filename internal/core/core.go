@@ -3,8 +3,10 @@ package core
 import (
 	"context"
 	"errors"
+	"fmt"
 	"strings"
 	"sync"
+	"time"
 
 	"gorm.io/driver/mysql"
 	"gorm.io/driver/sqlite"
@@ -12,9 +14,13 @@ import (
 
 	"github.com/indes/flowerss-bot/internal/config"
 	"github.com/indes/flowerss-bot/internal/core/task"
+	"github.com/indes/flowerss-bot/internal/feed"
+	"github.com/indes/flowerss-bot/internal/id"
 	"github.com/indes/flowerss-bot/internal/log"
 	"github.com/indes/flowerss-bot/internal/model"
 	"github.com/indes/flowerss-bot/internal/storage"
+	"github.com/indes/flowerss-bot/pkg/client"
+	"github.com/mmcdole/gofeed"
 )
 
 var (
@@ -30,12 +36,16 @@ type Core struct {
 	sourceStorage       storage.Source
 	subscriptionStorage storage.Subscription
 
-	rssTask *task.RssUpdateTask
+	rssTask    *task.RssUpdateTask
+	feedParser *feed.FeedParser
 }
 
 func NewCore(
-	userStorage storage.User, contentStorage storage.Content, sourceStorage storage.Source,
-	subscriptionStorage storage.Subscription, rssTask *task.RssUpdateTask,
+	userStorage storage.User,
+	contentStorage storage.Content,
+	sourceStorage storage.Source,
+	subscriptionStorage storage.Subscription,
+	rssTask *task.RssUpdateTask, parser *feed.FeedParser,
 ) *Core {
 	return &Core{
 		userStorage:         userStorage,
@@ -43,6 +53,7 @@ func NewCore(
 		sourceStorage:       sourceStorage,
 		subscriptionStorage: subscriptionStorage,
 		rssTask:             rssTask,
+		feedParser:          parser,
 	}
 }
 
@@ -68,12 +79,30 @@ func NewCoreFormConfig() *Core {
 	sqlDB.SetMaxOpenConns(50)
 
 	subscriptionStorage := storage.NewSubscriptionStorageImpl(db)
+
+	// httpclient
+	clientOpts := []client.HttpClientOption{
+		client.WithTimeout(10 * time.Second),
+	}
+	if config.Socks5 != "" {
+		clientOpts = append(clientOpts, client.WithProxyURL(fmt.Sprintf("socks5://%s", config.Socks5)))
+	}
+
+	if config.UserAgent != "" {
+		clientOpts = append(clientOpts, client.WithUserAgent(config.UserAgent))
+	}
+	httpClient := client.NewHttpClient(clientOpts...)
+
+	// feedParser
+	feedParser := feed.NewFeedParser(httpClient)
+
 	return NewCore(
 		storage.NewUserStorageImpl(db),
 		storage.NewContentStorageImpl(db),
 		storage.NewSourceStorageImpl(db),
 		subscriptionStorage,
 		task.NewRssTask(subscriptionStorage),
+		feedParser,
 	)
 }
 
@@ -211,6 +240,66 @@ func (c *Core) GetSource(ctx context.Context, id uint) (*model.Source, error) {
 		return nil, err
 	}
 	return source, nil
+}
+
+// CreateSource 创建订阅源
+func (c *Core) CreateSource(ctx context.Context, sourceURL string) (*model.Source, error) {
+	s, err := c.GetSourceByURL(ctx, sourceURL)
+	if err == nil {
+		return s, nil
+	}
+
+	if err != nil && err != ErrSourceNotExist {
+		return nil, err
+	}
+
+	rssFeed, err := c.feedParser.ParseFromURL(ctx, sourceURL)
+	if err != nil {
+		log.Errorf("ParseFromURL %s failed, %v", sourceURL, err)
+		return nil, err
+	}
+
+	s = &model.Source{
+		Title:      rssFeed.Title,
+		Link:       sourceURL,
+		ErrorCount: config.ErrorThreshold + 1, // 避免task更新
+	}
+
+	if err := c.sourceStorage.AddSource(ctx, s); err != nil {
+		log.Errorf("add source failed, %v", err)
+		return nil, err
+	}
+	defer c.ClearSourceErrorCount(ctx, s.ID)
+
+	if err := c.addSourceContents(ctx, s, rssFeed.Items); err != nil {
+		log.Errorf("add source content failed, %v", err)
+		return nil, err
+	}
+	return s, nil
+}
+
+func (c *Core) addSourceContents(ctx context.Context, source *model.Source, items []*gofeed.Item) error {
+	var wg sync.WaitGroup
+	for _, item := range items {
+		wg.Add(1)
+		log.Infof("item %v", item)
+		content := &model.Content{
+			Title:       strings.Trim(item.Title, " "),
+			Description: item.Content, //replace all kinds of <br> tag
+			SourceID:    source.ID,
+			RawID:       item.GUID,
+			HashID:      id.GenHashID(source.Link, item.GUID),
+			RawLink:     item.Link,
+		}
+		go func() {
+			defer wg.Done()
+			if err := c.contentStorage.AddContent(ctx, content); err != nil {
+				log.Errorf("add content %#v failed, %v", content, err)
+			}
+		}()
+	}
+	wg.Wait()
+	return nil
 }
 
 // UnsubscribeAllSource 添加订阅

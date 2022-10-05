@@ -10,7 +10,6 @@ import (
 	"github.com/indes/flowerss-bot/internal/bot/session"
 	"github.com/indes/flowerss-bot/internal/core"
 	"github.com/indes/flowerss-bot/internal/log"
-	"github.com/indes/flowerss-bot/internal/model"
 	"github.com/indes/flowerss-bot/internal/opml"
 
 	tb "gopkg.in/telebot.v3"
@@ -76,7 +75,7 @@ func (o *OnDocument) Handle(ctx tb.Context) error {
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
-			source, err := model.FindOrNewSourceByUrl(outline.XMLURL)
+			source, err := o.core.CreateSource(context.Background(), outline.XMLURL)
 			if err != nil {
 				failImportList[failIndex] = outline
 				failIndex++
