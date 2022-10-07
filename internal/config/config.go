@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"text/template"
 
+	"github.com/go-sql-driver/mysql"
 	"github.com/spf13/viper"
 	tb "gopkg.in/telebot.v3"
 )
@@ -27,7 +28,7 @@ var (
 	EnableTelegraph       bool = false
 	PreviewText           int  = 0
 	DisableWebPagePreview bool = false
-	Mysql                 MysqlConfig
+	mysqlConfig           *mysql.Config
 	SQLitePath            string
 	EnableMysql           bool = false
 
@@ -60,14 +61,6 @@ var (
 )
 
 const (
-	logo = `
-   __ _                                
-  / _| | _____      _____ _ __ ___ ___ 
- | |_| |/ _ \ \ /\ / / _ \ '__/ __/ __|
- |  _| | (_) \ V  V /  __/ |  \__ \__ \
- |_| |_|\___/ \_/\_/ \___|_|  |___/___/
-
-`
 	defaultMessageTplMode = tb.ModeHTML
 	defaultMessageTpl     = `<b>{{.SourceTitle}}</b>{{ if .PreviewText }}
 ---------- Preview ----------
@@ -95,15 +88,6 @@ const (
 	ReleaseMode RunType = "Release"
 )
 
-// MysqlConfig mysql 配置
-type MysqlConfig struct {
-	Host     string
-	Port     int
-	User     string
-	Password string
-	DB       string
-}
-
 type TplData struct {
 	SourceTitle     string
 	ContentTitle    string
@@ -127,4 +111,8 @@ func GetString(key string) string {
 	}
 
 	return value
+}
+
+func GetMysqlDSN() string {
+	return mysqlConfig.FormatDSN()
 }

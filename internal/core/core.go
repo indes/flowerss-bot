@@ -71,7 +71,7 @@ func NewCoreFormConfig() *Core {
 	var err error
 	var db *gorm.DB
 	if config.EnableMysql {
-		db, err = gorm.Open(mysql.Open(config.Mysql.GetMysqlConnectingString()))
+		db, err = gorm.Open(mysql.Open(config.GetMysqlDSN()))
 	} else {
 		db, err = gorm.Open(sqlite.Open(config.SQLitePath))
 	}
