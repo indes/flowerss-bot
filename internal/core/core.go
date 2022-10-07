@@ -8,11 +8,10 @@ import (
 	"sync"
 	"time"
 
+	"github.com/mmcdole/gofeed"
 	"gorm.io/driver/mysql"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
-
-	"github.com/mmcdole/gofeed"
 
 	"github.com/indes/flowerss-bot/internal/config"
 	"github.com/indes/flowerss-bot/internal/feed"

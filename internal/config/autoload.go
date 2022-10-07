@@ -140,7 +140,7 @@ func init() {
 		if err != nil {
 			err := os.MkdirAll(dir, os.ModeDir)
 			if err != nil {
-				log.Fatal("mkdir failed![%v]\n", err)
+				log.Fatalf("mkdir failed![%v]\n", err)
 			}
 		}
 	}
