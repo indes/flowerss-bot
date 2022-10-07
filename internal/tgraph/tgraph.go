@@ -15,8 +15,6 @@ const (
 var (
 	authToken   = config.TelegraphToken
 	socks5Proxy = config.Socks5
-	authorUrl   = "https://github.com/indes/flowerss-bot"
-	authorName  = "flowerss"
 	verbose     = false
 	//client     *telegraph.Client
 	clientPool []*telegraph.Client
@@ -24,7 +22,8 @@ var (
 
 func init() {
 	if config.EnableTelegraph {
-		zap.S().Infow("telegraph enabled",
+		zap.S().Infow(
+			"telegraph enabled",
 			"token count", len(authToken),
 			"token list", authToken,
 		)
@@ -34,7 +33,8 @@ func init() {
 		for _, t := range authToken {
 			client, err := telegraph.Load(t, socks5Proxy)
 			if err != nil {
-				zap.S().Errorw("telegraph load error",
+				zap.S().Errorw(
+					"telegraph load error",
 					"error", err,
 					"token", t,
 				)
@@ -62,8 +62,10 @@ func init() {
 				}
 
 				clientPool = append(clientPool, client)
-				zap.S().Infow("create telegraph account success",
-					"telegraph token", client.AccessToken)
+				zap.S().Infow(
+					"create telegraph account success",
+					"telegraph token", client.AccessToken,
+				)
 
 			}
 		}

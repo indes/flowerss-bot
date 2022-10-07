@@ -30,6 +30,7 @@ type Source interface {
 	Storage
 	AddSource(ctx context.Context, source *model.Source) error
 	GetSource(ctx context.Context, id uint) (*model.Source, error)
+	GetSources(ctx context.Context) ([]*model.Source, error)
 	GetSourceByURL(ctx context.Context, url string) (*model.Source, error)
 	Delete(ctx context.Context, id uint) error
 	UpsertSource(ctx context.Context, sourceID uint, newSource *model.Source) error

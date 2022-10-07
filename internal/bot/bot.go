@@ -6,6 +6,9 @@ import (
 	"strings"
 	"time"
 
+	"go.uber.org/zap"
+	tb "gopkg.in/telebot.v3"
+
 	"github.com/indes/flowerss-bot/internal/bot/handler"
 	"github.com/indes/flowerss-bot/internal/bot/middleware"
 	"github.com/indes/flowerss-bot/internal/bot/preview"
@@ -13,10 +16,6 @@ import (
 	"github.com/indes/flowerss-bot/internal/core"
 	"github.com/indes/flowerss-bot/internal/log"
 	"github.com/indes/flowerss-bot/internal/model"
-	"github.com/indes/flowerss-bot/pkg/client"
-
-	"go.uber.org/zap"
-	tb "gopkg.in/telebot.v3"
 )
 
 type Bot struct {
@@ -26,19 +25,11 @@ type Bot struct {
 
 func NewBot(core *core.Core) *Bot {
 	log.Infof("init telegram bot, token %s, endpoint %s", config.BotToken, config.TelegramEndpoint)
-	clientOpts := []client.HttpClientOption{
-		client.WithTimeout(10 * time.Second),
-	}
-	if config.Socks5 != "" {
-		clientOpts = append(clientOpts, client.WithProxyURL(fmt.Sprintf("socks5://%s", config.Socks5)))
-	}
-	httpClient := client.NewHttpClient(clientOpts...)
-
 	settings := tb.Settings{
 		URL:    config.TelegramEndpoint,
 		Token:  config.BotToken,
 		Poller: &tb.LongPoller{Timeout: 10 * time.Second},
-		Client: httpClient.Client(),
+		Client: core.HttpClient().Client(),
 	}
 
 	logLevel := config.GetString("log.level")
@@ -121,7 +112,7 @@ func (b *Bot) Run() error {
 	if err := b.registerCommands(b.core); err != nil {
 		return err
 	}
-	zap.S().Infof("bot start %s", config.AppVersionInfo())
+	log.Infof("bot start %s", config.AppVersionInfo())
 	b.tb.Start()
 	return nil
 }
@@ -209,7 +200,7 @@ func (b *Bot) BroadcastNews(source *model.Source, subs []*model.Subscribe, conte
 
 // BroadcastSourceError send fetcher update error message to subscribers
 func (b *Bot) BroadcastSourceError(source *model.Source) {
-	subs, err := b.core.GetSourceAllSubsciptions(context.Background(), source.ID)
+	subs, err := b.core.GetSourceAllSubscriptions(context.Background(), source.ID)
 	if err != nil {
 		log.Errorf("get subscriptions failed, %v", err)
 	}

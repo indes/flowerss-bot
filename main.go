@@ -5,36 +5,31 @@ import (
 	"os/signal"
 	"syscall"
 
-	_ "github.com/jinzhu/gorm/dialects/mysql"
-	_ "github.com/jinzhu/gorm/dialects/sqlite"
-
 	"github.com/indes/flowerss-bot/internal/bot"
 	"github.com/indes/flowerss-bot/internal/core"
 	"github.com/indes/flowerss-bot/internal/log"
-	"github.com/indes/flowerss-bot/internal/model"
+	"github.com/indes/flowerss-bot/internal/scheduler"
 )
 
 func main() {
-	model.InitDB()
-
 	appCore := core.NewCoreFormConfig()
 	if err := appCore.Init(); err != nil {
 		log.Fatal(err)
 	}
-	go handleSignal(appCore)
+	go handleSignal()
 	b := bot.NewBot(appCore)
-	appCore.RegisterRssUpdateObserver(b)
-	appCore.Run()
+
+	task := scheduler.NewRssTask(appCore)
+	task.Register(b)
+	task.Start()
 	b.Run()
 }
 
-func handleSignal(appCore *core.Core) {
+func handleSignal() {
 	c := make(chan os.Signal)
 	signal.Notify(c, os.Interrupt, os.Kill, syscall.SIGINT, syscall.SIGQUIT, syscall.SIGTERM)
 
 	<-c
 
-	appCore.Stop()
-	model.Disconnect()
 	os.Exit(0)
 }

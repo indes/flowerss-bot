@@ -43,6 +43,18 @@ func (s *SourceStorageImpl) GetSource(ctx context.Context, id uint) (*model.Sour
 	return source, nil
 }
 
+func (s *SourceStorageImpl) GetSources(ctx context.Context) ([]*model.Source, error) {
+	var sources []*model.Source
+	result := s.db.WithContext(ctx).Find(&sources)
+	if result.Error != nil {
+		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+			return nil, ErrRecordNotFound
+		}
+		return nil, result.Error
+	}
+	return sources, nil
+}
+
 func (s *SourceStorageImpl) GetSourceByURL(ctx context.Context, url string) (*model.Source, error) {
 	var source = &model.Source{}
 	result := s.db.WithContext(ctx).Where(&model.Source{Link: url}).First(source)
