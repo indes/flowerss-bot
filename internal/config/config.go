@@ -22,6 +22,8 @@ var (
 	TelegraphAccountName string
 	TelegraphAuthorName  string = "flowerss-bot"
 	TelegraphAuthorURL   string
+	TelegraphIncludes    []string
+	TelegraphExcludes    []string
 
 	// EnableTelegraph 是否启用telegraph
 	EnableTelegraph       bool = false

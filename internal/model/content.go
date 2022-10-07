@@ -33,7 +33,7 @@ func getContentByFeedItem(source *Source, item *rss.Item) (Content, error) {
 	html = strings.Replace(html, "<![CDATA[", "", -1)
 	html = strings.Replace(html, "]]>", "", -1)
 
-	if config.EnableTelegraph && len([]rune(html)) > config.PreviewText {
+	if config.EnableTelegraph && tgraph.Verify(source.Link) && len([]rune(html)) > config.PreviewText {
 		TelegraphURL = PublishItem(source, item, html)
 	}
 
