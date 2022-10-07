@@ -2,42 +2,24 @@ package tgraph
 
 import (
 	"github.com/indes/flowerss-bot/internal/config"
+	"github.com/indes/flowerss-bot/internal/log"
 
 	"github.com/indes/telegraph-go"
-	"go.uber.org/zap"
-)
-
-const (
-	//verbose = false
-	htmlContent = `<h1>hello</h1>`
 )
 
 var (
 	authToken   = config.TelegraphToken
 	socks5Proxy = config.Socks5
-	verbose     = false
-	//client     *telegraph.Client
-	clientPool []*telegraph.Client
+	clientPool  []*telegraph.Client
 )
 
 func init() {
 	if config.EnableTelegraph {
-		zap.S().Infow(
-			"telegraph enabled",
-			"token count", len(authToken),
-			"token list", authToken,
-		)
-
-		telegraph.Verbose = verbose
-
+		log.Infof("telegraph enabled, count %d, %#v", len(authToken), authToken)
 		for _, t := range authToken {
 			client, err := telegraph.Load(t, socks5Proxy)
 			if err != nil {
-				zap.S().Errorw(
-					"telegraph load error",
-					"error", err,
-					"token", t,
-				)
+				log.Errorf("telegraph load %s failed, %v", t, err)
 			} else {
 				clientPool = append(clientPool, client)
 			}
@@ -46,7 +28,7 @@ func init() {
 		if len(clientPool) == 0 {
 			if config.TelegraphAccountName == "" {
 				config.EnableTelegraph = false
-				zap.S().Error("telegraph token error, telegraph disabled")
+				log.Error("telegraph token error, telegraph disabled")
 			} else if len(authToken) == 0 {
 				// create account
 				client, err := telegraph.Create(
@@ -58,15 +40,11 @@ func init() {
 
 				if err != nil {
 					config.EnableTelegraph = false
-					zap.S().Errorw("create telegraph account fail, telegraph disabled", "error", err)
+					log.Errorf("create telegraph account failed, %v", err)
 				}
 
 				clientPool = append(clientPool, client)
-				zap.S().Infow(
-					"create telegraph account success",
-					"telegraph token", client.AccessToken,
-				)
-
+				log.Infof("create telegraph account success, token %v", client.AccessToken)
 			}
 		}
 	}
