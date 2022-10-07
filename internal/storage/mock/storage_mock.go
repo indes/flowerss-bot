@@ -197,6 +197,21 @@ func (mr *MockSourceMockRecorder) GetSourceByURL(ctx, url interface{}) *gomock.C
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetSourceByURL", reflect.TypeOf((*MockSource)(nil).GetSourceByURL), ctx, url)
 }
 
+// GetSources mocks base method.
+func (m *MockSource) GetSources(ctx context.Context) ([]*model.Source, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetSources", ctx)
+	ret0, _ := ret[0].([]*model.Source)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetSources indicates an expected call of GetSources.
+func (mr *MockSourceMockRecorder) GetSources(ctx interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetSources", reflect.TypeOf((*MockSource)(nil).GetSources), ctx)
+}
+
 // Init mocks base method.
 func (m *MockSource) Init(ctx context.Context) error {
 	m.ctrl.T.Helper()

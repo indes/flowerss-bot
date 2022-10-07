@@ -1,16 +1,17 @@
-package task
+package scheduler
 
 import (
-	"fmt"
+	"context"
 	"sync"
 	"time"
 
-	"github.com/SlyMarbo/rss"
+	"github.com/mmcdole/gofeed"
 	"go.uber.org/atomic"
-	"go.uber.org/zap"
 
 	"github.com/indes/flowerss-bot/internal/config"
-	"github.com/indes/flowerss-bot/internal/fetch"
+	"github.com/indes/flowerss-bot/internal/core"
+	"github.com/indes/flowerss-bot/internal/feed"
+	"github.com/indes/flowerss-bot/internal/log"
 	"github.com/indes/flowerss-bot/internal/model"
 	"github.com/indes/flowerss-bot/pkg/client"
 )
@@ -22,22 +23,12 @@ type RssUpdateObserver interface {
 }
 
 // NewRssTask new RssUpdateTask
-func NewRssTask() *RssUpdateTask {
-	clientOpts := []client.HttpClientOption{
-		client.WithTimeout(10 * time.Second),
-	}
-	if config.Socks5 != "" {
-		clientOpts = append(clientOpts, client.WithProxyURL(fmt.Sprintf("socks5://%s", config.Socks5)))
-	}
-
-	if config.UserAgent != "" {
-		clientOpts = append(clientOpts, client.WithUserAgent(config.UserAgent))
-	}
-	httpClient := client.NewHttpClient(clientOpts...)
-
+func NewRssTask(appCore *core.Core) *RssUpdateTask {
 	return &RssUpdateTask{
 		observerList: []RssUpdateObserver{},
-		httpClient:   httpClient,
+		core:         appCore,
+		feedParser:   appCore.FeedParser(),
+		httpClient:   appCore.HttpClient(),
 	}
 }
 
@@ -45,6 +36,8 @@ func NewRssTask() *RssUpdateTask {
 type RssUpdateTask struct {
 	observerList []RssUpdateObserver
 	isStop       atomic.Bool
+	core         *core.Core
+	feedParser   *feed.FeedParser
 	httpClient   *client.HttpClient
 }
 
@@ -53,12 +46,12 @@ func (t *RssUpdateTask) Register(observer RssUpdateObserver) {
 	t.observerList = append(t.observerList, observer)
 }
 
-// Stop task
+// Stop scheduler
 func (t *RssUpdateTask) Stop() {
 	t.isStop.Store(true)
 }
 
-// Start run task
+// Start run scheduler
 func (t *RssUpdateTask) Start() {
 	if config.RunMode == config.TestMode {
 		return
@@ -67,14 +60,19 @@ func (t *RssUpdateTask) Start() {
 	t.isStop.Store(false)
 	go func() {
 		for {
-			if t.isStop.Load() == true {
-				zap.S().Info("RssUpdateTask stopped")
+			if t.isStop.Load() {
+				log.Info("RssUpdateTask stopped")
 				return
 			}
 
-			sources := model.GetSubscribedNormalSources()
+			sources, err := t.core.GetSources(context.Background())
+			if err != nil {
+				log.Errorf("get sources failed, %v", err)
+				time.Sleep(time.Duration(config.UpdateInterval) * time.Minute)
+				continue
+			}
 			for _, source := range sources {
-				if !source.NeedUpdate() {
+				if source.ErrorCount >= config.ErrorThreshold {
 					continue
 				}
 
@@ -87,7 +85,13 @@ func (t *RssUpdateTask) Start() {
 				}
 
 				if len(newContents) > 0 {
-					subs := model.GetSubscriberBySource(source)
+					subs, err := t.core.GetSourceAllSubscriptions(
+						context.Background(), source.ID,
+					)
+					if err != nil {
+						log.Errorf("get subscriptions failed, %v", err)
+						continue
+					}
 					t.notifyAllObserverUpdate(source, newContents, subs)
 				}
 			}
@@ -99,25 +103,42 @@ func (t *RssUpdateTask) Start() {
 
 // getSourceNewContents 获取rss新内容
 func (t *RssUpdateTask) getSourceNewContents(source *model.Source) ([]*model.Content, error) {
-	zap.S().Debugw("fetch source updates", "source", source)
+	log.Debugf("fetch source [%d]%s update", source.ID, source.Link)
 
-	var newContents []*model.Content
-	feed, err := rss.FetchByFunc(fetch.FetchFunc(t.httpClient), source.Link)
+	rssFeed, err := t.feedParser.ParseFromURL(context.Background(), source.Link)
 	if err != nil {
-		zap.S().Errorw("unable to fetch SourceUpdate", "error", err, "source", source)
-		source.AddErrorCount()
+		log.Errorf("unable to fetch feed, source %#v, err %v", source, err)
+		t.core.SourceErrorCountIncr(context.Background(), source.ID)
 		return nil, err
 	}
+	t.core.ClearSourceErrorCount(context.Background(), source.ID)
 
-	source.EraseErrorCount()
-	items := feed.Items
-	for _, item := range items {
-		c, isBroad, _ := model.GenContentAndCheckByFeedItem(source, item)
-		if !isBroad {
-			newContents = append(newContents, c)
-		}
+	newContents, err := t.saveNewContents(source, rssFeed.Items)
+	if err != nil {
+		return nil, err
 	}
 	return newContents, nil
+}
+
+// saveNewContents generate content by fetcher item
+func (t *RssUpdateTask) saveNewContents(
+	s *model.Source, items []*gofeed.Item,
+) ([]*model.Content, error) {
+	var newItems []*gofeed.Item
+	for _, item := range items {
+		hashID := model.GenHashID(s.Link, item.GUID)
+		exist, err := t.core.ContentHashIDExist(context.Background(), hashID)
+		if err != nil {
+			log.Errorf("check item hash id failed, %v", err)
+		}
+
+		if exist {
+			// 已存在，跳过
+			continue
+		}
+		newItems = append(newItems, item)
+	}
+	return t.core.AddSourceContents(context.Background(), s, newItems)
 }
 
 // notifyAllObserverUpdate notify all rss SourceUpdate observer

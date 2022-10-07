@@ -3,8 +3,8 @@ package middleware
 import (
 	"github.com/indes/flowerss-bot/internal/bot/message"
 	"github.com/indes/flowerss-bot/internal/bot/session"
+	"github.com/indes/flowerss-bot/internal/log"
 
-	"go.uber.org/zap"
 	tb "gopkg.in/telebot.v3"
 )
 
@@ -15,7 +15,7 @@ func PreLoadMentionChat() tb.MiddlewareFunc {
 			if mention != "" {
 				chat, err := c.Bot().ChatByUsername(mention)
 				if err != nil {
-					zap.S().Errorf("pre load mention %s chat failed, %v", mention, err)
+					log.Errorf("pre load mention %s chat failed, %v", mention, err)
 					return next(c)
 				}
 				c.Set(session.StoreKeyMentionChat.String(), chat)

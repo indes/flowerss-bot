@@ -3,24 +3,31 @@ package core
 import (
 	"context"
 	"errors"
+	"fmt"
 	"strings"
 	"sync"
+	"time"
 
 	"gorm.io/driver/mysql"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 
+	"github.com/mmcdole/gofeed"
+
 	"github.com/indes/flowerss-bot/internal/config"
-	"github.com/indes/flowerss-bot/internal/core/task"
+	"github.com/indes/flowerss-bot/internal/feed"
 	"github.com/indes/flowerss-bot/internal/log"
 	"github.com/indes/flowerss-bot/internal/model"
+	"github.com/indes/flowerss-bot/internal/preview"
 	"github.com/indes/flowerss-bot/internal/storage"
+	"github.com/indes/flowerss-bot/pkg/client"
 )
 
 var (
 	ErrSubscriptionExist    = errors.New("already subscribed")
 	ErrSubscriptionNotExist = errors.New("subscription not exist")
 	ErrSourceNotExist       = errors.New("source not exist")
+	ErrContentNotExist      = errors.New("content not exist")
 )
 
 type Core struct {
@@ -30,19 +37,33 @@ type Core struct {
 	sourceStorage       storage.Source
 	subscriptionStorage storage.Subscription
 
-	rssTask *task.RssUpdateTask
+	feedParser *feed.FeedParser
+	httpClient *client.HttpClient
+}
+
+func (c *Core) FeedParser() *feed.FeedParser {
+	return c.feedParser
+}
+
+func (c *Core) HttpClient() *client.HttpClient {
+	return c.httpClient
 }
 
 func NewCore(
-	userStorage storage.User, contentStorage storage.Content, sourceStorage storage.Source,
-	subscriptionStorage storage.Subscription, rssTask *task.RssUpdateTask,
+	userStorage storage.User,
+	contentStorage storage.Content,
+	sourceStorage storage.Source,
+	subscriptionStorage storage.Subscription,
+	parser *feed.FeedParser,
+	httpClient *client.HttpClient,
 ) *Core {
 	return &Core{
 		userStorage:         userStorage,
 		contentStorage:      contentStorage,
 		sourceStorage:       sourceStorage,
 		subscriptionStorage: subscriptionStorage,
-		rssTask:             rssTask,
+		feedParser:          parser,
+		httpClient:          httpClient,
 	}
 }
 
@@ -67,35 +88,48 @@ func NewCoreFormConfig() *Core {
 	sqlDB.SetMaxIdleConns(10)
 	sqlDB.SetMaxOpenConns(50)
 
+	subscriptionStorage := storage.NewSubscriptionStorageImpl(db)
+
+	// httpclient
+	clientOpts := []client.HttpClientOption{
+		client.WithTimeout(10 * time.Second),
+	}
+	if config.Socks5 != "" {
+		clientOpts = append(clientOpts, client.WithProxyURL(fmt.Sprintf("socks5://%s", config.Socks5)))
+	}
+
+	if config.UserAgent != "" {
+		clientOpts = append(clientOpts, client.WithUserAgent(config.UserAgent))
+	}
+	httpClient := client.NewHttpClient(clientOpts...)
+
+	// feedParser
+	feedParser := feed.NewFeedParser(httpClient)
+
 	return NewCore(
 		storage.NewUserStorageImpl(db),
 		storage.NewContentStorageImpl(db),
 		storage.NewSourceStorageImpl(db),
-		storage.NewSubscriptionStorageImpl(db),
-		task.NewRssTask(),
+		subscriptionStorage,
+		feedParser,
+		httpClient,
 	)
 }
 
 func (c *Core) Init() error {
-	c.userStorage.Init(context.Background())
-	c.contentStorage.Init(context.Background())
-	c.sourceStorage.Init(context.Background())
-	c.subscriptionStorage.Init(context.Background())
+	if err := c.userStorage.Init(context.Background()); err != nil {
+		return err
+	}
+	if err := c.contentStorage.Init(context.Background()); err != nil {
+		return err
+	}
+	if err := c.sourceStorage.Init(context.Background()); err != nil {
+		return err
+	}
+	if err := c.subscriptionStorage.Init(context.Background()); err != nil {
+		return err
+	}
 	return nil
-}
-
-func (c *Core) Run() error {
-	c.rssTask.Start()
-	return nil
-}
-
-func (c *Core) Stop() error {
-	c.rssTask.Stop()
-	return nil
-}
-
-func (c *Core) RegisterRssUpdateObserver(o task.RssUpdateObserver) {
-	c.rssTask.Register(o)
 }
 
 // GetUserSubscribedSources 获取用户订阅的订阅源
@@ -212,6 +246,79 @@ func (c *Core) GetSource(ctx context.Context, id uint) (*model.Source, error) {
 	return source, nil
 }
 
+// GetSource 获取用户订阅的订阅源
+func (c *Core) GetSources(ctx context.Context) ([]*model.Source, error) {
+	return c.sourceStorage.GetSources(ctx)
+}
+
+// CreateSource 创建订阅源
+func (c *Core) CreateSource(ctx context.Context, sourceURL string) (*model.Source, error) {
+	s, err := c.GetSourceByURL(ctx, sourceURL)
+	if err == nil {
+		return s, nil
+	}
+
+	if err != nil && err != ErrSourceNotExist {
+		return nil, err
+	}
+
+	rssFeed, err := c.feedParser.ParseFromURL(ctx, sourceURL)
+	if err != nil {
+		log.Errorf("ParseFromURL %s failed, %v", sourceURL, err)
+		return nil, err
+	}
+
+	s = &model.Source{
+		Title:      rssFeed.Title,
+		Link:       sourceURL,
+		ErrorCount: config.ErrorThreshold + 1, // 避免task更新
+	}
+
+	if err := c.sourceStorage.AddSource(ctx, s); err != nil {
+		log.Errorf("add source failed, %v", err)
+		return nil, err
+	}
+	defer c.ClearSourceErrorCount(ctx, s.ID)
+
+	if _, err := c.AddSourceContents(ctx, s, rssFeed.Items); err != nil {
+		log.Errorf("add source content failed, %v", err)
+		return nil, err
+	}
+	return s, nil
+}
+
+func (c *Core) AddSourceContents(
+	ctx context.Context, source *model.Source, items []*gofeed.Item,
+) ([]*model.Content, error) {
+	var wg sync.WaitGroup
+	var contents []*model.Content
+	for _, item := range items {
+		wg.Add(1)
+		previewURL := ""
+		if config.EnableTelegraph && len([]rune(item.Content)) > config.PreviewText {
+			previewURL, _ = tgraph.PublishHtml(source.Title, item.Title, item.Link, item.Content)
+		}
+		content := &model.Content{
+			Title:        strings.Trim(item.Title, " "),
+			Description:  item.Content, //replace all kinds of <br> tag
+			SourceID:     source.ID,
+			RawID:        item.GUID,
+			HashID:       model.GenHashID(source.Link, item.GUID),
+			RawLink:      item.Link,
+			TelegraphURL: previewURL,
+		}
+		contents = append(contents, content)
+		go func() {
+			defer wg.Done()
+			if err := c.contentStorage.AddContent(ctx, content); err != nil {
+				log.Errorf("add content %#v failed, %v", content, err)
+			}
+		}()
+	}
+	wg.Wait()
+	return contents, nil
+}
+
 // UnsubscribeAllSource 添加订阅
 func (c *Core) UnsubscribeAllSource(ctx context.Context, userID int64) error {
 	sources, err := c.GetUserSubscribedSources(ctx, userID)
@@ -295,6 +402,17 @@ func (c *Core) ClearSourceErrorCount(ctx context.Context, sourceID uint) error {
 	return c.sourceStorage.UpsertSource(ctx, sourceID, source)
 }
 
+// SourceErrorCountIncr 增加订阅源错误计数
+func (c *Core) SourceErrorCountIncr(ctx context.Context, sourceID uint) error {
+	source, err := c.GetSource(ctx, sourceID)
+	if err != nil {
+		return err
+	}
+
+	source.ErrorCount += 1
+	return c.sourceStorage.UpsertSource(ctx, sourceID, source)
+}
+
 func (c *Core) ToggleSubscriptionNotice(ctx context.Context, userID int64, sourceID uint) error {
 	subscription, err := c.GetSubscription(ctx, userID, sourceID)
 	if err != nil {
@@ -333,4 +451,27 @@ func (c *Core) ToggleSubscriptionTelegraph(ctx context.Context, userID int64, so
 		subscription.EnableTelegraph = 1
 	}
 	return c.subscriptionStorage.UpsertSubscription(ctx, userID, sourceID, subscription)
+}
+
+func (c *Core) GetSourceAllSubscriptions(
+	ctx context.Context, sourceID uint,
+) ([]*model.Subscribe, error) {
+	opt := &storage.GetSubscriptionsOptions{
+		Count: -1,
+	}
+	result, err := c.subscriptionStorage.GetSubscriptionsBySourceID(ctx, sourceID, opt)
+	if err != nil {
+		return nil, err
+	}
+	return result.Subscriptions, nil
+}
+
+func (c *Core) ContentHashIDExist(
+	ctx context.Context, hashID string,
+) (bool, error) {
+	result, err := c.contentStorage.HashIDExist(ctx, hashID)
+	if err != nil {
+		return false, err
+	}
+	return result, nil
 }

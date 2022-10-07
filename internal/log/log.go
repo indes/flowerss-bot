@@ -51,12 +51,24 @@ func init() {
 	globalLogger = Logger.WithOptions(zap.AddCallerSkip(1))
 }
 
+func Warn(args ...interface{}) {
+	globalLogger.Sugar().Warn(args...)
+}
+
+func Warnf(template string, args ...interface{}) {
+	globalLogger.Sugar().Warnf(template, args...)
+}
+
 func Errorf(template string, args ...interface{}) {
 	globalLogger.Sugar().Errorf(template, args...)
 }
 
 func Error(args ...interface{}) {
 	globalLogger.Sugar().Error(args...)
+}
+
+func Info(args ...interface{}) {
+	globalLogger.Sugar().Info(args...)
 }
 
 func Infof(template string, args ...interface{}) {

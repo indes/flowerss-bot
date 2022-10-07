@@ -1,13 +1,14 @@
 package chat
 
 import (
-	"go.uber.org/zap"
 	tb "gopkg.in/telebot.v3"
+
+	"github.com/indes/flowerss-bot/internal/log"
 )
 
 func IsChatAdmin(bot *tb.Bot, chat *tb.Chat, userID int64) bool {
 	if chat == nil || bot == nil {
-		zap.S().Errorf("chat or bot is nil, chat %v bot %v", chat, bot)
+		log.Errorf("chat or bot is nil, chat %v bot %v", chat, bot)
 		return false
 	}
 
@@ -17,7 +18,7 @@ func IsChatAdmin(bot *tb.Bot, chat *tb.Chat, userID int64) bool {
 
 	admins, err := bot.AdminsOf(chat)
 	if err != nil {
-		zap.S().Warnf("get admins of chat %v failed, %v", chat.ID, err)
+		log.Warnf("get admins of chat %v failed, %v", chat.ID, err)
 		return false
 	}
 
