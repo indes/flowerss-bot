@@ -5,7 +5,7 @@ go 1.18
 require (
 	github.com/go-sql-driver/mysql v1.6.0
 	github.com/golang/mock v1.6.0
-	github.com/grokify/html-strip-tags-go v0.0.0-20200923094847-079d207a09f1
+	github.com/grokify/html-strip-tags-go v0.0.1
 	github.com/indes/telegraph-go v1.0.1
 	github.com/mmcdole/gofeed v1.2.1
 	github.com/spf13/cast v1.5.0
