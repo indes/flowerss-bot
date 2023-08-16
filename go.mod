@@ -16,8 +16,8 @@ require (
 	google.golang.org/protobuf v1.28.1
 	gopkg.in/telebot.v3 v3.1.0
 	gorm.io/driver/mysql v1.3.6
-	gorm.io/driver/sqlite v1.3.6
-	gorm.io/gorm v1.23.10
+	gorm.io/driver/sqlite v1.5.3
+	gorm.io/gorm v1.25.2-0.20230530020048-26663ab9bf55
 )
 
 require (
@@ -30,7 +30,7 @@ require (
 	github.com/jinzhu/now v1.1.5 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/magiconair/properties v1.8.6 // indirect
-	github.com/mattn/go-sqlite3 v1.14.15 // indirect
+	github.com/mattn/go-sqlite3 v1.14.17 // indirect
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
 	github.com/mmcdole/goxpp v1.1.0 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
